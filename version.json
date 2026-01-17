@@ -1,34 +1,4 @@
 {
   "version": "1.3.0",
-  "signature": "MEUCIQDfg6dINje08nLljwQZiOGl9PPH07x9CQ3c8m1LFSceLAIgFQvD9nQ1tSE0f3yKflPe1i5lKpdzWkLGPKfn4cAE73o=",
-  "changelog": [
-    {
-      "version": "1.3.0",
-      "date": "17.01.2025",
-      "title": "Update-Log Feature",
-      "changes": [
-        "Changelog wird bei Updates angezeigt",
-        "Alle Änderungen seit letzter Version sichtbar"
-      ]
-    },
-    {
-      "version": "1.2.1",
-      "date": "15.01.2025", 
-      "title": "V-Wagen Markierung",
-      "changes": [
-        "V-Wagen mit Klapprampe werden mit * markiert",
-        "Verbesserte Fahrzeug-Erkennung"
-      ]
-    },
-    {
-      "version": "1.2.0",
-      "date": "10.01.2025",
-      "title": "Sichere Updates",
-      "changes": [
-        "Firmware-Signatur Verifizierung",
-        "6-stelliger Code auf Display",
-        "Schutz vor unauthorisierten Updates"
-      ]
-    }
-  ]
+  "signature": "MEUCIQDfg6dINje08nLljwQZiOGl9PPH07x9CQ3c8m1LFSceLAIgFQvD9nQ1tSE0f3yKflPe1i5lKpdzWkLGPKfn4cAE73o="
 }
