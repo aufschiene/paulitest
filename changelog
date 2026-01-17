@@ -1,9 +1,9 @@
 {
   "changelog": [
     {
-      "version": "1.3.1",
+      "version": "1.3.2",
       "date": "17.01.2025",
-      "title": "Update-Log & Verbesserungen",
+      "title": "Komplett neues straba.local",
       "changes": [
         "Changelog wird bei Updates angezeigt",
         "Alle Änderungen seit letzter Version sichtbar",
@@ -11,45 +11,12 @@
       ]
     },
     {
-      "version": "1.2.1",
+      "version": "1.3.1",
       "date": "15.01.2025",
-      "title": "V-Wagen Markierung",
+      "title": "Anpassungen",
       "changes": [
         "V-Wagen mit Klapprampe werden mit * markiert",
         "Verbesserte Fahrzeug-Erkennung",
         "Bugfix: Silberpfeil-Anzeige korrigiert"
       ]
     },
-    {
-      "version": "1.2.0",
-      "date": "10.01.2025",
-      "title": "Sichere Updates",
-      "changes": [
-        "Firmware-Signatur Verifizierung",
-        "6-stelliger Code auf Display",
-        "Schutz vor unauthorisierten Updates",
-        "60 Minuten Sperre nach 3 Fehlversuchen"
-      ]
-    },
-    {
-      "version": "1.1.3",
-      "date": "05.01.2025",
-      "title": "Slideshow-Modus",
-      "changes": [
-        "Mehrere Haltestellen im Wechsel anzeigen",
-        "Einstellbares Wechsel-Intervall",
-        "Per-Stop Filter möglich"
-      ]
-    },
-    {
-      "version": "1.1.0",
-      "date": "01.01.2025",
-      "title": "Nachtmodus",
-      "changes": [
-        "Automatischer Nachtmodus",
-        "Display schaltet sich nachts ab",
-        "Einstellbare Start- und Endzeit"
-      ]
-    }
-  ]
-}
