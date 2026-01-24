@@ -761,7 +761,7 @@
               <label for="size-large">
                 <span class="size-icon">📺</span>
                 <span class="size-name">Groß</span>
-                <span class="size-limit">14×1</span>
+                <span class="size-limit">14×3</span>
               </label>
             </div>
             <div class="size-option">
@@ -769,7 +769,7 @@
               <label for="size-medium">
                 <span class="size-icon">📱</span>
                 <span class="size-name">Mittel</span>
-                <span class="size-limit">20×2</span>
+                <span class="size-limit">20×6</span>
               </label>
             </div>
             <div class="size-option">
@@ -777,7 +777,7 @@
               <label for="size-small">
                 <span class="size-icon">📟</span>
                 <span class="size-name">Klein</span>
-                <span class="size-limit">30×3</span>
+                <span class="size-limit">30×10</span>
               </label>
             </div>
           </div>
@@ -990,9 +990,9 @@
 
     // Size limits: [maxCharsPerLine, maxLines]
     const SIZE_LIMITS = {
-      large: { chars: 14, lines: 1 },
-      medium: { chars: 20, lines: 2 },
-      small: { chars: 30, lines: 3 }
+      large: { chars: 14, lines: 3 },
+      medium: { chars: 20, lines: 6 },
+      small: { chars: 30, lines: 10 }
     };
 
     let currentSha = null;
@@ -1619,8 +1619,11 @@
       const token = document.getElementById('tokenInput').value.trim();
       if (token) {
         localStorage.setItem('straba_github_token', token);
-        showStatus('quickStatus', 'Token gespeichert!', 'success');
+        alert('✓ Token gespeichert!');
         loadCurrentStatus();
+        loadAuthFromGitHub();
+      } else {
+        alert('Bitte Token eingeben!');
       }
     }
 
