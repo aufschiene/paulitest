@@ -1,6 +1,6 @@
 {
-  "enabled": true,
-  "text": "123456789123456789123456789123456789\\ndiese Webseite \\ngerade \\ngetestet \\n\\nDanke! :)",
+  "enabled": false,
+  "text": "",
   "size": "small",
   "mode": "stoerung",
   "interval": 30,
