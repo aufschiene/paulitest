@@ -248,8 +248,8 @@
     }
 
     .preview-container.size-small { align-items: flex-end; }
-    .preview-container.size-small .preview-text { font-size: 0.8rem; }
-    .preview-container.size-medium .preview-text { font-size: 1rem; }
+    .preview-container.size-small .preview-text { font-size: 0.65rem; font-weight: normal; }
+    .preview-container.size-medium .preview-text { font-size: 0.85rem; font-weight: normal; }
     .preview-container.size-large .preview-text { font-size: 1.4rem; font-weight: bold; }
 
     .preview-text {
@@ -656,6 +656,34 @@
       font-weight: 600;
       font-size: 0.95rem;
     }
+
+    /* Mode Selector */
+    .mode-selector {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mode-btn {
+      padding: 8px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 2px solid #444;
+      border-radius: 8px;
+      background: #1a1a2e;
+      color: #aaa;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .mode-btn:hover {
+      border-color: #666;
+    }
+
+    .mode-btn.active {
+      border-color: #FFD700;
+      color: #FFD700;
+      background: rgba(255, 215, 0, 0.1);
+    }
   </style>
 </head>
 <body>
@@ -743,6 +771,19 @@
             <input type="checkbox" id="enabled" onchange="updatePreview()">
             <span class="toggle-slider"></span>
           </label>
+        </div>
+        
+        <div class="toggle-row" style="border-top: 1px solid #333; margin-top: 8px; padding-top: 12px;">
+          <div>
+            <span class="toggle-label">Modus</span>
+            <div style="font-size: 0.75rem; color: #888; margin-top: 2px;">
+              Störung = immer · Fun = User kann ausschalten
+            </div>
+          </div>
+          <div class="mode-selector">
+            <button type="button" class="mode-btn active" id="mode-stoerung" onclick="setMode('stoerung')">⚠️ Störung</button>
+            <button type="button" class="mode-btn" id="mode-fun" onclick="setMode('fun')">🎉 Fun</button>
+          </div>
         </div>
       </div>
 
@@ -1002,6 +1043,7 @@
     let editingEventId = null;
     let pendingAction = null;
     let totpSecret = null;
+    let currentMode = 'stoerung';  // 'stoerung' or 'fun'
     
     // Auth data from GitHub
     let authData = {
@@ -1580,6 +1622,12 @@
       return document.querySelector('input[name="size"]:checked').value;
     }
 
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById('mode-stoerung').classList.toggle('active', mode === 'stoerung');
+      document.getElementById('mode-fun').classList.toggle('active', mode === 'fun');
+    }
+
     function updatePreview() {
       const text = document.getElementById('text').value;
       const size = getSelectedSize();
@@ -1650,14 +1698,19 @@
           
           const sizeRadio = document.getElementById('size-' + (content.size || 'large'));
           if (sizeRadio) sizeRadio.checked = true;
+          
+          // Load mode
+          setMode(content.mode || 'stoerung');
 
           // Update global status
           const dot = document.getElementById('globalStatusDot');
           const text = document.getElementById('globalStatusText');
           
+          const modeIcon = content.mode === 'fun' ? '🎉' : '⚠️';
+          
           if (content.enabled && content.text) {
             dot.classList.add('active');
-            text.textContent = `"${content.text.replace(/\\n/g, ' ')}"`;
+            text.textContent = `${modeIcon} "${content.text.replace(/\\n/g, ' ')}"`;
           } else {
             dot.classList.remove('active');
             text.textContent = 'Keine aktive Ankündigung';
@@ -1697,6 +1750,7 @@
         enabled: document.getElementById('enabled').checked,
         text: document.getElementById('text').value.replace(/\n/g, '\\n'),
         size: getSelectedSize(),
+        mode: currentMode,  // 'stoerung' or 'fun'
         interval: parseInt(document.getElementById('interval').value) || 30,
         duration: parseInt(document.getElementById('duration').value) || 5,
         startDate: document.getElementById('startDate').value || "",
