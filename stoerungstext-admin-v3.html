@@ -1,0 +1,1948 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Straba Ankündigungen</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #fff;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 1.6rem;
+      margin-bottom: 6px;
+    }
+
+    .header p {
+      color: #888;
+      font-size: 0.85rem;
+    }
+
+    .card {
+      background: #252540;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 12px;
+      background: #1a1a2e;
+      border: 2px solid #444;
+      border-radius: 10px;
+      color: #aaa;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .tab.active {
+      border-color: #FFD700;
+      color: #FFD700;
+      background: rgba(255, 215, 0, 0.1);
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    /* Toggle Switch */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+    }
+
+    .toggle-label {
+      font-size: 0.95rem;
+    }
+
+    .toggle {
+      position: relative;
+      width: 50px;
+      height: 28px;
+    }
+
+    .toggle input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #444;
+      transition: .3s;
+      border-radius: 28px;
+    }
+
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .3s;
+      border-radius: 50%;
+    }
+
+    .toggle input:checked + .toggle-slider {
+      background-color: #4CAF50;
+    }
+
+    .toggle input:checked + .toggle-slider:before {
+      transform: translateX(22px);
+    }
+
+    /* Input Styles */
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+
+    .text-input, .text-area {
+      width: 100%;
+      padding: 12px 14px;
+      font-size: 1rem;
+      border: 2px solid #444;
+      border-radius: 10px;
+      background: #1a1a2e;
+      color: #fff;
+      transition: border-color 0.3s;
+    }
+
+    .text-area {
+      resize: vertical;
+      min-height: 80px;
+      font-family: inherit;
+    }
+
+    .text-input:focus, .text-area:focus {
+      outline: none;
+      border-color: #FFD700;
+    }
+
+    .input-hint {
+      font-size: 0.75rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .char-counter {
+      text-align: right;
+      font-size: 0.8rem;
+      margin-top: 4px;
+      color: #888;
+    }
+
+    .char-counter.warning { color: #ff9800; }
+    .char-counter.error { color: #f44336; }
+
+    /* Size Selector */
+    .size-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .size-option {
+      position: relative;
+    }
+
+    .size-option input {
+      position: absolute;
+      opacity: 0;
+    }
+
+    .size-option label {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 10px 6px;
+      background: #1a1a2e;
+      border: 2px solid #444;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .size-option input:checked + label {
+      border-color: #FFD700;
+      background: rgba(255, 215, 0, 0.1);
+    }
+
+    .size-icon { font-size: 1.3rem; margin-bottom: 2px; }
+    .size-name { font-weight: 600; font-size: 0.85rem; }
+    .size-limit { font-size: 0.65rem; color: #888; }
+
+    /* Preview */
+    .preview-container {
+      background: #000;
+      border-radius: 12px;
+      padding: 16px;
+      min-height: 85px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 12px;
+      position: relative;
+    }
+
+    .preview-container.size-small { align-items: flex-end; }
+    .preview-container.size-small .preview-text { font-size: 0.8rem; }
+    .preview-container.size-medium .preview-text { font-size: 1rem; }
+    .preview-container.size-large .preview-text { font-size: 1.4rem; font-weight: bold; }
+
+    .preview-text {
+      color: #FFD700;
+      text-align: center;
+      white-space: pre-line;
+      line-height: 1.3;
+    }
+
+    /* Date Grid */
+    .date-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .date-item input {
+      width: 100%;
+      padding: 10px;
+      font-size: 0.9rem;
+      border: 2px solid #444;
+      border-radius: 8px;
+      background: #1a1a2e;
+      color: #fff;
+    }
+
+    .date-item input:focus {
+      outline: none;
+      border-color: #FFD700;
+    }
+
+    /* Timing Grid */
+    .timing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .timing-item input {
+      width: 100%;
+      padding: 10px;
+      font-size: 1rem;
+      border: 2px solid #444;
+      border-radius: 8px;
+      background: #1a1a2e;
+      color: #fff;
+      text-align: center;
+    }
+
+    .timing-unit {
+      font-size: 0.7rem;
+      color: #666;
+      text-align: center;
+      margin-top: 2px;
+    }
+
+    /* Event List */
+    .event-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .event-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px;
+      background: #1a1a2e;
+      border-radius: 10px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .event-item:hover {
+      background: #2a2a4a;
+    }
+
+    .event-item.active {
+      border: 2px solid #4CAF50;
+    }
+
+    .event-status {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #666;
+      flex-shrink: 0;
+    }
+
+    .event-status.scheduled { background: #ff9800; }
+    .event-status.active { background: #4CAF50; animation: pulse 2s infinite; }
+    .event-status.expired { background: #666; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .event-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .event-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .event-dates {
+      font-size: 0.75rem;
+      color: #888;
+    }
+
+    .event-actions {
+      display: flex;
+      gap: 6px;
+    }
+
+    .event-btn {
+      padding: 6px 10px;
+      font-size: 0.75rem;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .event-btn.edit {
+      background: #333;
+      color: #fff;
+    }
+
+    .event-btn.delete {
+      background: #c0392b;
+      color: #fff;
+    }
+
+    .event-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* Buttons */
+    .btn {
+      width: 100%;
+      padding: 14px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #FFD700, #FFA500);
+      color: #000;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+    }
+
+    .btn-primary:disabled {
+      background: #444;
+      color: #888;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #333;
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .btn-danger {
+      background: #c0392b;
+      color: #fff;
+      margin-top: 10px;
+    }
+
+    .btn-small {
+      padding: 10px 16px;
+      font-size: 0.9rem;
+    }
+
+    .button-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    /* Status */
+    .status {
+      text-align: center;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+      font-size: 0.85rem;
+    }
+
+    .status.success { background: rgba(76, 175, 80, 0.2); color: #4CAF50; }
+    .status.error { background: rgba(244, 67, 54, 0.2); color: #f44336; }
+    .status.loading { background: rgba(255, 215, 0, 0.2); color: #FFD700; }
+
+    /* Auth Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-overlay.hidden {
+      display: none;
+    }
+
+    .modal {
+      background: #252540;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 400px;
+      width: 100%;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .modal-subtitle {
+      font-size: 0.85rem;
+      color: #aaa;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .pin-input-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .pin-input {
+      width: 50px;
+      height: 60px;
+      font-size: 1.5rem;
+      text-align: center;
+      border: 2px solid #444;
+      border-radius: 10px;
+      background: #1a1a2e;
+      color: #fff;
+    }
+
+    .pin-input:focus {
+      outline: none;
+      border-color: #FFD700;
+    }
+
+    /* TOTP Display */
+    .totp-display {
+      text-align: center;
+      padding: 16px;
+      background: #1a1a2e;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .totp-code {
+      font-size: 2rem;
+      font-weight: bold;
+      letter-spacing: 8px;
+      color: #FFD700;
+      font-family: monospace;
+    }
+
+    .totp-timer {
+      font-size: 0.85rem;
+      color: #888;
+      margin-top: 8px;
+    }
+
+    .totp-timer-bar {
+      width: 100%;
+      height: 4px;
+      background: #333;
+      border-radius: 2px;
+      margin-top: 8px;
+      overflow: hidden;
+    }
+
+    .totp-timer-progress {
+      height: 100%;
+      background: #FFD700;
+      transition: width 1s linear;
+    }
+
+    /* Setup Section */
+    .setup-section {
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px solid rgba(255, 215, 0, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .setup-section summary {
+      cursor: pointer;
+      font-weight: 600;
+      color: #FFD700;
+    }
+
+    .setup-content {
+      margin-top: 12px;
+    }
+
+    .qr-placeholder {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      margin: 12px 0;
+    }
+
+    .secret-display {
+      background: #1a1a2e;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      word-break: break-all;
+      margin: 12px 0;
+    }
+
+    .hidden { display: none; }
+
+    /* Spinner */
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 3px solid rgba(0,0,0,0.2);
+      border-top-color: #000;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Current Status Bar */
+    .current-status {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: #1a1a2e;
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+
+    .status-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: #666;
+    }
+
+    .status-indicator.active {
+      background: #4CAF50;
+      animation: pulse 2s infinite;
+    }
+
+    .status-info {
+      flex: 1;
+    }
+
+    .status-title {
+      font-size: 0.85rem;
+      color: #aaa;
+    }
+
+    .status-value {
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Auth Modal -->
+  <div class="modal-overlay" id="authModal">
+    <div class="modal">
+      <div class="modal-title">🔐 Authentifizierung</div>
+      <div class="modal-subtitle">Gib den 6-stelligen Code aus deiner Authenticator-App ein</div>
+      
+      <div class="pin-input-container">
+        <input type="text" class="pin-input" maxlength="1" data-index="0">
+        <input type="text" class="pin-input" maxlength="1" data-index="1">
+        <input type="text" class="pin-input" maxlength="1" data-index="2">
+        <input type="text" class="pin-input" maxlength="1" data-index="3">
+        <input type="text" class="pin-input" maxlength="1" data-index="4">
+        <input type="text" class="pin-input" maxlength="1" data-index="5">
+      </div>
+
+      <button class="btn btn-primary" onclick="verifyTOTP()">Bestätigen</button>
+      <button class="btn btn-secondary" onclick="closeAuthModal()">Abbrechen</button>
+      
+      <div class="status hidden" id="authStatus"></div>
+    </div>
+  </div>
+
+  <!-- Setup Modal -->
+  <div class="modal-overlay hidden" id="setupModal">
+    <div class="modal">
+      <div class="modal-title">🔧 2FA Einrichten</div>
+      <div class="modal-subtitle">
+        <span id="setupSlotInfo">Schlüssel 1 von 3</span><br>
+        Scanne mit deiner Authenticator-App
+      </div>
+      
+      <div class="qr-placeholder" id="qrCode">
+        <div id="qrCanvas" style="display: inline-block;"></div>
+      </div>
+      
+      <div class="input-label">Oder manuell eingeben:</div>
+      <div class="secret-display" id="secretDisplay">LADE...</div>
+      
+      <div style="font-size: 0.8rem; color: #888; margin: 8px 0; text-align: center;">
+        In der App erscheint: <strong style="color: #FFD700;">Stoerungstext-Straba</strong>
+      </div>
+      
+      <div class="input-group" style="margin-top: 16px;">
+        <input type="text" class="text-input" id="setupCodeInput" placeholder="6-stelliger Code zur Bestätigung">
+      </div>
+      
+      <button class="btn btn-primary" onclick="confirmSetup()">Einrichtung bestätigen</button>
+      <button class="btn btn-secondary" onclick="closeSetupModal()">Abbrechen</button>
+      
+      <div class="status hidden" id="setupStatus"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="header">
+      <h1>🚋 Straba Ankündigungen</h1>
+      <p>Events verwalten und an alle Geräte senden</p>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <div class="tab active" data-tab="quick">⚡ Schnell</div>
+      <div class="tab" data-tab="events">📅 Events</div>
+      <div class="tab" data-tab="settings">⚙️ Setup</div>
+    </div>
+
+    <!-- Current Status -->
+    <div class="current-status">
+      <div class="status-indicator" id="globalStatusDot"></div>
+      <div class="status-info">
+        <div class="status-title">Aktueller Status</div>
+        <div class="status-value" id="globalStatusText">Lade...</div>
+      </div>
+    </div>
+
+    <!-- Quick Tab -->
+    <div class="tab-content active" id="tab-quick">
+      <div class="card">
+        <div class="toggle-row">
+          <span class="toggle-label">Ankündigung aktiv</span>
+          <label class="toggle">
+            <input type="checkbox" id="enabled" onchange="updatePreview()">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="input-group">
+          <label class="input-label">Text (Enter für Zeilenumbruch)</label>
+          <textarea id="text" class="text-area" placeholder="Frohe&#10;Weihnachten!" oninput="updatePreview()"></textarea>
+          <div class="char-counter" id="charCounter">0 / 14 Zeichen · 0 / 1 Zeilen</div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Größe</label>
+          <div class="size-selector">
+            <div class="size-option">
+              <input type="radio" name="size" id="size-large" value="large" checked onchange="updatePreview()">
+              <label for="size-large">
+                <span class="size-icon">📺</span>
+                <span class="size-name">Groß</span>
+                <span class="size-limit">14×1</span>
+              </label>
+            </div>
+            <div class="size-option">
+              <input type="radio" name="size" id="size-medium" value="medium" onchange="updatePreview()">
+              <label for="size-medium">
+                <span class="size-icon">📱</span>
+                <span class="size-name">Mittel</span>
+                <span class="size-limit">20×2</span>
+              </label>
+            </div>
+            <div class="size-option">
+              <input type="radio" name="size" id="size-small" value="small" onchange="updatePreview()">
+              <label for="size-small">
+                <span class="size-icon">📟</span>
+                <span class="size-name">Klein</span>
+                <span class="size-limit">30×3</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="preview-container size-large" id="previewContainer">
+          <span class="preview-text" id="previewText">Vorschau...</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">⏱️ Timing</div>
+        <div class="timing-grid">
+          <div class="timing-item">
+            <label class="input-label">Intervall</label>
+            <input type="number" id="interval" value="30" min="10" max="300">
+            <div class="timing-unit">Sekunden</div>
+          </div>
+          <div class="timing-item">
+            <label class="input-label">Dauer</label>
+            <input type="number" id="duration" value="5" min="2" max="30">
+            <div class="timing-unit">Sekunden</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">📅 Zeitraum (optional)</div>
+        <div class="date-grid">
+          <div class="date-item">
+            <label class="input-label">Von</label>
+            <input type="date" id="startDate">
+          </div>
+          <div class="date-item">
+            <label class="input-label">Bis</label>
+            <input type="date" id="endDate">
+          </div>
+        </div>
+        <div class="input-hint" style="margin-top: 8px; text-align: center;">Leer = sofort & unbegrenzt</div>
+      </div>
+
+      <button class="btn btn-primary" id="sendBtn" onclick="requestAuth('send')">
+        <span id="sendBtnText">🚀 Jetzt senden</span>
+        <div class="spinner hidden" id="sendSpinner"></div>
+      </button>
+
+      <button class="btn btn-danger" onclick="requestAuth('disable')">
+        🛑 Sofort deaktivieren
+      </button>
+
+      <div class="status hidden" id="quickStatus"></div>
+    </div>
+
+    <!-- Events Tab -->
+    <div class="tab-content" id="tab-events">
+      <div class="card">
+        <div class="card-title">📅 Gespeicherte Events</div>
+        <div class="event-list" id="eventList">
+          <p style="color: #888; text-align: center; padding: 20px;">Keine Events gespeichert</p>
+        </div>
+        
+        <button class="btn btn-secondary btn-small" onclick="showEventEditor()" style="margin-top: 12px;">
+          ➕ Neues Event erstellen
+        </button>
+      </div>
+
+      <!-- Event Editor -->
+      <div class="card hidden" id="eventEditor">
+        <div class="card-title">✏️ Event bearbeiten</div>
+        
+        <div class="input-group">
+          <label class="input-label">Event-Name</label>
+          <input type="text" id="eventName" class="text-input" placeholder="z.B. Weihnachten 2025">
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Anzeigetext</label>
+          <textarea id="eventText" class="text-area" placeholder="Frohe&#10;Weihnachten!"></textarea>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Größe</label>
+          <div class="size-selector">
+            <div class="size-option">
+              <input type="radio" name="eventSize" id="event-size-large" value="large" checked>
+              <label for="event-size-large">
+                <span class="size-icon">📺</span>
+                <span class="size-name">Groß</span>
+              </label>
+            </div>
+            <div class="size-option">
+              <input type="radio" name="eventSize" id="event-size-medium" value="medium">
+              <label for="event-size-medium">
+                <span class="size-icon">📱</span>
+                <span class="size-name">Mittel</span>
+              </label>
+            </div>
+            <div class="size-option">
+              <input type="radio" name="eventSize" id="event-size-small" value="small">
+              <label for="event-size-small">
+                <span class="size-icon">📟</span>
+                <span class="size-name">Klein</span>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="date-grid">
+          <div class="date-item">
+            <label class="input-label">Startdatum</label>
+            <input type="date" id="eventStartDate">
+          </div>
+          <div class="date-item">
+            <label class="input-label">Enddatum</label>
+            <input type="date" id="eventEndDate">
+          </div>
+        </div>
+
+        <div class="timing-grid" style="margin-top: 12px;">
+          <div class="timing-item">
+            <label class="input-label">Intervall</label>
+            <input type="number" id="eventInterval" value="30" min="10">
+          </div>
+          <div class="timing-item">
+            <label class="input-label">Dauer</label>
+            <input type="number" id="eventDuration" value="5" min="2">
+          </div>
+        </div>
+
+        <div class="toggle-row" style="margin-top: 12px;">
+          <span class="toggle-label">Jährlich wiederholen</span>
+          <label class="toggle">
+            <input type="checkbox" id="eventRecurring">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button class="btn btn-secondary btn-small" onclick="hideEventEditor()">Abbrechen</button>
+          <button class="btn btn-primary btn-small" onclick="saveEvent()">💾 Speichern</button>
+        </div>
+      </div>
+
+      <div class="status hidden" id="eventsStatus"></div>
+    </div>
+
+    <!-- Settings Tab -->
+    <div class="tab-content" id="tab-settings">
+      <div class="card">
+        <div class="card-title">🔑 GitHub Token</div>
+        <div class="input-group">
+          <input type="password" id="tokenInput" class="text-input" placeholder="ghp_xxxxxxxxxxxx">
+          <div class="input-hint">
+            <a href="https://github.com/settings/tokens/new?description=Straba%20Admin&scopes=repo" target="_blank" style="color: #FFD700;">
+              → Token hier erstellen
+            </a> (Berechtigung: repo)
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-small" onclick="saveToken()">Token speichern</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">🔐 2-Faktor-Authentifizierung</div>
+        <div id="tfaStatus">
+          <p style="color: #888;">2FA ist nicht eingerichtet</p>
+        </div>
+        <button class="btn btn-secondary btn-small" onclick="setup2FA()" style="margin-top: 12px;">
+          2FA einrichten
+        </button>
+        <button class="btn btn-danger btn-small hidden" id="reset2FABtn" onclick="reset2FA()">
+          2FA zurücksetzen
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">ℹ️ Info</div>
+        <p style="font-size: 0.85rem; color: #aaa; line-height: 1.5;">
+          Diese App speichert Ankündigungen auf GitHub. Alle Straba-Geräte laden die Daten automatisch alle 5 Minuten.<br><br>
+          <strong>Zeichenlimits:</strong><br>
+          • Groß: 14 Zeichen × 1 Zeile<br>
+          • Mittel: 20 Zeichen × 2 Zeilen<br>
+          • Klein: 30 Zeichen × 3 Zeilen
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- QR Code - Inline Generator (keine externe Library nötig) -->
+  <script>
+    // Minimaler QR-Code Generator (inline)
+    const QRGen = (function() {
+      function generate(text) {
+        // Einfacher QR-Code als SVG mit Google Charts API Fallback
+        const size = 180;
+        const googleUrl = `https://chart.googleapis.com/chart?cht=qr&chs=${size}x${size}&chl=${encodeURIComponent(text)}&choe=UTF-8`;
+        return `<img src="${googleUrl}" alt="QR Code" style="width:${size}px;height:${size}px;" onerror="this.parentElement.innerHTML='<p style=\\'color:#ff9800;font-size:0.9rem;\\'>QR-Code nicht verfügbar.<br>Nutze den Code unten manuell.</p>'">`;
+      }
+      return { generate };
+    })();
+  </script>
+  
+  <script>
+    // ============ CONFIG ============
+    const GITHUB_OWNER = 'aufschiene';
+    const GITHUB_REPO = 'paulitest';
+    const GITHUB_FILE = 'stoerungtext.json';
+    const GITHUB_EVENTS_FILE = 'events.json';
+    const GITHUB_AUTH_FILE = 'auth.json';
+    const GITHUB_BRANCH = 'main';
+
+    // Size limits: [maxCharsPerLine, maxLines]
+    const SIZE_LIMITS = {
+      large: { chars: 14, lines: 1 },
+      medium: { chars: 20, lines: 2 },
+      small: { chars: 30, lines: 3 }
+    };
+
+    let currentSha = null;
+    let eventsSha = null;
+    let authSha = null;
+    let events = [];
+    let editingEventId = null;
+    let pendingAction = null;
+    let totpSecret = null;
+    
+    // Auth data from GitHub
+    let authData = {
+      slots: [null, null, null],  // 3 slots for secret hashes
+      initialized: false
+    };
+
+    // ============ TOTP Implementation ============
+    function base32ToBytes(base32) {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      let bits = '';
+      for (let char of base32.toUpperCase().replace(/=+$/, '')) {
+        const val = alphabet.indexOf(char);
+        if (val === -1) continue;
+        bits += val.toString(2).padStart(5, '0');
+      }
+      const bytes = [];
+      for (let i = 0; i + 8 <= bits.length; i += 8) {
+        bytes.push(parseInt(bits.substr(i, 8), 2));
+      }
+      return new Uint8Array(bytes);
+    }
+
+    function generateRandomSecret() {
+      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+      let secret = '';
+      for (let i = 0; i < 16; i++) {
+        secret += alphabet[Math.floor(Math.random() * 32)];
+      }
+      return secret;
+    }
+
+    async function hmacSha1(key, message) {
+      const cryptoKey = await crypto.subtle.importKey(
+        'raw', key, { name: 'HMAC', hash: 'SHA-1' }, false, ['sign']
+      );
+      const signature = await crypto.subtle.sign('HMAC', cryptoKey, message);
+      return new Uint8Array(signature);
+    }
+
+    async function generateTOTP(secret, timeStep = 30) {
+      const counter = Math.floor(Date.now() / 1000 / timeStep);
+      const counterBytes = new Uint8Array(8);
+      let temp = counter;
+      for (let i = 7; i >= 0; i--) {
+        counterBytes[i] = temp & 0xff;
+        temp = Math.floor(temp / 256);
+      }
+
+      const key = base32ToBytes(secret);
+      const hmac = await hmacSha1(key, counterBytes);
+      
+      const offset = hmac[hmac.length - 1] & 0x0f;
+      const code = ((hmac[offset] & 0x7f) << 24 |
+                    (hmac[offset + 1] & 0xff) << 16 |
+                    (hmac[offset + 2] & 0xff) << 8 |
+                    (hmac[offset + 3] & 0xff)) % 1000000;
+      
+      return code.toString().padStart(6, '0');
+    }
+
+    async function verifyTOTPCode(inputCode) {
+      // Check all 3 slots (local secrets)
+      for (let slot = 1; slot <= 3; slot++) {
+        const secret = localStorage.getItem(`straba_totp_secret_${slot}`);
+        if (!secret) continue;
+
+        // Check current and adjacent time windows (±1)
+        for (let offset = -1; offset <= 1; offset++) {
+          const counter = Math.floor(Date.now() / 1000 / 30) + offset;
+          const counterBytes = new Uint8Array(8);
+          let temp = counter;
+          for (let i = 7; i >= 0; i--) {
+            counterBytes[i] = temp & 0xff;
+            temp = Math.floor(temp / 256);
+          }
+
+          const key = base32ToBytes(secret);
+          const hmac = await hmacSha1(key, counterBytes);
+          
+          const off = hmac[hmac.length - 1] & 0x0f;
+          const code = ((hmac[off] & 0x7f) << 24 |
+                        (hmac[off + 1] & 0xff) << 16 |
+                        (hmac[off + 2] & 0xff) << 8 |
+                        (hmac[off + 3] & 0xff)) % 1000000;
+          
+          if (code.toString().padStart(6, '0') === inputCode) {
+            console.log(`Auth successful with slot ${slot}`);
+            return true;
+          }
+        }
+      }
+      return false;
+    }
+    
+    // Check if any 2FA is configured (local OR GitHub)
+    function has2FAConfigured() {
+      // Check GitHub auth data first
+      if (authData.initialized) {
+        for (let i = 0; i < 3; i++) {
+          if (authData.slots[i]) {
+            return true;
+          }
+        }
+      }
+      // Also check local storage
+      for (let slot = 1; slot <= 3; slot++) {
+        if (localStorage.getItem(`straba_totp_secret_${slot}`)) {
+          return true;
+        }
+      }
+      return false;
+    }
+    
+    // Check if a slot is configured (either locally or on GitHub)
+    function isSlotConfigured(slot) {
+      // Check local
+      if (localStorage.getItem(`straba_totp_secret_${slot}`)) {
+        return true;
+      }
+      // Check GitHub
+      if (authData.slots && authData.slots[slot - 1]) {
+        return true;
+      }
+      return false;
+    }
+    
+    // Check if current device has the secret for a slot
+    function hasLocalSecret(slot) {
+      return !!localStorage.getItem(`straba_totp_secret_${slot}`);
+    }
+    
+    // Hash a secret for storage (we don't store the actual secret on GitHub!)
+    async function hashSecret(secret) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(secret + '_straba_salt_2024');
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+    
+    // Load auth configuration from GitHub
+    async function loadAuthFromGitHub() {
+      try {
+        const response = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_AUTH_FILE}?ref=${GITHUB_BRANCH}`,
+          {
+            headers: {
+              'Accept': 'application/vnd.github.v3+json',
+              'Authorization': getToken() ? `token ${getToken()}` : ''
+            }
+          }
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          authSha = data.sha;
+          authData = JSON.parse(atob(data.content));
+          authData.initialized = true;
+          console.log('Auth loaded from GitHub:', authData.slots.map(s => s ? '✓' : '○'));
+        } else if (response.status === 404) {
+          // No auth file yet - first time setup
+          authData = { slots: [null, null, null], initialized: true };
+          authSha = null;
+          console.log('No auth file found - first time setup');
+        }
+      } catch (error) {
+        console.error('Error loading auth:', error);
+        authData.initialized = true; // Mark as initialized even on error
+      }
+      
+      update2FAStatus();
+    }
+    
+    // Save auth configuration to GitHub
+    async function saveAuthToGitHub() {
+      const token = getToken();
+      if (!token) {
+        console.error('No GitHub token for saving auth');
+        return false;
+      }
+
+      try {
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(authData, null, 2))));
+        
+        const body = {
+          message: 'Update auth configuration',
+          content: content,
+          branch: GITHUB_BRANCH
+        };
+        
+        if (authSha) {
+          body.sha = authSha;
+        }
+
+        const response = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_AUTH_FILE}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          authSha = result.content.sha;
+          console.log('Auth saved to GitHub');
+          return true;
+        } else {
+          const error = await response.json();
+          console.error('Error saving auth:', error);
+          return false;
+        }
+      } catch (error) {
+        console.error('Error saving auth:', error);
+        return false;
+      }
+    }
+
+    // ============ AUTH ============
+    function requestAuth(action) {
+      if (!has2FAConfigured()) {
+        // No 2FA setup - proceed directly
+        executeAction(action);
+        return;
+      }
+
+      pendingAction = action;
+      document.getElementById('authModal').classList.remove('hidden');
+      document.querySelector('.pin-input').focus();
+    }
+
+    async function verifyTOTP() {
+      const inputs = document.querySelectorAll('.pin-input');
+      let code = '';
+      inputs.forEach(input => code += input.value);
+
+      if (code.length !== 6) {
+        showAuthStatus('Bitte 6-stelligen Code eingeben', 'error');
+        return;
+      }
+
+      const valid = await verifyTOTPCode(code);
+      if (valid) {
+        closeAuthModal();
+        executeAction(pendingAction);
+      } else {
+        showAuthStatus('Falscher Code!', 'error');
+        inputs.forEach(input => input.value = '');
+        inputs[0].focus();
+      }
+    }
+
+    function executeAction(action) {
+      switch (action) {
+        case 'send':
+          sendToGitHub();
+          break;
+        case 'disable':
+          quickDisable();
+          break;
+        case 'saveEvent':
+          doSaveEvent();
+          break;
+        case 'deleteEvent':
+          doDeleteEvent();
+          break;
+        case 'setupNewKey':
+          doSetup2FA(pendingSetupSlot);
+          pendingSetupSlot = null;
+          break;
+        case 'deleteKey':
+          doDeleteKey();
+          break;
+        case 'resetAllKeys':
+          doResetAllKeys();
+          break;
+      }
+    }
+
+    function closeAuthModal() {
+      document.getElementById('authModal').classList.add('hidden');
+      document.querySelectorAll('.pin-input').forEach(input => input.value = '');
+      document.getElementById('authStatus').classList.add('hidden');
+    }
+
+    function showAuthStatus(msg, type) {
+      const el = document.getElementById('authStatus');
+      el.textContent = msg;
+      el.className = 'status ' + type;
+      el.classList.remove('hidden');
+    }
+
+    // ============ 2FA SETUP ============
+    let currentSetupSlot = 1;
+    let pendingSetupSlot = null;
+    
+    function setup2FA(slot = null) {
+      // Wenn kein Slot angegeben, finde den ersten freien
+      if (slot === null) {
+        for (let i = 1; i <= 3; i++) {
+          if (!localStorage.getItem(`straba_totp_secret_${i}`)) {
+            slot = i;
+            break;
+          }
+        }
+        if (slot === null) {
+          alert('Alle 3 Schlüssel sind bereits vergeben. Lösche zuerst einen.');
+          return;
+        }
+      }
+      
+      // SICHERHEIT: Wenn bereits ein Schlüssel existiert, muss man sich erst authentifizieren
+      if (has2FAConfigured()) {
+        pendingSetupSlot = slot;
+        pendingAction = 'setupNewKey';
+        document.getElementById('authModal').classList.remove('hidden');
+        document.querySelector('.pin-input').focus();
+        return;
+      }
+      
+      // Erster Schlüssel - direkt einrichten
+      doSetup2FA(slot);
+    }
+    
+    function doSetup2FA(slot) {
+      currentSetupSlot = slot;
+      totpSecret = generateRandomSecret();
+      const otpAuthUrl = `otpauth://totp/Stoerungstext-Straba%20(Schluessel%20${slot})?secret=${totpSecret}&issuer=Straba`;
+      
+      document.getElementById('secretDisplay').textContent = totpSecret;
+      document.getElementById('setupSlotInfo').textContent = `Schlüssel ${slot} von 3`;
+      
+      // Generate QR Code using Google Charts API
+      const qrContainer = document.getElementById('qrCanvas');
+      qrContainer.innerHTML = QRGen.generate(otpAuthUrl);
+      
+      console.log('QR Code generated for slot', slot, 'URL:', otpAuthUrl);
+      
+      document.getElementById('setupModal').classList.remove('hidden');
+    }
+
+    async function confirmSetup() {
+      const code = document.getElementById('setupCodeInput').value.trim();
+      if (code.length !== 6) {
+        showSetupStatus('Bitte 6-stelligen Code eingeben', 'error');
+        return;
+      }
+
+      // Verify the code against the new secret
+      const testValid = await verifyTOTPCodeDirect(totpSecret, code);
+      
+      if (testValid) {
+        // Save secret locally
+        localStorage.setItem(`straba_totp_secret_${currentSetupSlot}`, totpSecret);
+        
+        // Save hash to GitHub (so other devices know this slot is taken)
+        const secretHash = await hashSecret(totpSecret);
+        authData.slots[currentSetupSlot - 1] = {
+          hash: secretHash,
+          createdAt: new Date().toISOString(),
+          slotName: `Schlüssel ${currentSetupSlot}`
+        };
+        
+        const saved = await saveAuthToGitHub();
+        
+        if (saved) {
+          showSetupStatus(`Schlüssel ${currentSetupSlot} erfolgreich eingerichtet!`, 'success');
+        } else {
+          showSetupStatus(`Schlüssel ${currentSetupSlot} lokal gespeichert (GitHub-Sync fehlgeschlagen)`, 'success');
+        }
+        
+        setTimeout(() => {
+          closeSetupModal();
+          update2FAStatus();
+        }, 1500);
+      } else {
+        showSetupStatus('Falscher Code! Bitte erneut versuchen.', 'error');
+      }
+    }
+    
+    // Direct verification against a specific secret
+    async function verifyTOTPCodeDirect(secret, inputCode) {
+      for (let offset = -1; offset <= 1; offset++) {
+        const counter = Math.floor(Date.now() / 1000 / 30) + offset;
+        const counterBytes = new Uint8Array(8);
+        let temp = counter;
+        for (let i = 7; i >= 0; i--) {
+          counterBytes[i] = temp & 0xff;
+          temp = Math.floor(temp / 256);
+        }
+
+        const key = base32ToBytes(secret);
+        const hmac = await hmacSha1(key, counterBytes);
+        
+        const off = hmac[hmac.length - 1] & 0x0f;
+        const code = ((hmac[off] & 0x7f) << 24 |
+                      (hmac[off + 1] & 0xff) << 16 |
+                      (hmac[off + 2] & 0xff) << 8 |
+                      (hmac[off + 3] & 0xff)) % 1000000;
+        
+        if (code.toString().padStart(6, '0') === inputCode) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function closeSetupModal() {
+      document.getElementById('setupModal').classList.add('hidden');
+      document.getElementById('setupCodeInput').value = '';
+      document.getElementById('setupStatus').classList.add('hidden');
+    }
+
+    function showSetupStatus(msg, type) {
+      const el = document.getElementById('setupStatus');
+      el.textContent = msg;
+      el.className = 'status ' + type;
+      el.classList.remove('hidden');
+    }
+
+    let pendingDeleteSlot = null;
+    
+    function reset2FA(slot = null) {
+      if (!has2FAConfigured()) {
+        // Keine Schlüssel vorhanden - nichts zu löschen
+        return;
+      }
+      
+      if (slot === null) {
+        // Alle löschen - Auth erforderlich
+        pendingAction = 'resetAllKeys';
+        document.getElementById('authModal').classList.remove('hidden');
+        document.querySelector('.pin-input').focus();
+      } else {
+        // Einzelnen Schlüssel löschen - Auth erforderlich
+        pendingDeleteSlot = slot;
+        pendingAction = 'deleteKey';
+        document.getElementById('authModal').classList.remove('hidden');
+        document.querySelector('.pin-input').focus();
+      }
+    }
+    
+    async function doDeleteKey() {
+      if (pendingDeleteSlot !== null) {
+        // Remove locally
+        localStorage.removeItem(`straba_totp_secret_${pendingDeleteSlot}`);
+        
+        // Remove from GitHub
+        authData.slots[pendingDeleteSlot - 1] = null;
+        await saveAuthToGitHub();
+        
+        pendingDeleteSlot = null;
+        update2FAStatus();
+        showStatus('quickStatus', `Schlüssel gelöscht`, 'success');
+      }
+    }
+    
+    async function doResetAllKeys() {
+      // Remove all locally
+      for (let i = 1; i <= 3; i++) {
+        localStorage.removeItem(`straba_totp_secret_${i}`);
+      }
+      
+      // Remove all from GitHub
+      authData.slots = [null, null, null];
+      await saveAuthToGitHub();
+      
+      update2FAStatus();
+      showStatus('quickStatus', 'Alle Schlüssel gelöscht', 'success');
+    }
+
+    function update2FAStatus() {
+      const statusEl = document.getElementById('tfaStatus');
+      const resetBtn = document.getElementById('reset2FABtn');
+      
+      if (!authData.initialized) {
+        statusEl.innerHTML = '<p style="color: #888;">Lade Auth-Status...</p>';
+        return;
+      }
+      
+      let html = '<div style="margin-bottom: 12px;">';
+      let hasAnyKey = false;
+      let hasLocalKey = false;
+      
+      for (let i = 1; i <= 3; i++) {
+        const isConfiguredOnGitHub = authData.slots && authData.slots[i - 1];
+        const isConfiguredLocally = !!localStorage.getItem(`straba_totp_secret_${i}`);
+        const isConfigured = isConfiguredOnGitHub || isConfiguredLocally;
+        
+        if (isConfigured) hasAnyKey = true;
+        if (isConfiguredLocally) hasLocalKey = true;
+        
+        let statusIcon = '○';
+        let statusColor = '#666';
+        let statusText = '';
+        
+        if (isConfiguredLocally) {
+          statusIcon = '✓';
+          statusColor = '#4CAF50';
+          statusText = ' (dein Gerät)';
+        } else if (isConfiguredOnGitHub) {
+          statusIcon = '🔒';
+          statusColor = '#ff9800';
+          statusText = ' (anderes Gerät)';
+        }
+        
+        html += `
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px; margin: 4px 0; background: ${isConfigured ? (isConfiguredLocally ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 152, 0, 0.2)') : '#1a1a2e'}; border-radius: 8px;">
+            <span>
+              <span style="color: ${statusColor};">${statusIcon}</span>
+              Schlüssel ${i}${statusText}
+            </span>
+            ${isConfiguredLocally 
+              ? `<button onclick="reset2FA(${i})" style="background: #c0392b; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">Löschen</button>`
+              : (isConfiguredOnGitHub 
+                ? `<span style="font-size: 0.7rem; color: #888;">Vergeben</span>`
+                : `<button onclick="setup2FA(${i})" style="background: #333; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer; font-size: 0.75rem;">Einrichten</button>`)
+            }
+          </div>
+        `;
+      }
+      html += '</div>';
+      
+      if (hasAnyKey) {
+        html += `<p style="font-size: 0.75rem; color: #888; margin-top: 8px;">🔒 Neue Schlüssel können nur mit bestehendem Auth-Code hinzugefügt werden</p>`;
+        if (!hasLocalKey) {
+          html += `<p style="font-size: 0.75rem; color: #ff9800; margin-top: 4px;">⚠️ Du hast keinen Schlüssel auf diesem Gerät! Du kannst nur von Geräten aus authentifizieren, die einen Schlüssel haben.</p>`;
+        }
+        resetBtn.classList.remove('hidden');
+        resetBtn.textContent = 'Alle 3 zurücksetzen';
+      } else {
+        html = `
+          <p style="color: #888;">Keine Schlüssel eingerichtet</p>
+          <p style="font-size: 0.75rem; color: #ff9800; margin-top: 8px;">⚠️ Richte jetzt den ersten Schlüssel ein um die Seite zu sichern!</p>
+        `;
+        resetBtn.classList.add('hidden');
+      }
+      
+      statusEl.innerHTML = html;
+    }
+
+    // ============ TABS ============
+    document.querySelectorAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        tab.classList.add('active');
+        document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
+      });
+    });
+
+    // ============ PIN INPUT ============
+    document.querySelectorAll('.pin-input').forEach((input, index, inputs) => {
+      input.addEventListener('input', (e) => {
+        if (e.target.value && index < inputs.length - 1) {
+          inputs[index + 1].focus();
+        }
+      });
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+          inputs[index - 1].focus();
+        }
+        if (e.key === 'Enter') {
+          verifyTOTP();
+        }
+      });
+    });
+
+    // ============ PREVIEW ============
+    function getSelectedSize() {
+      return document.querySelector('input[name="size"]:checked').value;
+    }
+
+    function updatePreview() {
+      const text = document.getElementById('text').value;
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      const enabled = document.getElementById('enabled').checked;
+
+      const lines = text.split('\n');
+      const lineCount = lines.length;
+      const maxLineLength = Math.max(...lines.map(l => l.length), 0);
+
+      // Update counter
+      const counter = document.getElementById('charCounter');
+      counter.textContent = `${maxLineLength} / ${limit.chars} Zeichen · ${lineCount} / ${limit.lines} Zeilen`;
+      counter.className = 'char-counter';
+      
+      if (maxLineLength > limit.chars || lineCount > limit.lines) {
+        counter.classList.add('error');
+      } else if (maxLineLength > limit.chars - 3 || lineCount === limit.lines) {
+        counter.classList.add('warning');
+      }
+
+      // Update preview
+      const container = document.getElementById('previewContainer');
+      const previewText = document.getElementById('previewText');
+      
+      container.className = 'preview-container size-' + size;
+      previewText.textContent = text || 'Vorschau...';
+      previewText.style.opacity = enabled ? '1' : '0.4';
+    }
+
+    // ============ TOKEN ============
+    function getToken() {
+      return localStorage.getItem('straba_github_token') || '';
+    }
+
+    function saveToken() {
+      const token = document.getElementById('tokenInput').value.trim();
+      if (token) {
+        localStorage.setItem('straba_github_token', token);
+        showStatus('quickStatus', 'Token gespeichert!', 'success');
+        loadCurrentStatus();
+      }
+    }
+
+    // ============ GITHUB API ============
+    async function loadCurrentStatus() {
+      try {
+        const response = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}`
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          currentSha = data.sha;
+          
+          const content = JSON.parse(atob(data.content));
+          
+          // Fill form
+          document.getElementById('enabled').checked = content.enabled;
+          document.getElementById('text').value = (content.text || '').replace(/\\n/g, '\n');
+          document.getElementById('interval').value = content.interval || 30;
+          document.getElementById('duration').value = content.duration || 5;
+          document.getElementById('startDate').value = content.startDate || '';
+          document.getElementById('endDate').value = content.endDate || '';
+          
+          const sizeRadio = document.getElementById('size-' + (content.size || 'large'));
+          if (sizeRadio) sizeRadio.checked = true;
+
+          // Update global status
+          const dot = document.getElementById('globalStatusDot');
+          const text = document.getElementById('globalStatusText');
+          
+          if (content.enabled && content.text) {
+            dot.classList.add('active');
+            text.textContent = `"${content.text.replace(/\\n/g, ' ')}"`;
+          } else {
+            dot.classList.remove('active');
+            text.textContent = 'Keine aktive Ankündigung';
+          }
+
+          updatePreview();
+        }
+      } catch (error) {
+        console.error('Load error:', error);
+      }
+    }
+
+    async function loadEvents() {
+      try {
+        const response = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_EVENTS_FILE}?ref=${GITHUB_BRANCH}`
+        );
+
+        if (response.ok) {
+          const data = await response.json();
+          eventsSha = data.sha;
+          events = JSON.parse(atob(data.content));
+        } else if (response.status === 404) {
+          events = [];
+          eventsSha = null;
+        }
+        renderEventList();
+      } catch (error) {
+        console.error('Events load error:', error);
+        events = [];
+        renderEventList();
+      }
+    }
+
+    function getJsonData() {
+      return {
+        enabled: document.getElementById('enabled').checked,
+        text: document.getElementById('text').value.replace(/\n/g, '\\n'),
+        size: getSelectedSize(),
+        interval: parseInt(document.getElementById('interval').value) || 30,
+        duration: parseInt(document.getElementById('duration').value) || 5,
+        startDate: document.getElementById('startDate').value || "",
+        endDate: document.getElementById('endDate').value || ""
+      };
+    }
+
+    async function sendToGitHub() {
+      const token = getToken();
+      if (!token) {
+        showStatus('quickStatus', 'Bitte GitHub Token einrichten!', 'error');
+        return;
+      }
+
+      setLoading(true);
+
+      try {
+        const data = getJsonData();
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
+
+        const response = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              message: `Update: ${data.enabled ? data.text.substring(0, 30) : 'Deaktiviert'}`,
+              content: content,
+              sha: currentSha,
+              branch: GITHUB_BRANCH
+            })
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          currentSha = result.content.sha;
+          showStatus('quickStatus', '✓ Gesendet! Geräte aktualisieren in ~5 Min.', 'success');
+          loadCurrentStatus();
+        } else {
+          const error = await response.json();
+          throw new Error(error.message);
+        }
+      } catch (error) {
+        showStatus('quickStatus', 'Fehler: ' + error.message, 'error');
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function quickDisable() {
+      document.getElementById('enabled').checked = false;
+      document.getElementById('text').value = '';
+      updatePreview();
+      await sendToGitHub();
+    }
+
+    function setLoading(loading) {
+      const btn = document.getElementById('sendBtn');
+      const text = document.getElementById('sendBtnText');
+      const spinner = document.getElementById('sendSpinner');
+      
+      btn.disabled = loading;
+      text.textContent = loading ? 'Sende...' : '🚀 Jetzt senden';
+      spinner.classList.toggle('hidden', !loading);
+    }
+
+    function showStatus(elementId, message, type) {
+      const el = document.getElementById(elementId);
+      el.textContent = message;
+      el.className = 'status ' + type;
+      el.classList.remove('hidden');
+      
+      if (type === 'success') {
+        setTimeout(() => el.classList.add('hidden'), 5000);
+      }
+    }
+
+    // ============ EVENTS ============
+    function renderEventList() {
+      const list = document.getElementById('eventList');
+      
+      if (events.length === 0) {
+        list.innerHTML = '<p style="color: #888; text-align: center; padding: 20px;">Keine Events gespeichert</p>';
+        return;
+      }
+
+      const today = new Date().toISOString().split('T')[0];
+      
+      list.innerHTML = events.map((event, index) => {
+        let status = 'scheduled';
+        if (event.endDate && event.endDate < today) {
+          status = 'expired';
+        } else if (event.startDate <= today && (!event.endDate || event.endDate >= today)) {
+          status = 'active';
+        }
+
+        return `
+          <div class="event-item" data-id="${index}">
+            <div class="event-status ${status}"></div>
+            <div class="event-info">
+              <div class="event-name">${event.name || event.text.substring(0, 20)}</div>
+              <div class="event-dates">${event.startDate || '?'} - ${event.endDate || '?'} ${event.recurring ? '🔄' : ''}</div>
+            </div>
+            <div class="event-actions">
+              <button class="event-btn edit" onclick="editEvent(${index})">✏️</button>
+              <button class="event-btn delete" onclick="deleteEvent(${index})">🗑️</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function showEventEditor() {
+      editingEventId = null;
+      document.getElementById('eventName').value = '';
+      document.getElementById('eventText').value = '';
+      document.getElementById('eventStartDate').value = '';
+      document.getElementById('eventEndDate').value = '';
+      document.getElementById('eventInterval').value = 30;
+      document.getElementById('eventDuration').value = 5;
+      document.getElementById('eventRecurring').checked = false;
+      document.getElementById('event-size-large').checked = true;
+      document.getElementById('eventEditor').classList.remove('hidden');
+    }
+
+    function hideEventEditor() {
+      document.getElementById('eventEditor').classList.add('hidden');
+    }
+
+    function editEvent(index) {
+      const event = events[index];
+      editingEventId = index;
+      
+      document.getElementById('eventName').value = event.name || '';
+      document.getElementById('eventText').value = (event.text || '').replace(/\\n/g, '\n');
+      document.getElementById('eventStartDate').value = event.startDate || '';
+      document.getElementById('eventEndDate').value = event.endDate || '';
+      document.getElementById('eventInterval').value = event.interval || 30;
+      document.getElementById('eventDuration').value = event.duration || 5;
+      document.getElementById('eventRecurring').checked = event.recurring || false;
+      
+      const sizeRadio = document.getElementById('event-size-' + (event.size || 'large'));
+      if (sizeRadio) sizeRadio.checked = true;
+      
+      document.getElementById('eventEditor').classList.remove('hidden');
+    }
+
+    function saveEvent() {
+      requestAuth('saveEvent');
+    }
+
+    async function doSaveEvent() {
+      const event = {
+        name: document.getElementById('eventName').value,
+        text: document.getElementById('eventText').value.replace(/\n/g, '\\n'),
+        size: document.querySelector('input[name="eventSize"]:checked').value,
+        startDate: document.getElementById('eventStartDate').value,
+        endDate: document.getElementById('eventEndDate').value,
+        interval: parseInt(document.getElementById('eventInterval').value) || 30,
+        duration: parseInt(document.getElementById('eventDuration').value) || 5,
+        recurring: document.getElementById('eventRecurring').checked
+      };
+
+      if (editingEventId !== null) {
+        events[editingEventId] = event;
+      } else {
+        events.push(event);
+      }
+
+      await saveEventsToGitHub();
+      hideEventEditor();
+      renderEventList();
+    }
+
+    let deleteEventIndex = null;
+    function deleteEvent(index) {
+      deleteEventIndex = index;
+      requestAuth('deleteEvent');
+    }
+
+    async function doDeleteEvent() {
+      if (deleteEventIndex !== null) {
+        events.splice(deleteEventIndex, 1);
+        await saveEventsToGitHub();
+        renderEventList();
+        deleteEventIndex = null;
+      }
+    }
+
+    async function saveEventsToGitHub() {
+      const token = getToken();
+      if (!token) {
+        showStatus('eventsStatus', 'Bitte GitHub Token einrichten!', 'error');
+        return;
+      }
+
+      try {
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(events, null, 2))));
+        
+        const body = {
+          message: 'Update events',
+          content: content,
+          branch: GITHUB_BRANCH
+        };
+        
+        if (eventsSha) {
+          body.sha = eventsSha;
+        }
+
+        const response = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_EVENTS_FILE}`,
+          {
+            method: 'PUT',
+            headers: {
+              'Authorization': `token ${token}`,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+          }
+        );
+
+        if (response.ok) {
+          const result = await response.json();
+          eventsSha = result.content.sha;
+          showStatus('eventsStatus', '✓ Events gespeichert!', 'success');
+        } else {
+          const error = await response.json();
+          throw new Error(error.message);
+        }
+      } catch (error) {
+        showStatus('eventsStatus', 'Fehler: ' + error.message, 'error');
+      }
+    }
+
+    // ============ INIT ============
+    document.getElementById('tokenInput').value = getToken();
+    
+    // Load auth from GitHub first, then update status
+    loadAuthFromGitHub().then(() => {
+      update2FAStatus();
+    });
+    
+    loadCurrentStatus();
+    loadEvents();
+    updatePreview();
+  </script>
+</body>
+</html>
