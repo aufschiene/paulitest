@@ -1,7 +1,8 @@
 {
   "enabled": true,
-  "text": "Frohe \\nWeihnachten",
+  "text": "123456789123456789123456789123456789\\ndiese Webseite \\ngerade \\ngetestet \\n\\nDanke! :)",
   "size": "small",
+  "mode": "stoerung",
   "interval": 30,
   "duration": 4,
   "startDate": "2024-12-20",
