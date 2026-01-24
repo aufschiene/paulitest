@@ -1,7 +1,7 @@
 {
-  "enabled": true,
-  "text": "Derzeit gibt es\\nkeine \\nEchtzeitinfo.\\n",
-  "size": "medium",
+  "enabled": false,
+  "text": "",
+  "size": "small",
   "mode": "stoerung",
   "interval": 30,
   "duration": 4,
