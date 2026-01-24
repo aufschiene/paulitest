@@ -1,7 +1,7 @@
 {
   "enabled": false,
   "text": "",
-  "size": "small",
+  "size": "medium",
   "mode": "stoerung",
   "interval": 30,
   "duration": 4,
