@@ -1,7 +1,7 @@
 {
   "enabled": true,
-  "text": "Test Klein",
-  "size": "small",
+  "text": "Das \\nist ein großer\\nTest",
+  "size": "large",
   "interval": 30,
   "duration": 5,
   "startDate": "2024-12-20",
