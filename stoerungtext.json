@@ -1,1 +1,9 @@
-
+{
+  "enabled": true,
+  "text": "Frohe Weihnachten!",
+  "size": "large",
+  "interval": 30,
+  "duration": 5,
+  "startDate": "2024-12-20",
+  "endDate": "2026-12-26"
+}
