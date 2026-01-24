@@ -685,59 +685,83 @@
       background: rgba(255, 215, 0, 0.1);
     }
 
-    /* Line Editor Grid */
-    .line-editor-container {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .line-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .line-number {
-      font-size: 0.75rem;
-      color: #666;
-      width: 20px;
-      text-align: right;
-    }
-
-    .line-input {
-      flex: 1;
-      padding: 10px 12px;
+    /* Smart Textarea */
+    .smart-textarea {
+      width: 100%;
+      padding: 12px 14px;
       font-size: 1rem;
       border: 2px solid #444;
-      border-radius: 8px;
+      border-radius: 10px;
       background: #1a1a2e;
       color: #fff;
       font-family: monospace;
+      resize: none;
+      line-height: 1.5;
+      transition: border-color 0.3s;
     }
 
-    .line-input:focus {
+    .smart-textarea:focus {
       outline: none;
       border-color: #FFD700;
     }
 
-    .line-input.overflow {
+    .smart-textarea.limit-reached {
       border-color: #f44336;
     }
 
-    .line-char-count {
-      font-size: 0.7rem;
-      color: #666;
-      width: 40px;
-      text-align: right;
+    .textarea-info {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 6px;
+      font-size: 0.75rem;
+      color: #888;
     }
 
-    .line-char-count.warning {
+    .textarea-hint {
+      color: #666;
+    }
+
+    .line-display {
+      background: #1a1a2e;
+      border-radius: 8px;
+      padding: 8px 12px;
+      margin-top: 8px;
+      font-family: monospace;
+      font-size: 0.85rem;
+    }
+
+    .line-display-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+      border-bottom: 1px solid #333;
+    }
+
+    .line-display-row:last-child {
+      border-bottom: none;
+    }
+
+    .line-display-num {
+      color: #666;
+      margin-right: 8px;
+    }
+
+    .line-display-text {
+      flex: 1;
+      color: #FFD700;
+    }
+
+    .line-display-count {
+      color: #888;
+      margin-left: 8px;
+    }
+
+    .line-display-count.warning {
       color: #ff9800;
     }
 
-    .line-char-count.error {
-      color: #f44336;
+    .line-display-count.full {
+      color: #4CAF50;
     }
   </style>
 </head>
@@ -874,11 +898,15 @@
         </div>
 
         <div class="input-group">
-          <label class="input-label">Text (automatischer Zeilenumbruch)</label>
-          <div class="line-editor-container" id="lineEditor">
-            <!-- Lines werden dynamisch generiert -->
+          <label class="input-label">Text (automatischer Zeilenumbruch bei Limit, Enter = neue Zeile)</label>
+          <textarea id="smartText" class="smart-textarea" rows="4" placeholder="Text eingeben..."></textarea>
+          <div class="textarea-info">
+            <span class="textarea-hint">Max <span id="maxCharsInfo">11</span> Zeichen/Zeile · <span id="maxLinesInfo">3</span> Zeilen</span>
+            <span id="charCounter">0 / 11 Zeichen · 0 / 3 Zeilen</span>
           </div>
-          <div class="char-counter" id="charCounter">0 / 11 Zeichen · 0 / 3 Zeilen</div>
+          <div class="line-display" id="lineDisplay">
+            <!-- Zeilen-Vorschau -->
+          </div>
         </div>
 
         <!-- Hidden textarea für Daten -->
@@ -1133,229 +1161,232 @@
       initialized: false
     };
 
-    // ============ LINE EDITOR ============
-    function createLineEditor() {
-      const size = getSelectedSize();
-      const limit = SIZE_LIMITS[size];
-      const container = document.getElementById('lineEditor');
-      
-      // Bestehende Werte sammeln
-      const existingInputs = container.querySelectorAll('.line-input');
-      const existingValues = [];
-      existingInputs.forEach(input => existingValues.push(input.value));
-      
-      container.innerHTML = '';
-      
-      for (let i = 0; i < limit.lines; i++) {
-        const row = document.createElement('div');
-        row.className = 'line-row';
-        
-        const lineNum = document.createElement('span');
-        lineNum.className = 'line-number';
-        lineNum.textContent = (i + 1) + '.';
-        
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.className = 'line-input';
-        input.dataset.line = i;
-        input.placeholder = i === 0 ? 'Text eingeben...' : '';
-        input.maxLength = limit.chars; // Hard limit
-        
-        // Bestehenden Wert wiederherstellen
-        if (existingValues[i]) {
-          input.value = existingValues[i].substring(0, limit.chars);
-        }
-        
-        // Event Listener
-        input.addEventListener('input', handleLineInput);
-        input.addEventListener('keydown', handleLineKeydown);
-        input.addEventListener('paste', handleLinePaste);
-        
-        const charCount = document.createElement('span');
-        charCount.className = 'line-char-count';
-        charCount.dataset.lineCount = i;
-        charCount.textContent = `${input.value.length}/${limit.chars}`;
-        
-        row.appendChild(lineNum);
-        row.appendChild(input);
-        row.appendChild(charCount);
-        container.appendChild(row);
-      }
-      
-      updateHiddenTextarea();
-      updatePreview();
+    // ============ SMART TEXTAREA ============
+    let isProcessing = false;
+    
+    function initSmartTextarea() {
+      const textarea = document.getElementById('smartText');
+      textarea.addEventListener('input', handleSmartInput);
+      textarea.addEventListener('keydown', handleSmartKeydown);
+      textarea.addEventListener('paste', handleSmartPaste);
+      updateLimitsDisplay();
+      updateLineDisplay();
     }
     
-    function handleLineInput(e) {
-      const input = e.target;
-      const lineIndex = parseInt(input.dataset.line);
+    function updateLimitsDisplay() {
       const size = getSelectedSize();
       const limit = SIZE_LIMITS[size];
-      
-      // Auto-Wrap: Wenn mehr als limit.chars eingegeben werden
-      if (input.value.length > limit.chars) {
-        const overflow = input.value.substring(limit.chars);
-        input.value = input.value.substring(0, limit.chars);
-        
-        // Nächste Zeile finden und Overflow hinzufügen
-        const nextInput = document.querySelector(`.line-input[data-line="${lineIndex + 1}"]`);
-        if (nextInput) {
-          nextInput.value = overflow + nextInput.value;
-          nextInput.value = nextInput.value.substring(0, limit.chars);
-          nextInput.focus();
-          nextInput.setSelectionRange(overflow.length, overflow.length);
-        }
-      }
-      
-      updateCharCounter(lineIndex);
-      updateHiddenTextarea();
-      updatePreview();
+      document.getElementById('maxCharsInfo').textContent = limit.chars;
+      document.getElementById('maxLinesInfo').textContent = limit.lines;
     }
     
-    function handleLineKeydown(e) {
-      const input = e.target;
-      const lineIndex = parseInt(input.dataset.line);
+    function handleSmartInput(e) {
+      if (isProcessing) return;
+      isProcessing = true;
+      
+      const textarea = e.target;
       const size = getSelectedSize();
       const limit = SIZE_LIMITS[size];
       
-      // Enter -> nächste Zeile
+      // Text verarbeiten und Auto-Wrap anwenden
+      const processed = processText(textarea.value, limit.chars, limit.lines);
+      
+      // Cursor-Position merken
+      const cursorPos = textarea.selectionStart;
+      const oldLength = textarea.value.length;
+      
+      // Text aktualisieren
+      textarea.value = processed.text;
+      
+      // Cursor-Position anpassen
+      const newLength = textarea.value.length;
+      const diff = newLength - oldLength;
+      const newCursorPos = Math.min(cursorPos + diff, newLength);
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      
+      // Limit-Warnung
+      textarea.classList.toggle('limit-reached', processed.limitReached);
+      
+      updateHiddenTextarea();
+      updateLineDisplay();
+      updatePreview();
+      
+      isProcessing = false;
+    }
+    
+    function handleSmartKeydown(e) {
+      const textarea = e.target;
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      
+      // Bei Enter prüfen ob noch Zeilen frei sind
       if (e.key === 'Enter') {
-        e.preventDefault();
-        const nextInput = document.querySelector(`.line-input[data-line="${lineIndex + 1}"]`);
-        if (nextInput) {
-          nextInput.focus();
-        }
-      }
-      
-      // Backspace am Anfang -> vorherige Zeile
-      if (e.key === 'Backspace' && input.selectionStart === 0 && lineIndex > 0) {
-        e.preventDefault();
-        const prevInput = document.querySelector(`.line-input[data-line="${lineIndex - 1}"]`);
-        if (prevInput) {
-          // Text der aktuellen Zeile an vorherige anhängen
-          const currentText = input.value;
-          const prevText = prevInput.value;
-          const combined = prevText + currentText;
-          
-          prevInput.value = combined.substring(0, limit.chars);
-          input.value = combined.substring(limit.chars);
-          
-          prevInput.focus();
-          prevInput.setSelectionRange(prevText.length, prevText.length);
-          
-          updateCharCounter(lineIndex - 1);
-          updateCharCounter(lineIndex);
-          updateHiddenTextarea();
-          updatePreview();
-        }
-      }
-      
-      // Arrow Down -> nächste Zeile
-      if (e.key === 'ArrowDown') {
-        const nextInput = document.querySelector(`.line-input[data-line="${lineIndex + 1}"]`);
-        if (nextInput) {
+        const lines = textarea.value.split('\n');
+        if (lines.length >= limit.lines) {
           e.preventDefault();
-          nextInput.focus();
-        }
-      }
-      
-      // Arrow Up -> vorherige Zeile
-      if (e.key === 'ArrowUp') {
-        const prevInput = document.querySelector(`.line-input[data-line="${lineIndex - 1}"]`);
-        if (prevInput) {
-          e.preventDefault();
-          prevInput.focus();
+          return;
         }
       }
     }
     
-    function handleLinePaste(e) {
+    function handleSmartPaste(e) {
       e.preventDefault();
       const pastedText = e.clipboardData.getData('text');
-      const lines = pastedText.split('\n');
-      const startLine = parseInt(e.target.dataset.line);
+      const textarea = e.target;
       const size = getSelectedSize();
       const limit = SIZE_LIMITS[size];
       
-      let currentLine = startLine;
-      for (const line of lines) {
-        if (currentLine >= limit.lines) break;
-        
-        const input = document.querySelector(`.line-input[data-line="${currentLine}"]`);
-        if (input) {
-          input.value = line.substring(0, limit.chars);
-          updateCharCounter(currentLine);
-        }
-        currentLine++;
-      }
+      // Aktuellen Text mit eingefügtem Text kombinieren
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const currentText = textarea.value;
+      const newText = currentText.substring(0, start) + pastedText + currentText.substring(end);
+      
+      // Verarbeiten
+      const processed = processText(newText, limit.chars, limit.lines);
+      textarea.value = processed.text;
+      
+      // Cursor ans Ende des eingefügten Textes
+      const newCursorPos = Math.min(start + pastedText.length, textarea.value.length);
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      
+      textarea.classList.toggle('limit-reached', processed.limitReached);
       
       updateHiddenTextarea();
+      updateLineDisplay();
       updatePreview();
     }
     
-    function updateCharCounter(lineIndex) {
-      const input = document.querySelector(`.line-input[data-line="${lineIndex}"]`);
-      const counter = document.querySelector(`.line-char-count[data-line-count="${lineIndex}"]`);
+    function processText(text, maxChars, maxLines) {
+      // Zeilen splitten (behalte manuelle Umbrüche)
+      const inputLines = text.split('\n');
+      const resultLines = [];
+      let limitReached = false;
+      
+      for (let i = 0; i < inputLines.length; i++) {
+        let line = inputLines[i];
+        
+        // Wenn Zeile zu lang, umbrechen
+        while (line.length > maxChars) {
+          if (resultLines.length >= maxLines) {
+            limitReached = true;
+            break;
+          }
+          
+          // Finde beste Umbruchstelle (Leerzeichen bevorzugt)
+          let breakPoint = maxChars;
+          const lastSpace = line.lastIndexOf(' ', maxChars);
+          if (lastSpace > maxChars * 0.5) {
+            breakPoint = lastSpace;
+          }
+          
+          resultLines.push(line.substring(0, breakPoint).trimEnd());
+          line = line.substring(breakPoint).trimStart();
+        }
+        
+        // Rest der Zeile hinzufügen
+        if (resultLines.length >= maxLines) {
+          limitReached = true;
+          break;
+        }
+        resultLines.push(line);
+      }
+      
+      // Auf maxLines begrenzen
+      if (resultLines.length > maxLines) {
+        resultLines.length = maxLines;
+        // Letzte Zeile auf maxChars begrenzen
+        if (resultLines[maxLines - 1].length > maxChars) {
+          resultLines[maxLines - 1] = resultLines[maxLines - 1].substring(0, maxChars);
+        }
+        limitReached = true;
+      }
+      
+      return {
+        text: resultLines.join('\n'),
+        lines: resultLines,
+        limitReached: limitReached
+      };
+    }
+    
+    function updateLineDisplay() {
+      const textarea = document.getElementById('smartText');
       const size = getSelectedSize();
       const limit = SIZE_LIMITS[size];
+      const lines = textarea.value.split('\n');
       
-      if (input && counter) {
-        const len = input.value.length;
-        counter.textContent = `${len}/${limit.chars}`;
-        counter.className = 'line-char-count';
-        
-        if (len >= limit.chars) {
-          counter.classList.add('error');
-        } else if (len >= limit.chars - 2) {
-          counter.classList.add('warning');
+      const display = document.getElementById('lineDisplay');
+      let html = '';
+      
+      // Zeige alle Zeilen bis maxLines
+      for (let i = 0; i < limit.lines; i++) {
+        const lineText = lines[i] || '';
+        const charCount = lineText.length;
+        let countClass = '';
+        if (charCount >= limit.chars) {
+          countClass = 'full';
+        } else if (charCount >= limit.chars - 2) {
+          countClass = 'warning';
         }
+        
+        html += `
+          <div class="line-display-row">
+            <span class="line-display-num">${i + 1}.</span>
+            <span class="line-display-text">${lineText || '<span style="color:#555">—</span>'}</span>
+            <span class="line-display-count ${countClass}">${charCount}/${limit.chars}</span>
+          </div>
+        `;
       }
+      
+      display.innerHTML = html;
+      
+      // Counter aktualisieren
+      const maxLineLength = Math.max(...lines.map(l => l.length), 0);
+      const lineCount = lines.filter(l => l.length > 0).length || (textarea.value ? 1 : 0);
+      const counter = document.getElementById('charCounter');
+      counter.textContent = `${maxLineLength} / ${limit.chars} Zeichen · ${lineCount} / ${limit.lines} Zeilen`;
     }
     
     function updateHiddenTextarea() {
-      const inputs = document.querySelectorAll('.line-input');
-      const lines = [];
-      let lastNonEmptyLine = -1;
-      
-      inputs.forEach((input, i) => {
-        if (input.value) {
-          lastNonEmptyLine = i;
-        }
-      });
-      
-      for (let i = 0; i <= lastNonEmptyLine; i++) {
-        lines.push(inputs[i].value);
-      }
-      
-      document.getElementById('text').value = lines.join('\n');
+      const smartText = document.getElementById('smartText');
+      document.getElementById('text').value = smartText.value;
     }
     
-    function loadTextToLineEditor(text) {
-      const lines = text.split('\n');
+    function loadTextToSmartTextarea(text) {
+      const textarea = document.getElementById('smartText');
       const size = getSelectedSize();
       const limit = SIZE_LIMITS[size];
       
-      for (let i = 0; i < limit.lines; i++) {
-        const input = document.querySelector(`.line-input[data-line="${i}"]`);
-        if (input) {
-          input.value = (lines[i] || '').substring(0, limit.chars);
-          updateCharCounter(i);
-        }
-      }
+      // Text verarbeiten
+      const processed = processText(text, limit.chars, limit.lines);
+      textarea.value = processed.text;
       
       updateHiddenTextarea();
+      updateLineDisplay();
       updatePreview();
     }
     
     function onSizeChange() {
       // Bestehenden Text speichern
-      const currentText = document.getElementById('text').value;
+      const currentText = document.getElementById('smartText').value;
       
-      // Neuen Editor erstellen
-      createLineEditor();
+      // Limits aktualisieren
+      updateLimitsDisplay();
       
-      // Text wieder laden
-      loadTextToLineEditor(currentText);
+      // Text neu verarbeiten mit neuen Limits
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      const processed = processText(currentText, limit.chars, limit.lines);
+      document.getElementById('smartText').value = processed.text;
+      document.getElementById('smartText').classList.toggle('limit-reached', processed.limitReached);
+      
+      // Textarea Höhe anpassen
+      const textarea = document.getElementById('smartText');
+      textarea.rows = Math.min(limit.lines + 1, 6);
+      
+      updateHiddenTextarea();
+      updateLineDisplay();
+      updatePreview();
     }
 
     // ============ TOTP Implementation ============
@@ -2032,9 +2063,9 @@
           setMode(content.mode || 'stoerung');
 
           // Text laden NACH dem Size Change (um korrekten Editor zu haben)
-          createLineEditor();
+          onSizeChange();
           const textContent = (content.text || '').replace(/\\n/g, '\n');
-          loadTextToLineEditor(textContent);
+          loadTextToSmartTextarea(textContent);
 
           // Update global status
           const dot = document.getElementById('globalStatusDot');
@@ -2140,9 +2171,10 @@
 
     async function quickDisable() {
       document.getElementById('enabled').checked = false;
-      // Alle Zeilen leeren
-      document.querySelectorAll('.line-input').forEach(input => input.value = '');
+      // Smart Textarea leeren
+      document.getElementById('smartText').value = '';
       updateHiddenTextarea();
+      updateLineDisplay();
       updatePreview();
       await sendToGitHub();
     }
@@ -2335,8 +2367,8 @@
     // ============ INIT ============
     document.getElementById('tokenInput').value = getToken();
     
-    // Initialer Line Editor erstellen
-    createLineEditor();
+    // Smart Textarea initialisieren
+    initSmartTextarea();
     
     // Load auth from GitHub first, then update status
     loadAuthFromGitHub().then(() => {
