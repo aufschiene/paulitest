@@ -1,9 +1,9 @@
 {
   "changelog": [
     {
-      "version": "1.3.2",
-      "date": "17.01.2025",
-      "title": "Komplett neues straba.local",
+      "version": "1.4",
+      "date": "24.01.2026",
+      "title": "Update & Zeilen bei Betriebsschluss gefixed",
       "changes": [
         "Changelog wird bei Updates angezeigt",
         "Alle Änderungen seit letzter Version sichtbar",
