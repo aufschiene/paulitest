@@ -1,7 +1,7 @@
 {
   "enabled": false,
-  "text": "",
-  "size": "small",
+  "text": "123456789123456789123456789\\n1\\n1\\n1\\n1\\n1\\n1",
+  "size": "medium",
   "mode": "stoerung",
   "interval": 30,
   "duration": 4,
