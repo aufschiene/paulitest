@@ -883,7 +883,7 @@
               <label for="size-medium">
                 <span class="size-icon">📱</span>
                 <span class="size-name">Mittel</span>
-                <span class="size-limit">14×4</span>
+                <span class="size-limit">16×4</span>
               </label>
             </div>
             <div class="size-option">
@@ -891,7 +891,7 @@
               <label for="size-small">
                 <span class="size-icon">📟</span>
                 <span class="size-name">Klein</span>
-                <span class="size-limit">15×10</span>
+                <span class="size-limit">25×10</span>
               </label>
             </div>
           </div>
@@ -1017,7 +1017,7 @@
               <label for="event-size-medium">
                 <span class="size-icon">📱</span>
                 <span class="size-name">Mittel</span>
-                <span class="size-limit">14×4</span>
+                <span class="size-limit">16×4</span>
               </label>
             </div>
             <div class="size-option">
@@ -1025,7 +1025,7 @@
               <label for="event-size-small">
                 <span class="size-icon">📟</span>
                 <span class="size-name">Klein</span>
-                <span class="size-limit">15×10</span>
+                <span class="size-limit">25×10</span>
               </label>
             </div>
           </div>
@@ -1104,8 +1104,8 @@
           Diese App speichert Ankündigungen auf GitHub. Alle Straba-Geräte laden die Daten automatisch alle 5 Minuten.<br><br>
           <strong>Zeichenlimits:</strong><br>
           • Groß: 10 Zeichen × 3 Zeilen<br>
-          • Mittel: 14 Zeichen × 4 Zeilen<br>
-          • Klein: 15 Zeichen × 10 Zeilen
+          • Mittel: 16 Zeichen × 4 Zeilen<br>
+          • Klein: 25 Zeichen × 10 Zeilen
         </p>
       </div>
     </div>
@@ -1136,13 +1136,13 @@
 
     // Size limits: [maxCharsPerLine, maxLines]
     // NEUE LIMITS:
-    // Klein: 10 Zeilen, 15 Zeichen
-    // Mittel: 4 Zeilen, 14 Zeichen
+    // Klein: 10 Zeilen, 25 Zeichen
+    // Mittel: 4 Zeilen, 16 Zeichen
     // Groß: 3 Zeilen, 10 Zeichen
     const SIZE_LIMITS = {
       large: { chars: 10, lines: 3 },
-      medium: { chars: 14, lines: 4 },
-      small: { chars: 15, lines: 10 }
+      medium: { chars: 16, lines: 4 },
+      small: { chars: 25, lines: 10 }
     };
 
     let currentSha = null;
@@ -2133,6 +2133,22 @@
       setLoading(true);
 
       try {
+        // Zuerst aktuelle SHA holen um Konflikte zu vermeiden
+        const shaResponse = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE}?ref=${GITHUB_BRANCH}`,
+          {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          }
+        );
+        
+        if (shaResponse.ok) {
+          const shaData = await shaResponse.json();
+          currentSha = shaData.sha;
+        }
+
         const data = getJsonData();
         const content = btoa(unescape(encodeURIComponent(JSON.stringify(data, null, 2))));
 
@@ -2327,6 +2343,24 @@
       }
 
       try {
+        // Zuerst aktuelle SHA holen um Konflikte zu vermeiden
+        const shaResponse = await fetch(
+          `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_EVENTS_FILE}?ref=${GITHUB_BRANCH}`,
+          {
+            headers: {
+              'Authorization': `token ${token}`,
+              'Accept': 'application/vnd.github.v3+json'
+            }
+          }
+        );
+        
+        if (shaResponse.ok) {
+          const shaData = await shaResponse.json();
+          eventsSha = shaData.sha;
+        } else if (shaResponse.status === 404) {
+          eventsSha = null; // Datei existiert noch nicht
+        }
+
         const content = btoa(unescape(encodeURIComponent(JSON.stringify(events, null, 2))));
         
         const body = {
