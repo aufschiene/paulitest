@@ -1,7 +1,7 @@
 {
   "enabled": true,
-  "text": "HerzlichWILLKOMMENbeiStra\\nba",
-  "size": "small",
+  "text": "HerzlichWILLKOMM\\nENbeiStra\\nba",
+  "size": "medium",
   "mode": "stoerung",
   "interval": 30,
   "duration": 4,
