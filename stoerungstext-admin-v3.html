@@ -684,6 +684,61 @@
       color: #FFD700;
       background: rgba(255, 215, 0, 0.1);
     }
+
+    /* Line Editor Grid */
+    .line-editor-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .line-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .line-number {
+      font-size: 0.75rem;
+      color: #666;
+      width: 20px;
+      text-align: right;
+    }
+
+    .line-input {
+      flex: 1;
+      padding: 10px 12px;
+      font-size: 1rem;
+      border: 2px solid #444;
+      border-radius: 8px;
+      background: #1a1a2e;
+      color: #fff;
+      font-family: monospace;
+    }
+
+    .line-input:focus {
+      outline: none;
+      border-color: #FFD700;
+    }
+
+    .line-input.overflow {
+      border-color: #f44336;
+    }
+
+    .line-char-count {
+      font-size: 0.7rem;
+      color: #666;
+      width: 40px;
+      text-align: right;
+    }
+
+    .line-char-count.warning {
+      color: #ff9800;
+    }
+
+    .line-char-count.error {
+      color: #f44336;
+    }
   </style>
 </head>
 <body>
@@ -789,40 +844,45 @@
 
       <div class="card">
         <div class="input-group">
-          <label class="input-label">Text (Enter für Zeilenumbruch)</label>
-          <textarea id="text" class="text-area" placeholder="Frohe&#10;Weihnachten!" oninput="updatePreview()"></textarea>
-          <div class="char-counter" id="charCounter">0 / 14 Zeichen · 0 / 1 Zeilen</div>
-        </div>
-
-        <div class="input-group">
           <label class="input-label">Größe</label>
           <div class="size-selector">
             <div class="size-option">
-              <input type="radio" name="size" id="size-large" value="large" checked onchange="updatePreview()">
+              <input type="radio" name="size" id="size-large" value="large" checked onchange="onSizeChange()">
               <label for="size-large">
                 <span class="size-icon">📺</span>
                 <span class="size-name">Groß</span>
-                <span class="size-limit">14×3</span>
+                <span class="size-limit">11×3</span>
               </label>
             </div>
             <div class="size-option">
-              <input type="radio" name="size" id="size-medium" value="medium" onchange="updatePreview()">
+              <input type="radio" name="size" id="size-medium" value="medium" onchange="onSizeChange()">
               <label for="size-medium">
                 <span class="size-icon">📱</span>
                 <span class="size-name">Mittel</span>
-                <span class="size-limit">20×6</span>
+                <span class="size-limit">17×4</span>
               </label>
             </div>
             <div class="size-option">
-              <input type="radio" name="size" id="size-small" value="small" onchange="updatePreview()">
+              <input type="radio" name="size" id="size-small" value="small" onchange="onSizeChange()">
               <label for="size-small">
                 <span class="size-icon">📟</span>
                 <span class="size-name">Klein</span>
-                <span class="size-limit">30×10</span>
+                <span class="size-limit">16×10</span>
               </label>
             </div>
           </div>
         </div>
+
+        <div class="input-group">
+          <label class="input-label">Text (automatischer Zeilenumbruch)</label>
+          <div class="line-editor-container" id="lineEditor">
+            <!-- Lines werden dynamisch generiert -->
+          </div>
+          <div class="char-counter" id="charCounter">0 / 11 Zeichen · 0 / 3 Zeilen</div>
+        </div>
+
+        <!-- Hidden textarea für Daten -->
+        <textarea id="text" class="hidden"></textarea>
 
         <div class="preview-container size-large" id="previewContainer">
           <span class="preview-text" id="previewText">Vorschau...</span>
@@ -894,6 +954,20 @@
           <input type="text" id="eventName" class="text-input" placeholder="z.B. Weihnachten 2025">
         </div>
 
+        <!-- Modus Toggle für Events -->
+        <div class="toggle-row" style="border-bottom: 1px solid #333; margin-bottom: 12px; padding-bottom: 12px;">
+          <div>
+            <span class="toggle-label">Event-Modus</span>
+            <div style="font-size: 0.75rem; color: #888; margin-top: 2px;">
+              Störung = immer · Fun = User kann ausschalten
+            </div>
+          </div>
+          <div class="mode-selector">
+            <button type="button" class="mode-btn" id="event-mode-stoerung" onclick="setEventMode('stoerung')">⚠️ Störung</button>
+            <button type="button" class="mode-btn active" id="event-mode-fun" onclick="setEventMode('fun')">🎉 Fun</button>
+          </div>
+        </div>
+
         <div class="input-group">
           <label class="input-label">Anzeigetext</label>
           <textarea id="eventText" class="text-area" placeholder="Frohe&#10;Weihnachten!"></textarea>
@@ -907,6 +981,7 @@
               <label for="event-size-large">
                 <span class="size-icon">📺</span>
                 <span class="size-name">Groß</span>
+                <span class="size-limit">11×3</span>
               </label>
             </div>
             <div class="size-option">
@@ -914,6 +989,7 @@
               <label for="event-size-medium">
                 <span class="size-icon">📱</span>
                 <span class="size-name">Mittel</span>
+                <span class="size-limit">17×4</span>
               </label>
             </div>
             <div class="size-option">
@@ -921,6 +997,7 @@
               <label for="event-size-small">
                 <span class="size-icon">📟</span>
                 <span class="size-name">Klein</span>
+                <span class="size-limit">16×10</span>
               </label>
             </div>
           </div>
@@ -977,7 +1054,7 @@
             </a> (Berechtigung: repo)
           </div>
         </div>
-        <button class="btn btn-secondary btn-small" onclick="saveToken()">Token speichern</button>
+        <button class="btn btn-secondary btn-small" onclick="saveTokenWithAuth()">Token speichern</button>
       </div>
 
       <div class="card">
@@ -998,9 +1075,9 @@
         <p style="font-size: 0.85rem; color: #aaa; line-height: 1.5;">
           Diese App speichert Ankündigungen auf GitHub. Alle Straba-Geräte laden die Daten automatisch alle 5 Minuten.<br><br>
           <strong>Zeichenlimits:</strong><br>
-          • Groß: 14 Zeichen × 1 Zeile<br>
-          • Mittel: 20 Zeichen × 2 Zeilen<br>
-          • Klein: 30 Zeichen × 3 Zeilen
+          • Groß: 11 Zeichen × 3 Zeilen<br>
+          • Mittel: 17 Zeichen × 4 Zeilen<br>
+          • Klein: 16 Zeichen × 10 Zeilen
         </p>
       </div>
     </div>
@@ -1030,10 +1107,14 @@
     const GITHUB_BRANCH = 'main';
 
     // Size limits: [maxCharsPerLine, maxLines]
+    // NEUE LIMITS:
+    // Klein: 10 Zeilen, 16 Zeichen
+    // Mittel: 4 Zeilen, 17 Zeichen
+    // Groß: 3 Zeilen, 11 Zeichen
     const SIZE_LIMITS = {
-      large: { chars: 14, lines: 3 },
-      medium: { chars: 20, lines: 6 },
-      small: { chars: 30, lines: 10 }
+      large: { chars: 11, lines: 3 },
+      medium: { chars: 17, lines: 4 },
+      small: { chars: 16, lines: 10 }
     };
 
     let currentSha = null;
@@ -1044,12 +1125,238 @@
     let pendingAction = null;
     let totpSecret = null;
     let currentMode = 'stoerung';  // 'stoerung' or 'fun'
+    let currentEventMode = 'fun';  // Default für Events
     
     // Auth data from GitHub
     let authData = {
       slots: [null, null, null],  // 3 slots for secret hashes
       initialized: false
     };
+
+    // ============ LINE EDITOR ============
+    function createLineEditor() {
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      const container = document.getElementById('lineEditor');
+      
+      // Bestehende Werte sammeln
+      const existingInputs = container.querySelectorAll('.line-input');
+      const existingValues = [];
+      existingInputs.forEach(input => existingValues.push(input.value));
+      
+      container.innerHTML = '';
+      
+      for (let i = 0; i < limit.lines; i++) {
+        const row = document.createElement('div');
+        row.className = 'line-row';
+        
+        const lineNum = document.createElement('span');
+        lineNum.className = 'line-number';
+        lineNum.textContent = (i + 1) + '.';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.className = 'line-input';
+        input.dataset.line = i;
+        input.placeholder = i === 0 ? 'Text eingeben...' : '';
+        input.maxLength = limit.chars; // Hard limit
+        
+        // Bestehenden Wert wiederherstellen
+        if (existingValues[i]) {
+          input.value = existingValues[i].substring(0, limit.chars);
+        }
+        
+        // Event Listener
+        input.addEventListener('input', handleLineInput);
+        input.addEventListener('keydown', handleLineKeydown);
+        input.addEventListener('paste', handleLinePaste);
+        
+        const charCount = document.createElement('span');
+        charCount.className = 'line-char-count';
+        charCount.dataset.lineCount = i;
+        charCount.textContent = `${input.value.length}/${limit.chars}`;
+        
+        row.appendChild(lineNum);
+        row.appendChild(input);
+        row.appendChild(charCount);
+        container.appendChild(row);
+      }
+      
+      updateHiddenTextarea();
+      updatePreview();
+    }
+    
+    function handleLineInput(e) {
+      const input = e.target;
+      const lineIndex = parseInt(input.dataset.line);
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      
+      // Auto-Wrap: Wenn mehr als limit.chars eingegeben werden
+      if (input.value.length > limit.chars) {
+        const overflow = input.value.substring(limit.chars);
+        input.value = input.value.substring(0, limit.chars);
+        
+        // Nächste Zeile finden und Overflow hinzufügen
+        const nextInput = document.querySelector(`.line-input[data-line="${lineIndex + 1}"]`);
+        if (nextInput) {
+          nextInput.value = overflow + nextInput.value;
+          nextInput.value = nextInput.value.substring(0, limit.chars);
+          nextInput.focus();
+          nextInput.setSelectionRange(overflow.length, overflow.length);
+        }
+      }
+      
+      updateCharCounter(lineIndex);
+      updateHiddenTextarea();
+      updatePreview();
+    }
+    
+    function handleLineKeydown(e) {
+      const input = e.target;
+      const lineIndex = parseInt(input.dataset.line);
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      
+      // Enter -> nächste Zeile
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const nextInput = document.querySelector(`.line-input[data-line="${lineIndex + 1}"]`);
+        if (nextInput) {
+          nextInput.focus();
+        }
+      }
+      
+      // Backspace am Anfang -> vorherige Zeile
+      if (e.key === 'Backspace' && input.selectionStart === 0 && lineIndex > 0) {
+        e.preventDefault();
+        const prevInput = document.querySelector(`.line-input[data-line="${lineIndex - 1}"]`);
+        if (prevInput) {
+          // Text der aktuellen Zeile an vorherige anhängen
+          const currentText = input.value;
+          const prevText = prevInput.value;
+          const combined = prevText + currentText;
+          
+          prevInput.value = combined.substring(0, limit.chars);
+          input.value = combined.substring(limit.chars);
+          
+          prevInput.focus();
+          prevInput.setSelectionRange(prevText.length, prevText.length);
+          
+          updateCharCounter(lineIndex - 1);
+          updateCharCounter(lineIndex);
+          updateHiddenTextarea();
+          updatePreview();
+        }
+      }
+      
+      // Arrow Down -> nächste Zeile
+      if (e.key === 'ArrowDown') {
+        const nextInput = document.querySelector(`.line-input[data-line="${lineIndex + 1}"]`);
+        if (nextInput) {
+          e.preventDefault();
+          nextInput.focus();
+        }
+      }
+      
+      // Arrow Up -> vorherige Zeile
+      if (e.key === 'ArrowUp') {
+        const prevInput = document.querySelector(`.line-input[data-line="${lineIndex - 1}"]`);
+        if (prevInput) {
+          e.preventDefault();
+          prevInput.focus();
+        }
+      }
+    }
+    
+    function handleLinePaste(e) {
+      e.preventDefault();
+      const pastedText = e.clipboardData.getData('text');
+      const lines = pastedText.split('\n');
+      const startLine = parseInt(e.target.dataset.line);
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      
+      let currentLine = startLine;
+      for (const line of lines) {
+        if (currentLine >= limit.lines) break;
+        
+        const input = document.querySelector(`.line-input[data-line="${currentLine}"]`);
+        if (input) {
+          input.value = line.substring(0, limit.chars);
+          updateCharCounter(currentLine);
+        }
+        currentLine++;
+      }
+      
+      updateHiddenTextarea();
+      updatePreview();
+    }
+    
+    function updateCharCounter(lineIndex) {
+      const input = document.querySelector(`.line-input[data-line="${lineIndex}"]`);
+      const counter = document.querySelector(`.line-char-count[data-line-count="${lineIndex}"]`);
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      
+      if (input && counter) {
+        const len = input.value.length;
+        counter.textContent = `${len}/${limit.chars}`;
+        counter.className = 'line-char-count';
+        
+        if (len >= limit.chars) {
+          counter.classList.add('error');
+        } else if (len >= limit.chars - 2) {
+          counter.classList.add('warning');
+        }
+      }
+    }
+    
+    function updateHiddenTextarea() {
+      const inputs = document.querySelectorAll('.line-input');
+      const lines = [];
+      let lastNonEmptyLine = -1;
+      
+      inputs.forEach((input, i) => {
+        if (input.value) {
+          lastNonEmptyLine = i;
+        }
+      });
+      
+      for (let i = 0; i <= lastNonEmptyLine; i++) {
+        lines.push(inputs[i].value);
+      }
+      
+      document.getElementById('text').value = lines.join('\n');
+    }
+    
+    function loadTextToLineEditor(text) {
+      const lines = text.split('\n');
+      const size = getSelectedSize();
+      const limit = SIZE_LIMITS[size];
+      
+      for (let i = 0; i < limit.lines; i++) {
+        const input = document.querySelector(`.line-input[data-line="${i}"]`);
+        if (input) {
+          input.value = (lines[i] || '').substring(0, limit.chars);
+          updateCharCounter(i);
+        }
+      }
+      
+      updateHiddenTextarea();
+      updatePreview();
+    }
+    
+    function onSizeChange() {
+      // Bestehenden Text speichern
+      const currentText = document.getElementById('text').value;
+      
+      // Neuen Editor erstellen
+      createLineEditor();
+      
+      // Text wieder laden
+      loadTextToLineEditor(currentText);
+    }
 
     // ============ TOTP Implementation ============
     function base32ToBytes(base32) {
@@ -1324,6 +1631,9 @@
           break;
         case 'resetAllKeys':
           doResetAllKeys();
+          break;
+        case 'saveToken':
+          doSaveToken();
           break;
       }
     }
@@ -1628,6 +1938,12 @@
       document.getElementById('mode-fun').classList.toggle('active', mode === 'fun');
     }
 
+    function setEventMode(mode) {
+      currentEventMode = mode;
+      document.getElementById('event-mode-stoerung').classList.toggle('active', mode === 'stoerung');
+      document.getElementById('event-mode-fun').classList.toggle('active', mode === 'fun');
+    }
+
     function updatePreview() {
       const text = document.getElementById('text').value;
       const size = getSelectedSize();
@@ -1635,7 +1951,7 @@
       const enabled = document.getElementById('enabled').checked;
 
       const lines = text.split('\n');
-      const lineCount = lines.length;
+      const lineCount = lines.length || 0;
       const maxLineLength = Math.max(...lines.map(l => l.length), 0);
 
       // Update counter
@@ -1645,7 +1961,7 @@
       
       if (maxLineLength > limit.chars || lineCount > limit.lines) {
         counter.classList.add('error');
-      } else if (maxLineLength > limit.chars - 3 || lineCount === limit.lines) {
+      } else if (maxLineLength >= limit.chars - 2 || lineCount === limit.lines) {
         counter.classList.add('warning');
       }
 
@@ -1663,15 +1979,29 @@
       return localStorage.getItem('straba_github_token') || '';
     }
 
-    function saveToken() {
+    // Token speichern MIT Auth-Abfrage wenn 2FA aktiv
+    function saveTokenWithAuth() {
+      const token = document.getElementById('tokenInput').value.trim();
+      if (!token) {
+        alert('Bitte Token eingeben!');
+        return;
+      }
+      
+      // Wenn 2FA aktiv ist, Auth anfordern
+      if (has2FAConfigured()) {
+        requestAuth('saveToken');
+      } else {
+        doSaveToken();
+      }
+    }
+
+    function doSaveToken() {
       const token = document.getElementById('tokenInput').value.trim();
       if (token) {
         localStorage.setItem('straba_github_token', token);
         alert('✓ Token gespeichert!');
         loadCurrentStatus();
         loadAuthFromGitHub();
-      } else {
-        alert('Bitte Token eingeben!');
       }
     }
 
@@ -1690,7 +2020,6 @@
           
           // Fill form
           document.getElementById('enabled').checked = content.enabled;
-          document.getElementById('text').value = (content.text || '').replace(/\\n/g, '\n');
           document.getElementById('interval').value = content.interval || 30;
           document.getElementById('duration').value = content.duration || 5;
           document.getElementById('startDate').value = content.startDate || '';
@@ -1701,6 +2030,11 @@
           
           // Load mode
           setMode(content.mode || 'stoerung');
+
+          // Text laden NACH dem Size Change (um korrekten Editor zu haben)
+          createLineEditor();
+          const textContent = (content.text || '').replace(/\\n/g, '\n');
+          loadTextToLineEditor(textContent);
 
           // Update global status
           const dot = document.getElementById('globalStatusDot');
@@ -1806,7 +2140,9 @@
 
     async function quickDisable() {
       document.getElementById('enabled').checked = false;
-      document.getElementById('text').value = '';
+      // Alle Zeilen leeren
+      document.querySelectorAll('.line-input').forEach(input => input.value = '');
+      updateHiddenTextarea();
       updatePreview();
       await sendToGitHub();
     }
@@ -1851,11 +2187,13 @@
           status = 'active';
         }
 
+        const modeIcon = event.mode === 'fun' ? '🎉' : '⚠️';
+
         return `
           <div class="event-item" data-id="${index}">
             <div class="event-status ${status}"></div>
             <div class="event-info">
-              <div class="event-name">${event.name || event.text.substring(0, 20)}</div>
+              <div class="event-name">${modeIcon} ${event.name || event.text.substring(0, 20)}</div>
               <div class="event-dates">${event.startDate || '?'} - ${event.endDate || '?'} ${event.recurring ? '🔄' : ''}</div>
             </div>
             <div class="event-actions">
@@ -1877,6 +2215,7 @@
       document.getElementById('eventDuration').value = 5;
       document.getElementById('eventRecurring').checked = false;
       document.getElementById('event-size-large').checked = true;
+      setEventMode('fun'); // Default für neue Events
       document.getElementById('eventEditor').classList.remove('hidden');
     }
 
@@ -1896,6 +2235,9 @@
       document.getElementById('eventDuration').value = event.duration || 5;
       document.getElementById('eventRecurring').checked = event.recurring || false;
       
+      // Modus setzen
+      setEventMode(event.mode || 'fun');
+      
       const sizeRadio = document.getElementById('event-size-' + (event.size || 'large'));
       if (sizeRadio) sizeRadio.checked = true;
       
@@ -1911,6 +2253,7 @@
         name: document.getElementById('eventName').value,
         text: document.getElementById('eventText').value.replace(/\n/g, '\\n'),
         size: document.querySelector('input[name="eventSize"]:checked').value,
+        mode: currentEventMode,  // 'stoerung' or 'fun'
         startDate: document.getElementById('eventStartDate').value,
         endDate: document.getElementById('eventEndDate').value,
         interval: parseInt(document.getElementById('eventInterval').value) || 30,
@@ -1991,6 +2334,9 @@
 
     // ============ INIT ============
     document.getElementById('tokenInput').value = getToken();
+    
+    // Initialer Line Editor erstellen
+    createLineEditor();
     
     // Load auth from GitHub first, then update status
     loadAuthFromGitHub().then(() => {
