@@ -1,7 +1,7 @@
 {
   "enabled": false,
-  "text": "",
-  "size": "medium",
+  "text": "HELLO \\nWORLD\\n:D",
+  "size": "large",
   "mode": "stoerung",
   "interval": 30,
   "duration": 4,
