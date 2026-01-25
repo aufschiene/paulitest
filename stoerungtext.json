@@ -1,6 +1,6 @@
 {
-  "enabled": true,
-  "text": "HELLO \\nWORLD\\n:D",
+  "enabled": false,
+  "text": "",
   "size": "large",
   "mode": "stoerung",
   "interval": 30,
