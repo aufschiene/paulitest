@@ -269,6 +269,11 @@
       background: #006e34;
       color: #fff;
     }
+    /* O-Bus / Trolleybus - Orange */
+    .line-badge.type-obus {
+      background: #e67700;
+      color: #fff;
+    }
     /* Regional/Zug - Weiß mit schwarzer Schrift */
     .line-badge.type-train {
       background: #fff;
@@ -414,6 +419,27 @@
       flex-shrink: 0;
     }
     .station-chip .delete:hover { background: #ffcdd2; }
+    .station-chip .edit {
+      background: #e3f2fd;
+      border: none;
+      color: #1565c0;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-right: 6px;
+    }
+    .station-chip .edit:hover { background: #bbdefb; }
+    .station-chip .buttons {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
     
     .empty-state {
       text-align: center;
@@ -470,6 +496,7 @@
       border-top: 1px solid #e0e0e0;
       padding: 16px 20px;
       box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+      z-index: 100;
     }
     .bottom-bar .container { max-width: 500px; }
     .btn-save {
@@ -1222,6 +1249,83 @@
       font-size: 20px;
     }
 
+    /* Feintuning Linz-Filter */
+    .ft-filter-area {
+      margin-top: 12px;
+    }
+    .ft-filter-selected {
+      background: #e8ffe8;
+      border: 1px solid #90d090;
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 16px;
+    }
+    .filter-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      min-height: 40px;
+    }
+    .filter-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      background: #4CAF50;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+    }
+    .filter-item .remove-filter {
+      background: rgba(255,255,255,0.3);
+      border: none;
+      color: white;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .filter-item .remove-filter:hover {
+      background: rgba(255,255,255,0.5);
+    }
+    .ft-filter-pool {
+      background: #fafafa;
+      border: 1px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .filter-pool-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f0f0f0;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 14px;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    .filter-pool-item:hover {
+      background: #e0e0e0;
+      border-color: #4CAF50;
+    }
+    .filter-pool-item.selected {
+      background: #4CAF50;
+      color: white;
+    }
+    .no-filter-hint {
+      color: #888;
+      font-size: 13px;
+      padding: 8px;
+      text-align: center;
+    }
+
     /* Feintuning Gruppierung */
     .ft-grouping-area {
       margin-top: 12px;
@@ -1646,6 +1750,91 @@
       display: none;
     }
 
+    /* Zeilen-Reihenfolge Drag & Drop */
+    .ft-row-order-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .ft-row-order-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #f8f8f8;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      cursor: grab;
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .ft-row-order-item:hover {
+      border-color: #0055a4;
+      background: #f0f5fa;
+    }
+    .ft-row-order-item.dragging {
+      opacity: 0.5;
+      border-color: #0055a4;
+      background: #e8f0f8;
+    }
+    .ft-row-order-item .drag-handle {
+      color: #999;
+      font-size: 18px;
+      cursor: grab;
+    }
+    .ft-row-order-item .row-number {
+      background: #0055a4;
+      color: #fff;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .ft-row-order-item .line-badge {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 14px;
+      background: #333;
+      color: #fff;
+    }
+    .ft-row-order-item .direction-text {
+      flex: 1;
+      font-size: 14px;
+      color: #333;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    /* Gruppen-Styling in der Reihenfolge */
+    .ft-row-order-item.ft-row-order-group {
+      background: linear-gradient(135deg, #f0f5fa 0%, #e8f0f8 100%);
+      border-color: #0055a4;
+    }
+    .ft-row-order-item .group-badges {
+      display: flex;
+      gap: 4px;
+      flex-wrap: wrap;
+    }
+    .ft-row-order-item .group-badges .line-badge {
+      padding: 3px 8px;
+      font-size: 12px;
+    }
+    .ft-row-order-empty {
+      padding: 20px;
+      text-align: center;
+      color: #888;
+      font-size: 14px;
+      background: #f8f8f8;
+      border-radius: 10px;
+      border: 2px dashed #ddd;
+    }
+
     /* Night Mode Times */
     .finetuning-step .night-times {
       display: flex;
@@ -1874,6 +2063,9 @@
         <p>Noch keine Stationen hinzugefügt</p>
       </div>
     </div>
+    <button class="btn btn-primary hidden" id="openFinetuningBtn" onclick="handleStationsNextStep()" style="margin-top: 12px; width: 100%;">
+      Weiter
+    </button>
   </div>
   
   <!-- Step: Display Config -->
@@ -2066,7 +2258,7 @@
       </div>
     </div>
 
-    <!-- Richtungs-Gruppierung -->
+    <!-- Richtungs-Gruppierung & Sortierung -->
     <div class="config-card" id="ftGroupingCard">
       <h3>Richtungen gruppieren</h3>
       <p class="form-hint" style="margin-bottom:12px;">
@@ -2084,6 +2276,29 @@
           <div class="pool-items" id="ftPoolItems">
             <!-- Richtungen werden hier gerendert -->
           </div>
+        </div>
+      </div>
+
+      <!-- Sortierung Toggle -->
+      <div style="margin-top:20px; padding-top:16px; border-top:1px solid #e0e0e0;">
+        <div class="form-row">
+          <div>
+            <div class="form-label">Sortierung</div>
+            <div class="form-hint">Dynamisch nach Zeit oder feste Reihenfolge</div>
+          </div>
+          <div class="toggle-row" id="ftSortModeToggle">
+            <button class="toggle-btn active" data-value="1" onclick="setFtSortMode(1)">Zeit</button>
+            <button class="toggle-btn" data-value="2" onclick="setFtSortMode(2)">Statisch</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zeilen-Reihenfolge (nur bei Statisch sichtbar) -->
+      <div id="ftRowOrderSection" style="display:none; margin-top:16px; padding-top:16px; border-top:1px solid #e0e0e0;">
+        <div class="form-label" style="margin-bottom:12px;">Zeilen-Reihenfolge festlegen</div>
+        <div class="form-hint" style="margin-bottom:12px;">Ziehe die Gruppen/Linien in die gewünschte Reihenfolge (Zeile 1 = oben)</div>
+        <div class="ft-row-order-list" id="ftRowOrderList">
+          <!-- Wird dynamisch gefüllt mit drag & drop Items (Gruppen + einzelne Linien) -->
         </div>
       </div>
     </div>
@@ -2153,6 +2368,22 @@
 </div>
 
 <script>
+// ==================== EARLY MESSAGE HANDLER ====================
+// Fängt Nachrichten ab, die vor dem Laden des restlichen Scripts ankommen
+let _pendingConfigMessages = [];
+let _configHandlerReady = false;
+
+window.addEventListener('message', function(event) {
+  if (event.data?.type === 'loadFullConfig' || event.data?.type === 'loadExistingConfig') {
+    if (_configHandlerReady) {
+      // Handler ist bereit, nichts zu tun (wird vom späteren Handler verarbeitet)
+    } else {
+      // Puffere Nachrichten für später
+      _pendingConfigMessages.push(event.data);
+    }
+  }
+});
+
 // ==================== CONFIG ====================
 const REGIONS = {
   AT: {
@@ -2359,7 +2590,7 @@ const NETWORKS = {
     region: 'DE',
     desc: 'Bodensee-Oberschwaben',
     searchType: 'server_proxy',
-    placeholder: 'z.B. Friedrichshafen...',
+    placeholder: 'z.B. Ravensburg, Bahnhof...',
     isJourneyBased: false
   },
   SALZBURG: {
@@ -2435,6 +2666,8 @@ let selectedStop = null;
 let availableLines = [];
 let selectedLines = new Set();
 let stations = [];
+let editingStationIndex = null;  // Index der Station die bearbeitet wird (null = neue Station)
+let hasExistingConfig = false;   // True wenn Config vom Gerät geladen wurde
 let wienData = null;
 let searchTimeout = null;
 
@@ -2697,7 +2930,6 @@ async function loadWienData() {
   try {
     const response = await fetch(WIEN_DATA_URL);
     wienData = await response.json();
-    console.log('Wien data loaded:', wienData.length, 'lines');
   } catch (e) {
     console.error('Failed to load Wien data:', e);
   }
@@ -3120,20 +3352,22 @@ function addWienStation() {
     return;
   }
 
-  // Ausgewaehlte Richtungen speichern (Linie + towards)
+  // Ausgewaehlte Richtungen speichern (Linie + towards + richtungsId/patternID)
   const selectedDirections = [];
   wienSelectedDirections.forEach(d => {
     selectedDirections.push({
       line: wienSelectedLine.lineName,
       towards: d.towards || '',
-      type: 'metro'
+      type: 'metro',
+      richtungsId: String(d.patternID || '')  // Wien patternID = richtungsId
     });
   });
   wienOtherLines.forEach(ol => {
     selectedDirections.push({
       line: ol.lineName,
       towards: ol.towards || '',
-      type: ol.lineName.startsWith('U') ? 'metro' : 'tram'
+      type: ol.lineName.startsWith('U') ? 'metro' : 'tram',
+      richtungsId: String(ol.patternID || '')  // Wien patternID = richtungsId
     });
   });
 
@@ -3281,29 +3515,41 @@ function displaySearchResults(results) {
 
 // ==================== STOP SELECTION ====================
 async function selectStop(id, name) {
+  const fullId = `${selectedNetwork}:${id}`;
+
+  // Prüfen ob diese Station schon existiert - dann automatisch Bearbeiten-Modus
+  const existingIndex = stations.findIndex(s => s.fullId === fullId);
+  if (existingIndex !== -1) {
+    const existingStation = stations[existingIndex];
+    editingStationIndex = existingIndex;
+    await selectStopForEdit(id, name, existingStation.directions || [], existingStation.filter || '');
+    return;
+  }
+
   selectedStop = { id, name };
   selectedLines = new Set();
   availableLines = [];
-  
+  editingStationIndex = null;  // Sicherstellen dass wir nicht im Bearbeiten-Modus sind
+
   document.getElementById('selectedStationName').textContent = name;
   document.getElementById('selectedStationInfo').textContent = `${NETWORKS[selectedNetwork].name} · ID: ${id}`;
-  
+
   searchResults.classList.remove('show');
   showStep('lines');
-  
+
   // Load departures to get available lines
   linesLoading.classList.remove('hidden');
   linesContainer.classList.add('hidden');
   addStationBtn.disabled = true;
-  
+  addStationBtn.textContent = 'Weiter';  // Button-Text zurücksetzen
+
   try {
-    const fullId = `${selectedNetwork}:${id}`;
     const response = await fetch(`${DEPARTURES_API}?stopId=${fullId}`);
     const data = await response.json();
-    
+
     extractLines(data);
     renderLines();
-    
+
     linesLoading.classList.add('hidden');
     linesContainer.classList.remove('hidden');
   } catch (e) {
@@ -3314,7 +3560,29 @@ async function selectStop(id, name) {
 
 function extractLines(data) {
   const linesMap = new Map();
-  
+
+  // BODO Filter: Nur reine Zahlen oder erlaubte Buslinien
+  // Erlaubt: Reine Zahlen (1, 2, 7, 22/3, etc.), S20-S199 (Schnellbusse), R25-R199 (Regiobusse)
+  function isBodoAllowed(name) {
+    const trimmed = name.trim();
+    // Reine Zahlen sind erlaubt (auch mit Schrägstrich wie 22/3)
+    if (/^[\d\/]+$/.test(trimmed)) return true;
+    // Schnellbusse S20-S199
+    const sMatch = trimmed.match(/^S\s*(\d+)$/i);
+    if (sMatch) {
+      const num = parseInt(sMatch[1]);
+      if (num >= 20 && num <= 199) return true;
+    }
+    // Regiobusse R25-R199
+    const rMatch = trimmed.match(/^R\s*(\d+)$/i);
+    if (rMatch) {
+      const num = parseInt(rMatch[1]);
+      if (num >= 25 && num <= 199) return true;
+    }
+    // Alles andere (MEX, RS, RE, ICE, etc.) ist nicht erlaubt
+    return false;
+  }
+
   if (data.data && data.data.monitors) {
     data.data.monitors.forEach(monitor => {
       if (monitor.lines) {
@@ -3322,7 +3590,12 @@ function extractLines(data) {
           const name = line.name || '?';
           const towards = line.towards || '';
           const key = `${name}|${towards}`;
-          
+
+          // Bei BODO: Nur erlaubte Linien anzeigen
+          if (selectedNetwork === 'BODO' && !isBodoAllowed(name)) {
+            return; // Nicht erlaubte Linie überspringen
+          }
+
           if (!linesMap.has(key)) {
             linesMap.set(key, { name, towards, type: line.type || '' });
           }
@@ -3330,7 +3603,7 @@ function extractLines(data) {
       }
     });
   }
-  
+
   availableLines = Array.from(linesMap.values());
   
   availableLines.sort((a, b) => {
@@ -3421,6 +3694,11 @@ function getLineTypeClass(type, lineName) {
     return 'type-train';
   }
   
+  // O-Bus / Trolleybus (Linz)
+  if (t.includes('obus') || t.includes('trolley') || t.includes('oberleitungsbus')) {
+    return 'type-obus';
+  }
+
   // Bus explizit
   if (t.includes('bus') || t === 'ptbuscity' || t === 'ptbusnight') {
     return 'type-bus';
@@ -3455,11 +3733,16 @@ function getLineTypeClass(type, lineName) {
     return 'type-tram';
   }
   
+  // Linz O-Bus Linien: 41, 43, 45, 46 (ohne Buchstaben)
+  if (!isNaN(num) && [41, 43, 45, 46].includes(num) && /^\d+$/.test(lineName)) {
+    return 'type-obus';
+  }
+
   // Mittlere Nummern (20-99) ohne Buchstaben = wahrscheinlich Bus
   if (!isNaN(num) && num >= 20 && num <= 99 && /^\d+$/.test(lineName)) {
     return 'type-bus';
   }
-  
+
   // Default
   return 'type-default';
 }
@@ -3523,30 +3806,39 @@ function addStation() {
 
   const fullId = `${selectedNetwork}:${selectedStop.id}`;
 
-  // Check duplicate
-  if (stations.some(s => s.fullId === fullId)) {
-    alert('Diese Station ist bereits hinzugefügt!');
-    return;
-  }
-
   // Ausgewaehlte Richtungen speichern (Linie + towards)
   const selectedDirections = Array.from(selectedLines).map(idx => ({
     line: availableLines[idx].name,
     towards: availableLines[idx].towards || '',
-    type: availableLines[idx].type || ''
+    type: availableLines[idx].type || '',
+    richtungsId: availableLines[idx].richtungsId || ''
   }));
 
-  stations.push({
-    network: selectedNetwork,
-    networkName: NETWORKS[selectedNetwork].name,
-    stopId: selectedStop.id,
-    stopName: selectedStop.name,
-    filter: filter,
-    fullId: fullId,
-    isExisting: false,
-    directions: selectedDirections  // Speichert Linie + Richtung
-  });
-  
+  if (editingStationIndex !== null) {
+    // Bearbeiten-Modus: Bestehende Station aktualisieren
+    const existingStation = stations[editingStationIndex];
+    existingStation.filter = filter;
+    existingStation.directions = selectedDirections;
+    editingStationIndex = null;  // Reset
+  } else {
+    // Neu-Modus: Duplikat prüfen
+    if (stations.some(s => s.fullId === fullId)) {
+      alert('Diese Station ist bereits hinzugefügt!');
+      return;
+    }
+
+    stations.push({
+      network: selectedNetwork,
+      networkName: NETWORKS[selectedNetwork].name,
+      stopId: selectedStop.id,
+      stopName: selectedStop.name,
+      filter: filter,
+      fullId: fullId,
+      isExisting: false,
+      directions: selectedDirections
+    });
+  }
+
   // Reset and go back
   selectedStop = null;
   selectedLines = new Set();
@@ -3560,35 +3852,207 @@ function removeStation(idx) {
 }
 
 function updateStationsList() {
-  stationCount.textContent = stations.length;
-  
+  // Gruppiere Stationen nach Name und Netzwerk
+  const groupedStations = new Map();
+  stations.forEach((s, idx) => {
+    const key = `${s.network}:${s.stopName}`;
+    if (!groupedStations.has(key)) {
+      groupedStations.set(key, {
+        network: s.network,
+        stopName: s.stopName,
+        isJourney: s.isJourney,
+        isExisting: s.isExisting,
+        indices: [],
+        filters: [],
+        directions: []
+      });
+    }
+    const group = groupedStations.get(key);
+    group.indices.push(idx);
+    if (s.filter) group.filters.push(s.filter);
+    if (s.directions) group.directions.push(...s.directions);
+  });
+
+  // Anzahl der einzigartigen Stationen anzeigen
+  stationCount.textContent = groupedStations.size;
+
+  const openFinetuningBtn = document.getElementById('openFinetuningBtn');
+
   if (stations.length === 0) {
     emptyState.style.display = 'block';
     saveBtn.disabled = true;
+    if (openFinetuningBtn) openFinetuningBtn.classList.add('hidden');
   } else {
     emptyState.style.display = 'none';
     saveBtn.disabled = false;
+    if (openFinetuningBtn) {
+      openFinetuningBtn.classList.remove('hidden');
+      // Button-Text je nach Config-Status
+      openFinetuningBtn.textContent = hasExistingConfig ? 'Feintuning öffnen' : 'Weiter';
+    }
   }
-  
-  const chips = stations.map((s, idx) => {
-    const filterLabel = s.isJourney ? `Produkte: ${s.filter}` : `Linien: ${s.filter || 'Alle'}`;
-    const badgeClass = s.network.toLowerCase();
-    
+
+  const chips = Array.from(groupedStations.values()).map((group) => {
+    let filterLabel;
+    if (group.isJourney) {
+      const uniqueFilters = [...new Set(group.filters)];
+      filterLabel = `Produkte: ${uniqueFilters.join(', ') || 'Alle'}`;
+    } else if (group.directions && group.directions.length > 0) {
+      // Zeige Linien mit Richtungen: "1 → Böfingen, 2 → Kuhberg"
+      const directionLabels = group.directions.map(d => {
+        if (d.towards) {
+          return `${d.line} → ${d.towards}`;
+        }
+        return d.line;
+      });
+      // Unique und sortiert
+      const uniqueLabels = [...new Set(directionLabels)];
+      filterLabel = uniqueLabels.join(', ');
+    } else {
+      // Fallback: nur Liniennummern
+      const uniqueFilters = [...new Set(group.filters)];
+      filterLabel = `Linien: ${uniqueFilters.join(', ') || 'Alle'}`;
+    }
+    const badgeClass = group.network.toLowerCase();
+    const firstIdx = group.indices[0];
+
     return `
-      <div class="station-chip ${s.isExisting ? 'existing' : ''} ${s.isJourney ? 'journey' : ''}">
-        <span class="network-badge ${badgeClass}">${s.network}</span>
+      <div class="station-chip ${group.isExisting ? 'existing' : ''} ${group.isJourney ? 'journey' : ''}">
+        <span class="network-badge ${badgeClass}">${group.network}</span>
         <div class="info">
-          <div class="stop-name">${s.stopName}</div>
+          <div class="stop-name">${group.stopName}</div>
           <div class="stop-details">${filterLabel}</div>
         </div>
-        <button class="delete" onclick="removeStation(${idx})">×</button>
+        <div class="buttons">
+          <button class="edit" onclick="editStation(${firstIdx})" title="Bearbeiten">✎</button>
+          <button class="delete" onclick="removeStationGroup('${group.network}:${group.stopName.replace(/'/g, "\\'")}')" title="Löschen">×</button>
+        </div>
       </div>
     `;
   }).join('');
-  
+
   const existingChips = stationsContainer.querySelectorAll('.station-chip');
   existingChips.forEach(c => c.remove());
   emptyState.insertAdjacentHTML('beforebegin', chips);
+}
+
+function removeStationGroup(key) {
+  // Entferne alle Stationen mit diesem Key
+  const [network, stopName] = [key.split(':')[0], key.split(':').slice(1).join(':')];
+  stations = stations.filter(s => !(s.network === network && s.stopName === stopName));
+  updateStationsList();
+}
+
+// Nächster Schritt nach Stationen-Auswahl
+function handleStationsNextStep() {
+  if (hasExistingConfig) {
+    // Bestehende Config vom Gerät: Direkt zum Feintuning
+    goToDisplayConfig();  // Erst Config berechnen
+    goToFinetuning();     // Dann direkt zum Feintuning
+  } else {
+    // Neue Config: Zur Display-Config Seite
+    goToDisplayConfig();
+  }
+}
+
+async function editStation(idx) {
+  const station = stations[idx];
+  if (!station) return;
+
+  // Setze Bearbeiten-Modus
+  editingStationIndex = idx;
+
+  // Setze Netzwerk
+  selectedNetwork = station.network;
+
+  if (station.network === 'WL') {
+    // Wien: Lade Wien-Daten und gehe zur Linienauswahl
+    editingStationIndex = null;  // Wien hat eigenen Flow
+    await loadWienData();
+    showStep('wienLine');
+  } else {
+    // Andere Netzwerke: Direkt zur Linienauswahl
+    selectedStop = { id: station.stopId, name: station.stopName };
+    await selectStopForEdit(station.stopId, station.stopName, station.directions || [], station.filter || '');
+  }
+}
+
+// Spezielle Version von selectStop für das Bearbeiten (mit Vorauswahl)
+async function selectStopForEdit(id, name, existingDirections, existingFilter) {
+  selectedStop = { id, name };
+  selectedLines = new Set();
+  availableLines = [];
+
+  document.getElementById('selectedStationName').textContent = name;
+  document.getElementById('selectedStationInfo').textContent = `${NETWORKS[selectedNetwork].name} · ID: ${id}`;
+
+  searchResults.classList.remove('show');
+  showStep('lines');
+
+  // Load departures to get available lines
+  linesLoading.classList.remove('hidden');
+  linesContainer.classList.add('hidden');
+  addStationBtn.disabled = true;
+
+  try {
+    const fullId = `${selectedNetwork}:${id}`;
+    const response = await fetch(`${DEPARTURES_API}?stopId=${fullId}`);
+    const data = await response.json();
+
+    extractLines(data);
+
+    // Vorauswahl: Markiere Linien die bereits ausgewählt waren
+    availableLines.forEach((line, idx) => {
+      let isSelected = false;
+
+      if (existingDirections && existingDirections.length > 0) {
+        // Wenn directions vorhanden: exaktes Matching (Line + Richtung müssen übereinstimmen)
+        isSelected = existingDirections.some(d => {
+          // Linienname muss übereinstimmen
+          if (d.line !== line.name) return false;
+
+          // Beide haben Richtung: müssen übereinstimmen
+          if (d.towards && line.towards) {
+            return d.towards === line.towards;
+          }
+
+          // Gespeicherte direction hat Richtung, aber API nicht: kein Match
+          // (API sollte normalerweise immer towards haben)
+          if (d.towards && !line.towards) {
+            return false;
+          }
+
+          // Gespeicherte direction hat KEINE Richtung: nur Linienname matchen
+          // Das passiert bei alten Configs die ohne directions gespeichert wurden
+          if (!d.towards) {
+            return true;
+          }
+
+          return false;
+        });
+      } else if (existingFilter) {
+        // Fallback: Nur Liniennummer prüfen (für alte Config ohne directions)
+        const filterLines = existingFilter.split(',').map(l => l.trim());
+        isSelected = filterLines.includes(line.name);
+      }
+
+      if (isSelected) {
+        selectedLines.add(idx);
+      }
+    });
+
+    renderLines();
+
+    linesLoading.classList.add('hidden');
+    linesContainer.classList.remove('hidden');
+
+    // Button-Status und -Text aktualisieren
+    addStationBtn.disabled = selectedLines.size === 0;
+    addStationBtn.textContent = 'Aktualisieren';
+  } catch (e) {
+    console.error('Failed to load departures:', e);
+    linesLoading.innerHTML = '<div style="color:#d32f2f">Fehler beim Laden der Linien</div>';
+  }
 }
 
 // ==================== DISPLAY CONFIG ====================
@@ -3669,16 +4133,27 @@ function calculateRecommendedConfig() {
   // Gehweg-Werte (alle auf 0 als Default)
   const gehwegValues = stations.map(() => 0);
 
+  // Einzigartige Stationen für stationDetails (gruppiert nach Name+Netzwerk)
+  const uniqueStationDetails = [];
+  const seenStations = new Set();
+  stations.forEach(s => {
+    const key = `${s.network}:${s.stopName}`;
+    if (!seenStations.has(key)) {
+      seenStations.add(key);
+      uniqueStationDetails.push({
+        id: s.stopId,
+        name: s.stopName,
+        network: s.network,
+        lines: s.filter ? s.filter.split(',').map(l => ({ name: l, direction: '' })) : []
+      });
+    }
+  });
+
   return {
     // Station-Daten
     rbl: stations.map(s => s.fullId).join(','),
     filter: stations.map(s => s.filter || '').join('|'),
-    stationDetails: stations.map(s => ({
-      id: s.stopId,
-      name: s.stopName,
-      network: s.network,
-      lines: s.filter ? s.filter.split(',').map(l => ({ name: l, direction: '' })) : []
-    })),
+    stationDetails: uniqueStationDetails,
 
     // Display-Einstellungen
     colour: displayType,
@@ -3702,9 +4177,16 @@ function calculateRecommendedConfig() {
     stopInterval: 10,
     gehweg: gehwegValues,
     showFunMessages: true,
+    sortMode: 1,           // 1 = Zeit (dynamisch), 2 = Statisch
+    rowOrder: '',          // Zeilen-Reihenfolge einfach (für Wien)
+    rowOrderDestination: '',  // Zeilen-Reihenfolge mit Ziel (für Linz)
 
     // Linien-Gruppierung (Format: "1+62,U1+U2" bedeutet Gruppe1=1&62, Gruppe2=U1&U2)
     lineGroups: stations.map(s => s.lineGroups || '').join('|'),
+
+    // Linien+Ziel Filter für Linz (automatisch aus ausgewählten directions)
+    // Format: "1:Auwiesen,2:Universität" - wird automatisch aus den directions gebaut
+    lineFilterDestination: buildLineFilterDestination(stations),
 
     // Capabilities (für UI)
     capabilities: capabilities,
@@ -3712,12 +4194,96 @@ function calculateRecommendedConfig() {
   };
 }
 
+/**
+ * Baut den lineFilterDestination String aus den directions der Linz-Stationen
+ *
+ * NEUES FORMAT mit Richtungs-Gruppierung:
+ * "1:Auwiesen|Remise Kleinmünchen,2:Universität|Auhof"
+ *
+ * Bedeutung: Linie 1 zeigt Auwiesen UND Remise Kleinmünchen (gleiche Richtung),
+ *            Linie 2 zeigt Universität UND Auhof
+ *
+ * Das löst das Problem, dass abends Trams als "Remise" statt "Auwiesen" fahren,
+ * aber trotzdem angezeigt werden sollen.
+ */
+function buildLineFilterDestination(stationsList) {
+  // Gruppiere nach Linie: { "1": ["Auwiesen", "Remise Kleinmünchen"], "2": ["Universität"] }
+  const lineToDestinations = {};
+
+  stationsList.forEach(station => {
+    // Nur für Linz (Netzwerke ohne richtungsId)
+    if (station.network === 'LINZ' && station.directions && station.directions.length > 0) {
+      station.directions.forEach(dir => {
+        if (dir.line && dir.towards) {
+          const line = dir.line;
+          const dest = dir.towards;
+
+          if (!lineToDestinations[line]) {
+            lineToDestinations[line] = [];
+          }
+          if (!lineToDestinations[line].includes(dest)) {
+            lineToDestinations[line].push(dest);
+          }
+        }
+      });
+    }
+  });
+
+  // Baue Filter-String: "1:Auwiesen|Remise,2:Uni|Auhof"
+  const filters = [];
+  for (const line in lineToDestinations) {
+    const destinations = lineToDestinations[line];
+    // Mehrere Ziele mit | verbinden
+    filters.push(line + ':' + destinations.join('|'));
+  }
+
+  return filters.join(',');
+}
+
 function goToDisplayConfig() {
   if (stations.length === 0) return;
+
+  // Speichere vorherige Einstellungen (vom Gerät geladen)
+  const previousSettings = recommendedConfig ? {
+    lineGroups: recommendedConfig.lineGroups,
+    sortMode: recommendedConfig.sortMode,
+    rowOrder: recommendedConfig.rowOrder,
+    rowOrderDestination: recommendedConfig.rowOrderDestination,
+    lineFilterDestination: recommendedConfig.lineFilterDestination,
+    gehweg: recommendedConfig.gehweg,
+    rows: recommendedConfig.rows,
+    colour: recommendedConfig.colour,
+    displayLight: recommendedConfig.displayLight,
+    chopper: recommendedConfig.chopper,
+    silberpfeil: recommendedConfig.silberpfeil,
+    nightMode: recommendedConfig.nightMode,
+    nightStart: recommendedConfig.nightStart,
+    nightEnd: recommendedConfig.nightEnd,
+    showFunMessages: recommendedConfig.showFunMessages
+  } : null;
 
   // Berechne vollständige empfohlene Konfiguration
   recommendedConfig = calculateRecommendedConfig();
   if (!recommendedConfig) return;
+
+  // Übernehme vorherige Einstellungen (wenn vom Gerät geladen)
+  if (previousSettings) {
+    if (previousSettings.lineGroups) recommendedConfig.lineGroups = previousSettings.lineGroups;
+    if (previousSettings.sortMode !== undefined) recommendedConfig.sortMode = previousSettings.sortMode;
+    if (previousSettings.rowOrder) recommendedConfig.rowOrder = previousSettings.rowOrder;
+    if (previousSettings.rowOrderDestination) recommendedConfig.rowOrderDestination = previousSettings.rowOrderDestination;
+    if (previousSettings.lineFilterDestination) recommendedConfig.lineFilterDestination = previousSettings.lineFilterDestination;
+    if (previousSettings.gehweg) recommendedConfig.gehweg = previousSettings.gehweg;
+    if (previousSettings.rows) recommendedConfig.rows = previousSettings.rows;
+    if (previousSettings.colour !== undefined) recommendedConfig.colour = previousSettings.colour;
+    if (previousSettings.displayLight !== undefined) recommendedConfig.displayLight = previousSettings.displayLight;
+    if (previousSettings.chopper !== undefined) recommendedConfig.chopper = previousSettings.chopper;
+    if (previousSettings.silberpfeil !== undefined) recommendedConfig.silberpfeil = previousSettings.silberpfeil;
+    if (previousSettings.nightMode !== undefined) recommendedConfig.nightMode = previousSettings.nightMode;
+    if (previousSettings.nightStart !== undefined) recommendedConfig.nightStart = previousSettings.nightStart;
+    if (previousSettings.nightEnd !== undefined) recommendedConfig.nightEnd = previousSettings.nightEnd;
+    if (previousSettings.showFunMessages !== undefined) recommendedConfig.showFunMessages = previousSettings.showFunMessages;
+  }
 
   suggestedColor = recommendedConfig.colour;
   suggestedRows = recommendedConfig.rows;
@@ -3826,11 +4392,12 @@ function updateRealisticPreview(config) {
       highlight: '#87ceeb',    // Skyblue für Hochflurer
       name: 'Wiener Linien'
     },
-    2: { // Linz AG
-      bg: '#000500',
-      text: '#fff05d',
-      highlight: '#87ceeb',
-      name: 'Linz AG'
+    2: { // Linz AG - LED Matrix Style
+      bg: '#001405',           // Dunkelgrün (LED Matrix Hintergrund)
+      text: '#c8ff00',         // Gelb-Grün (LED Farbe)
+      highlight: '#c8ff00',
+      name: 'Linz AG',
+      isLedMatrix: true        // Flag für spezielles LED-Matrix Rendering
     },
     3: { // VBB Berlin
       bg: '#000500',
@@ -3901,6 +4468,7 @@ function updateRealisticPreview(config) {
   if (sampleData.length === 0) {
     const fallbackData = {
       1: [{ line: 'U6', dest: 'Floridsdorf', time: 3 }, { line: '2', dest: 'Ottakring', time: 6 }, { line: '13A', dest: 'Hauptbahnhof', time: 8 }],
+      2: [{ line: '1', dest: 'Auwiesen', time: 2 }, { line: '2', dest: 'Solar City', time: 5 }, { line: '43', dest: 'Harbachsiedlung', time: 8 }],  // Linz AG
       4: [{ line: 'WLB', dest: 'Baden Josefsplatz', time: 4 }, { line: 'WLB', dest: 'Wien Oper', time: 12 }],
       5: [{ line: 'S1', dest: 'Oranienburg', time: 2 }, { line: 'S7', dest: 'Ahrensfelde', time: 5 }],
       6: [{ line: 'ICE', dest: 'Berlin Hbf', time: 12 }, { line: 'RJ', dest: 'Wien Hbf', time: 28 }],
@@ -3910,35 +4478,69 @@ function updateRealisticPreview(config) {
     sampleData = (fallbackData[colour] || fallbackData[1]).slice(0, rows);
   }
 
-  // Realistische Preview im Stil von display_wien.cpp
+  // Realistische Preview im Stil von display_wien.cpp / display_linz.cpp
   const rowHeight = Math.floor(80 / rows);
-  previewEl.style.background = style.bg;
   previewEl.style.borderRadius = '4px';
   previewEl.style.padding = '0';
   previewEl.style.overflow = 'hidden';
 
-  previewEl.innerHTML = `
-    <div class="realistic-display" style="width:100%;height:100%;display:flex;flex-direction:column;">
-      ${sampleData.slice(0, rows).map((dep, i) => {
-        const textColor = dep.isHighfloor && config.capabilities?.showHighFloor ? style.highlight : style.text;
-        return `
-          <div class="display-row" style="
-            flex:1;
-            display:flex;
-            align-items:center;
-            padding:2px 4px;
-            border-bottom:${i < rows - 1 ? '1px solid #000' : 'none'};
-            color:${textColor};
-            font-family:'Courier New',monospace;
-          ">
-            <span style="font-weight:bold;font-size:10px;min-width:28px;">${dep.line}</span>
-            <span style="flex:1;font-size:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0 4px;">${dep.dest}</span>
-            <span style="font-weight:bold;font-size:11px;color:${style.text};">${dep.time}</span>
-          </div>
-        `;
-      }).join('')}
-    </div>
-  `;
+  // Linz AG LED-Matrix Style
+  if (style.isLedMatrix) {
+    const gridColor = '#000a02';  // Noch dunkleres Grün für Gitter
+    previewEl.style.background = style.bg;
+    previewEl.style.backgroundImage = `radial-gradient(circle, ${gridColor} 1px, transparent 1px)`;
+    previewEl.style.backgroundSize = '4px 4px';
+
+    previewEl.innerHTML = `
+      <div class="realistic-display linz-led-matrix" style="width:100%;height:100%;display:flex;flex-direction:column;">
+        ${sampleData.slice(0, rows).map((dep, i) => {
+          return `
+            <div class="display-row" style="
+              flex:1;
+              display:flex;
+              align-items:center;
+              padding:2px 4px;
+              border-bottom:${i < rows - 1 ? '1px solid #000a02' : 'none'};
+              color:${style.text};
+              font-family:'Courier New',monospace;
+              text-shadow: 0 0 4px ${style.text}, 0 0 8px ${style.text}40;
+            ">
+              <span style="font-weight:bold;font-size:10px;min-width:28px;text-shadow:0 0 6px ${style.text};">${dep.line}</span>
+              <span style="flex:1;font-size:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0 4px;">${dep.dest}</span>
+              <span style="font-weight:bold;font-size:11px;text-shadow:0 0 6px ${style.text};">${dep.time}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  } else {
+    // Standard Display Style (Wien, etc.)
+    previewEl.style.background = style.bg;
+    previewEl.style.backgroundImage = 'none';
+
+    previewEl.innerHTML = `
+      <div class="realistic-display" style="width:100%;height:100%;display:flex;flex-direction:column;">
+        ${sampleData.slice(0, rows).map((dep, i) => {
+          const textColor = dep.isHighfloor && config.capabilities?.showHighFloor ? style.highlight : style.text;
+          return `
+            <div class="display-row" style="
+              flex:1;
+              display:flex;
+              align-items:center;
+              padding:2px 4px;
+              border-bottom:${i < rows - 1 ? '1px solid #000' : 'none'};
+              color:${textColor};
+              font-family:'Courier New',monospace;
+            ">
+              <span style="font-weight:bold;font-size:10px;min-width:28px;">${dep.line}</span>
+              <span style="flex:1;font-size:8px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0 4px;">${dep.dest}</span>
+              <span style="font-weight:bold;font-size:11px;color:${style.text};">${dep.time}</span>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `;
+  }
 }
 
 // Legacy-Funktion für Kompatibilität
@@ -4156,6 +4758,12 @@ function initFinetuningStep() {
   // Gruppierung initialisieren
   initFtGrouping();
 
+  // Zeilen-Reihenfolge zurücksetzen, damit gespeicherte Konfiguration geladen wird
+  ftRowOrder = [];
+
+  // Sortierungsmodus initialisieren
+  setFtSortMode(config.sortMode || 1);
+
   // Preview aktualisieren
   updateFinetuningPreview();
 }
@@ -4193,7 +4801,16 @@ function populateFtGehwegList() {
   const container = document.getElementById('ftGehwegList');
   container.innerHTML = '';
 
+  // Gruppiere Stationen nach Name und Netzwerk (wie in updateStationsList)
+  const uniqueStations = new Map();
   stations.forEach((station, index) => {
+    const key = `${station.network}:${station.stopName}`;
+    if (!uniqueStations.has(key)) {
+      uniqueStations.set(key, { station, index });
+    }
+  });
+
+  uniqueStations.forEach(({ station, index }) => {
     const gehwegValue = recommendedConfig.gehweg?.[index] || 0;
     const item = document.createElement('div');
     item.className = 'gehweg-item';
@@ -4230,6 +4847,433 @@ function setFtBrightness(value) {
 function getFtBrightness() {
   const active = document.querySelector('#ftBrightnessToggle .toggle-btn.active');
   return active ? parseInt(active.dataset.value) : 3;
+}
+
+// ==================== SORTIERUNG & ZEILEN-REIHENFOLGE ====================
+let ftSortMode = 1;  // 1 = Zeit (dynamisch), 2 = Statisch
+let ftRowOrder = []; // Array von {line, towards, key} in der gewünschten Reihenfolge
+
+function setFtSortMode(value) {
+  ftSortMode = value;
+  document.querySelectorAll('#ftSortModeToggle .toggle-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.value) === value);
+  });
+
+  // Zeilen-Reihenfolge Sektion ein-/ausblenden
+  const rowOrderSection = document.getElementById('ftRowOrderSection');
+  if (value === 2) {
+    rowOrderSection.style.display = 'block';
+    initRowOrderList();
+  } else {
+    rowOrderSection.style.display = 'none';
+  }
+}
+
+function getFtSortMode() {
+  return ftSortMode;
+}
+
+function initRowOrderList() {
+  const container = document.getElementById('ftRowOrderList');
+
+  // Versuche gespeicherte Reihenfolge aus Config zu laden
+  const savedRowOrder = recommendedConfig?.rowOrderDestination || recommendedConfig?.rowOrder || '';
+
+  // Sammle alle verfügbaren Linien+Richtungen aus den Stationen
+  const allDirections = [];
+  stations.forEach(station => {
+    if (station.directions && Array.isArray(station.directions)) {
+      station.directions.forEach(dir => {
+        const key = `${dir.line}:${dir.towards || ''}`;
+        if (!allDirections.some(d => d.key === key)) {
+          allDirections.push({
+            line: dir.line,
+            towards: dir.towards || '',
+            type: dir.type || '',
+            key: key
+          });
+        }
+      });
+    } else if (station.filter) {
+      // Fallback: aus filter String
+      const lines = station.filter.split(',').map(l => l.trim());
+      lines.forEach(lineName => {
+        const key = `${lineName}:`;
+        if (!allDirections.some(d => d.key === key)) {
+          allDirections.push({
+            line: lineName,
+            towards: station.stopName || '',
+            type: '',
+            key: key
+          });
+        }
+      });
+    }
+  });
+
+  // Erstelle Order-Items basierend auf Gruppen + einzelne ungruppierten Richtungen
+  const orderItems = [];
+  const usedKeys = new Set();
+
+  // 1. Füge Gruppen hinzu
+  ftLineGroups.forEach((group, gIdx) => {
+    const groupDirections = (group.directions || []).map(key => {
+      // Suche exaktes Match
+      let dirInfo = allDirections.find(d => d.key === key);
+
+      // Fallback: Suche nach Linie+richtungsId wenn Key mit :R beginnt
+      if (!dirInfo && key.includes(':R')) {
+        const colonIdx = key.indexOf(':');
+        const line = key.substring(0, colonIdx);
+        const richtungsId = key.substring(colonIdx + 2); // Nach ":R"
+        dirInfo = allDirections.find(d => d.line === line && d.richtungsId === richtungsId);
+      }
+
+      // Fallback: Suche nach Linie+Zieltext
+      if (!dirInfo && key.includes(':') && !key.includes(':R')) {
+        const colonIdx = key.indexOf(':');
+        const line = key.substring(0, colonIdx);
+        const towards = key.substring(colonIdx + 1);
+        dirInfo = allDirections.find(d => d.line === line && d.towards === towards);
+      }
+
+      return dirInfo || { key, line: key.split(':')[0], towards: key.includes(':R') ? '' : key.split(':').slice(1).join(':') };
+    });
+
+    orderItems.push({
+      type: 'group',
+      groupIndex: gIdx,
+      directions: groupDirections,
+      key: `group_${gIdx}`
+    });
+
+    // Markiere alle Keys dieser Gruppe als verwendet (sowohl der Original-Key als auch der gefundene)
+    (group.directions || []).forEach(k => usedKeys.add(k));
+    groupDirections.forEach(d => usedKeys.add(d.key));
+  });
+
+  // 2. Füge ungruppierten Richtungen hinzu
+  allDirections.forEach(dir => {
+    if (!usedKeys.has(dir.key)) {
+      orderItems.push({
+        type: 'single',
+        line: dir.line,
+        towards: dir.towards,
+        lineType: dir.type,
+        key: dir.key
+      });
+    }
+  });
+
+  // Wenn ftRowOrder leer oder veraltet ist, initialisiere neu
+  if (ftRowOrder.length === 0 || !ftRowOrder[0]?.type) {
+    // Versuche gespeicherte Reihenfolge aus Config zu laden
+    if (savedRowOrder && savedRowOrder.length > 0) {
+      // Format: "1:Uni+2:Uni,3:Solar" - Gruppen mit +, Einträge mit ,
+      const savedItems = savedRowOrder.split(',').map(s => s.trim());
+      const sortedOrder = [];
+      const processedKeys = new Set();
+
+      // Sortiere orderItems nach der gespeicherten Reihenfolge
+      savedItems.forEach(savedItem => {
+        // Prüfe ob savedItem eine Gruppe ist (enthält +)
+        const isGroupItem = savedItem.includes('+');
+
+        if (isGroupItem) {
+          // Gruppe: "1:Uni+2:Uni" - parse alle Teile
+          const groupParts = savedItem.split('+').map(p => p.trim());
+          const firstPart = groupParts[0];
+          const colonIdx = firstPart.indexOf(':');
+          const savedLine = colonIdx > 0 ? firstPart.substring(0, colonIdx) : firstPart;
+          const savedDest = colonIdx > 0 ? firstPart.substring(colonIdx + 1) : '';
+
+          // Finde passende Gruppe in orderItems
+          for (const item of orderItems) {
+            if (processedKeys.has(item.key)) continue;
+            if (item.type !== 'group') continue;
+
+            // Prüfe ob diese Gruppe die erste Linie+Destination enthält
+            const hasMatch = item.directions.some(d => {
+              const lineMatch = d.line === savedLine;
+              const destMatch = !savedDest || d.towards === savedDest ||
+                                d.towards.includes(savedDest) || savedDest.includes(d.towards);
+              return lineMatch && destMatch;
+            });
+            if (hasMatch) {
+              sortedOrder.push(item);
+              processedKeys.add(item.key);
+              break;
+            }
+          }
+        } else {
+          // Single: "2:solarCity" oder nur "2"
+          const colonIdx = savedItem.indexOf(':');
+          const savedLine = colonIdx > 0 ? savedItem.substring(0, colonIdx) : savedItem;
+          const savedDest = colonIdx > 0 ? savedItem.substring(colonIdx + 1) : '';
+
+          // Finde passendes Item (Gruppe oder Single)
+          for (const item of orderItems) {
+            if (processedKeys.has(item.key)) continue;
+
+            if (item.type === 'group') {
+              // Prüfe ob diese Gruppe die gespeicherte Linie+Destination enthält
+              const hasMatch = item.directions.some(d => {
+                const lineMatch = d.line === savedLine;
+                const destMatch = !savedDest || d.towards === savedDest ||
+                                  d.towards.includes(savedDest) || savedDest.includes(d.towards);
+                return lineMatch && destMatch;
+              });
+              if (hasMatch) {
+                sortedOrder.push(item);
+                processedKeys.add(item.key);
+                break;
+              }
+            } else if (item.type === 'single') {
+              const lineMatch = item.line === savedLine;
+              const destMatch = !savedDest || item.towards === savedDest ||
+                                item.towards.includes(savedDest) || savedDest.includes(item.towards);
+              if (lineMatch && destMatch) {
+                sortedOrder.push(item);
+                processedKeys.add(item.key);
+                break;
+              }
+            }
+          }
+        }
+      });
+
+      // Füge nicht gefundene Items am Ende hinzu
+      orderItems.forEach(item => {
+        if (!processedKeys.has(item.key)) {
+          sortedOrder.push(item);
+        }
+      });
+
+      ftRowOrder = sortedOrder;
+    } else {
+      ftRowOrder = orderItems;
+    }
+  } else {
+    // Synchronisiere: behalte Reihenfolge, aber aktualisiere Gruppen
+    const newOrder = [];
+    const processedKeys = new Set();
+    const processedGroupIndices = new Set();
+
+    // Sammle alle Keys die jetzt in Gruppen sind (inkl. Linie für Fallback-Match)
+    const keysInGroups = new Set();
+    const linesInGroups = new Set();
+    orderItems.forEach(item => {
+      if (item.type === 'group') {
+        item.directions.forEach(d => {
+          keysInGroups.add(d.key);
+          linesInGroups.add(d.line);
+        });
+      }
+    });
+
+    // Behalte bestehende Reihenfolge wo möglich
+    ftRowOrder.forEach(item => {
+      if (item.type === 'group') {
+        // Prüfe ob Gruppe noch existiert (gleicher Index)
+        const matchingGroup = orderItems.find(oi =>
+          oi.type === 'group' && oi.groupIndex === item.groupIndex
+        );
+        if (matchingGroup && !processedGroupIndices.has(matchingGroup.groupIndex)) {
+          newOrder.push(matchingGroup);
+          processedKeys.add(matchingGroup.key);
+          processedGroupIndices.add(matchingGroup.groupIndex);
+        }
+      } else if (item.type === 'single') {
+        // Prüfe ob dieses Single jetzt in einer Gruppe ist
+        // Vergleiche über Key ODER über Linie+Towards
+        const isInGroup = keysInGroups.has(item.key) ||
+          Array.from(orderItems).some(oi =>
+            oi.type === 'group' && oi.directions.some(d =>
+              d.key === item.key || (d.line === item.line && d.towards === item.towards)
+            )
+          );
+
+        if (isInGroup) {
+          // Dieses Single ist jetzt gruppiert - füge die Gruppe hier ein (falls noch nicht eingefügt)
+          const groupWithThisKey = orderItems.find(oi =>
+            oi.type === 'group' && oi.directions.some(d =>
+              d.key === item.key || (d.line === item.line && d.towards === item.towards)
+            )
+          );
+          if (groupWithThisKey && !processedGroupIndices.has(groupWithThisKey.groupIndex)) {
+            newOrder.push(groupWithThisKey);
+            processedKeys.add(groupWithThisKey.key);
+            processedGroupIndices.add(groupWithThisKey.groupIndex);
+          }
+          // Single nicht mehr hinzufügen (ist in Gruppe)
+        } else {
+          // Prüfe ob Single noch existiert
+          const matchingSingle = orderItems.find(oi =>
+            oi.type === 'single' && (oi.key === item.key || (oi.line === item.line && oi.towards === item.towards))
+          );
+          if (matchingSingle) {
+            newOrder.push(matchingSingle);
+            processedKeys.add(matchingSingle.key);
+          }
+        }
+      }
+    });
+
+    // Füge neue Items hinzu die noch nicht in der Reihenfolge sind
+    orderItems.forEach(item => {
+      if (!processedKeys.has(item.key)) {
+        newOrder.push(item);
+      }
+    });
+
+    ftRowOrder = newOrder;
+  }
+
+  renderRowOrderList();
+}
+
+function renderRowOrderList() {
+  const container = document.getElementById('ftRowOrderList');
+
+  if (ftRowOrder.length === 0) {
+    container.innerHTML = '<div class="ft-row-order-empty">Keine Linien verfügbar</div>';
+    return;
+  }
+
+  container.innerHTML = ftRowOrder.map((item, idx) => {
+    if (item.type === 'group') {
+      // Gruppe darstellen - zeigt alle Linien der Gruppe
+      const badgesHtml = item.directions.map(dir => {
+        const badgeClass = getLineTypeClass(dir.type || dir.lineType, dir.line);
+        return `<span class="line-badge ${badgeClass}">${dir.line}</span>`;
+      }).join('');
+
+      const firstDest = item.directions[0]?.towards || '';
+
+      return `
+        <div class="ft-row-order-item ft-row-order-group" draggable="true" data-index="${idx}">
+          <span class="drag-handle">☰</span>
+          <span class="row-number">${idx + 1}</span>
+          <span class="group-badges">${badgesHtml}</span>
+          <span class="direction-text">${firstDest}</span>
+        </div>
+      `;
+    } else {
+      // Einzelne Linie
+      const badgeClass = getLineTypeClass(item.lineType, item.line);
+      return `
+        <div class="ft-row-order-item" draggable="true" data-index="${idx}">
+          <span class="drag-handle">☰</span>
+          <span class="row-number">${idx + 1}</span>
+          <span class="line-badge ${badgeClass}">${item.line}</span>
+          <span class="direction-text">${item.towards || 'Alle Richtungen'}</span>
+        </div>
+      `;
+    }
+  }).join('');
+
+  // Drag & Drop Events hinzufügen
+  const items = container.querySelectorAll('.ft-row-order-item');
+  items.forEach(item => {
+    item.addEventListener('dragstart', handleDragStart);
+    item.addEventListener('dragend', handleDragEnd);
+    item.addEventListener('dragover', handleDragOver);
+    item.addEventListener('drop', handleDrop);
+    item.addEventListener('dragenter', handleDragEnter);
+    item.addEventListener('dragleave', handleDragLeave);
+  });
+}
+
+let draggedItem = null;
+let draggedIndex = -1;
+
+function handleDragStart(e) {
+  draggedItem = this;
+  draggedIndex = parseInt(this.dataset.index);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', draggedIndex);
+}
+
+function handleDragEnd(e) {
+  this.classList.remove('dragging');
+  document.querySelectorAll('.ft-row-order-item').forEach(item => {
+    item.classList.remove('drag-over');
+  });
+  draggedItem = null;
+  draggedIndex = -1;
+}
+
+function handleDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function handleDragEnter(e) {
+  e.preventDefault();
+  if (this !== draggedItem) {
+    this.classList.add('drag-over');
+  }
+}
+
+function handleDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const targetIndex = parseInt(this.dataset.index);
+
+  if (draggedIndex !== -1 && draggedIndex !== targetIndex) {
+    // Element verschieben
+    const movedItem = ftRowOrder.splice(draggedIndex, 1)[0];
+    ftRowOrder.splice(targetIndex, 0, movedItem);
+
+    // Liste neu rendern
+    renderRowOrderList();
+  }
+
+  this.classList.remove('drag-over');
+}
+
+function getRowOrderString() {
+  // Einfaches Format für Wien: "U6,2,43" - nur Linien
+  // Bei Gruppen: erste Linie der Gruppe verwenden
+  const lines = [];
+  ftRowOrder.forEach(item => {
+    if (item.type === 'group' && item.directions && item.directions.length > 0) {
+      // Bei Gruppe: alle Linien der Gruppe hinzufügen (erste kommt zuerst)
+      item.directions.forEach(dir => {
+        if (!lines.includes(dir.line)) {
+          lines.push(dir.line);
+        }
+      });
+    } else if (item.type === 'single') {
+      if (!lines.includes(item.line)) {
+        lines.push(item.line);
+      }
+    }
+  });
+  return lines.join(',');
+}
+
+function getRowOrderDestinationString() {
+  // Format für Linz: "1:Uni+2:Uni,3:Solarc" - Gruppen mit +, Einträge mit ,
+  // Bei Gruppen: alle Richtungen der Gruppe mit + verbunden
+  // Bei Singles: einzeln
+  const items = [];
+  ftRowOrder.forEach(item => {
+    if (item.type === 'group' && item.directions && item.directions.length > 0) {
+      // Bei Gruppe: alle Richtungen mit + verbinden
+      const groupParts = item.directions.map(dir => `${dir.line}:${dir.towards || ''}`);
+      items.push(groupParts.join('+'));
+    } else if (item.type === 'single') {
+      items.push(`${item.line}:${item.towards || ''}`);
+    }
+  });
+  return items.join(',');
 }
 
 function updateFinetuningPreview() {
@@ -4280,12 +5324,32 @@ function updateFinetuningPreview() {
   // Render basierend auf Display-Typ
   let html = '';
 
-  if (colour === 1 || colour === 2 || colour === 3) {
-    // Wien/Linz/VBB Style: Gelb auf schwarz
+  if (colour === 2) {
+    // LINZ Style: Gelb-Grün auf dunkelgrünem Hintergrund mit LED-Matrix Look
+    const bgColor = '#001405';  // Sehr dunkelgrün
+    const textColor = '#c8ff00';  // Gelb-Grün (LED-Farbe)
+    const gridColor = '#002810';  // Etwas heller für Gitter-Muster
+    previewEl.style.background = bgColor;
+    previewEl.style.backgroundImage = `radial-gradient(circle, ${gridColor} 1px, transparent 1px)`;
+    previewEl.style.backgroundSize = '4px 4px';
+
+    html = `<div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:'Courier New',monospace;">
+      ${data.map((dep, i) => {
+        return `<div style="flex:1;display:flex;align-items:center;padding:4px 8px;border-bottom:${i < rows - 1 ? '1px solid #0a3020' : 'none'};color:${textColor};">
+          <span style="font-weight:bold;font-size:18px;min-width:36px;text-shadow:0 0 8px ${textColor};">${dep.line}</span>
+          <span style="flex:1;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;margin:0 6px;text-shadow:0 0 4px ${textColor};">${dep.dest}</span>
+          <span style="font-weight:bold;font-size:18px;text-shadow:0 0 8px ${textColor};">${dep.time}</span>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }
+  else if (colour === 1 || colour === 3) {
+    // Wien/VBB Style: Gelb auf schwarz
     const bgColor = '#000500';
     const textColor = '#fff05d';
     const hlColor = '#87ceeb';
     previewEl.style.background = bgColor;
+    previewEl.style.backgroundImage = 'none';
 
     html = `<div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:'Courier New',monospace;">
       ${data.map((dep, i) => {
@@ -4301,6 +5365,7 @@ function updateFinetuningPreview() {
   else if (colour === 4) {
     // WLB Style: Weiß auf blau gestreift
     previewEl.style.background = '#0078c8';
+    previewEl.style.backgroundImage = 'none';
 
     html = `<div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Arial,sans-serif;">
       ${data.map((dep, i) => {
@@ -4317,6 +5382,7 @@ function updateFinetuningPreview() {
     // DB Style: Modern dunkel
     const bgColor = '#0a1628';
     previewEl.style.background = bgColor;
+    previewEl.style.backgroundImage = 'none';
 
     html = `<div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Arial,sans-serif;">
       ${data.map((dep, i) => {
@@ -4333,6 +5399,7 @@ function updateFinetuningPreview() {
   else if (colour === 7) {
     // BODO Style: Blau
     previewEl.style.background = '#005BBB';
+    previewEl.style.backgroundImage = 'none';
 
     html = `<div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Arial,sans-serif;">
       ${data.map((dep, i) => `<div style="flex:1;display:flex;align-items:center;padding:4px 10px;color:#fff;">
@@ -4345,6 +5412,7 @@ function updateFinetuningPreview() {
   else if (colour === 8) {
     // Salzburg Style: Schwarz/Weiß alternierend mit Uhrzeit
     previewEl.style.background = '#000';
+    previewEl.style.backgroundImage = 'none';
 
     html = `<div style="width:100%;height:100%;display:flex;flex-direction:column;font-family:Arial,sans-serif;">
       ${data.map((dep, i) => {
@@ -4376,6 +5444,44 @@ function backFromFinetuning() {
   document.getElementById('stepDisplayConfig').classList.remove('hidden');
 }
 
+// ==================== FEINTUNING: LINZ LINIEN-FILTER ====================
+// Filter wird jetzt automatisch aus ausgewählten Linien generiert (in buildLineFilterDestination)
+
+function isLinzNetwork() {
+  // Prüfe ob mindestens eine Station aus Linz ist
+  return stations.some(s => s.network === 'LINZ' || (s.stopId && s.stopId.toString().startsWith('LINZ:')));
+}
+
+function collectFtLineFilter() {
+  // Generiere Filter aus allen aktuell verfügbaren Richtungen
+  // Format: "1:Universität,2:Solarcity,27:Chemiepark"
+  // WICHTIG: Gruppierte Linien werden im Display sowieso nicht gefiltert,
+  // daher hier nur die ungruppierten Richtungen sammeln
+
+  const filterParts = [];
+
+  // Sammle alle Keys die in Gruppen sind
+  const groupedKeys = new Set();
+  for (const group of ftLineGroups) {
+    if (group.directions) {
+      for (const key of group.directions) {
+        groupedKeys.add(key);
+      }
+    }
+  }
+
+  // Nur ungroupierte Richtungen zum Filter hinzufügen
+  for (const dir of ftAvailableDirections) {
+    if (dir.line && dir.towards && !groupedKeys.has(dir.key)) {
+      filterParts.push(dir.line + ':' + dir.towards);
+    }
+  }
+
+  // Entferne Duplikate
+  const uniqueParts = [...new Set(filterParts)];
+  return uniqueParts.join(',');
+}
+
 // ==================== FEINTUNING: RICHTUNGS-GRUPPIERUNG ====================
 let ftLineGroups = [];  // Array of groups: [{ directions: ['U1:Leopoldau', '62:Meidling'] }, ...]
 let ftAvailableDirections = [];  // Alle verfugbaren Richtungen aus den Stationen
@@ -4397,6 +5503,9 @@ async function initFtGrouping() {
     parseFtExistingGroups(recommendedConfig.lineGroups);
   }
 
+  // WICHTIG: Bereinige Gruppen - entferne Linien die nicht mehr ausgewählt sind
+  cleanupGroupsWithCurrentDirections();
+
   // Event-Listener anhaengen (nur einmal)
   if (!ftEventsAttached) {
     setupFtGroupingEvents();
@@ -4405,6 +5514,46 @@ async function initFtGrouping() {
 
   // UI rendern
   renderFtGroupingUI();
+}
+
+// Bereinigt Gruppen: Entfernt Linien die nicht mehr in ftAvailableDirections sind
+// Löst Gruppen auf die weniger als 2 Linien haben
+function cleanupGroupsWithCurrentDirections() {
+  // Sammle alle aktuell verfügbaren Keys
+  const availableKeys = new Set(ftAvailableDirections.map(d => d.key));
+
+  // Gehe durch alle Gruppen und entferne ungültige Richtungen
+  for (let i = ftLineGroups.length - 1; i >= 0; i--) {
+    const group = ftLineGroups[i];
+    if (!group.directions) {
+      ftLineGroups.splice(i, 1);
+      continue;
+    }
+
+    // Filtere nur die Richtungen die noch verfügbar sind
+    group.directions = group.directions.filter(key => {
+      // Prüfe ob der Key in availableKeys ist
+      if (availableKeys.has(key)) return true;
+
+      // Fallback: Prüfe ob Linie:Destination matcht (ohne R-Prefix für richtungsId)
+      // z.B. "27:Chemiepark" sollte matchen auch wenn Key anders formatiert ist
+      const parts = key.split(':');
+      if (parts.length >= 2) {
+        const line = parts[0];
+        const dest = parts.slice(1).join(':');
+        // Suche nach passender Richtung
+        return ftAvailableDirections.some(d =>
+          d.line === line && (d.towards === dest || d.key === key)
+        );
+      }
+      return false;
+    });
+
+    // Gruppe auflösen wenn weniger als 2 Richtungen übrig
+    if (group.directions.length < 2) {
+      ftLineGroups.splice(i, 1);
+    }
+  }
 }
 
 async function loadFtDirectionsFromStations() {
@@ -4418,10 +5567,24 @@ async function loadFtDirectionsFromStations() {
         const lineName = dir.line || '';
         const towards = dir.towards || '';
         const type = dir.type || '';
+        const richtungsId = dir.richtungsId || '';
 
         if (!lineName) return;
 
-        const key = `${lineName}:${towards}`;
+        // Bei BODO: Nur erlaubte Linien (Zahlen, Zahlen mit Schrägstrich, S20-S199, R25-R199)
+        if (station.network === 'BODO') {
+          const trimmed = lineName.trim();
+          const isAllowed = /^[\d\/]+$/.test(trimmed) ||
+            (trimmed.match(/^S\s*(\d+)$/i) && parseInt(trimmed.match(/^S\s*(\d+)$/i)[1]) >= 20 && parseInt(trimmed.match(/^S\s*(\d+)$/i)[1]) <= 199) ||
+            (trimmed.match(/^R\s*(\d+)$/i) && parseInt(trimmed.match(/^R\s*(\d+)$/i)[1]) >= 25 && parseInt(trimmed.match(/^R\s*(\d+)$/i)[1]) <= 199);
+          if (!isAllowed) {
+            return; // Nicht erlaubte Linie überspringen
+          }
+        }
+
+        // Für Wien: Key basiert auf richtungsId (wenn vorhanden)
+        // Für Linz/andere: Key basiert auf towards
+        const key = richtungsId ? `${lineName}:R${richtungsId}` : `${lineName}:${towards}`;
         // Duplikate vermeiden
         if (!ftAvailableDirections.some(d => d.key === key)) {
           ftAvailableDirections.push({
@@ -4429,7 +5592,9 @@ async function loadFtDirectionsFromStations() {
             line: lineName,
             towards: towards,
             type: type,
-            station: station.stopName
+            richtungsId: richtungsId,
+            station: station.stopName,
+            network: station.network  // Netzwerk speichern für spätere Logik
           });
         }
       });
@@ -4447,19 +5612,34 @@ async function loadFtDirectionsFromStations() {
                 const lineName = line.name || '';
                 const towards = line.towards || monitor.towards || '';
                 const type = line.type || '';
+                const richtungsId = line.richtungsId || monitor.richtungsId || '';
 
                 if (!lineName) return;
 
+                // Bei BODO: Nur erlaubte Linien (Zahlen, Zahlen mit Schrägstrich, S20-S199, R25-R199)
+                if (station.network === 'BODO') {
+                  const trimmed = lineName.trim();
+                  const isAllowed = /^[\d\/]+$/.test(trimmed) ||
+                    (trimmed.match(/^S\s*(\d+)$/i) && parseInt(trimmed.match(/^S\s*(\d+)$/i)[1]) >= 20 && parseInt(trimmed.match(/^S\s*(\d+)$/i)[1]) <= 199) ||
+                    (trimmed.match(/^R\s*(\d+)$/i) && parseInt(trimmed.match(/^R\s*(\d+)$/i)[1]) >= 25 && parseInt(trimmed.match(/^R\s*(\d+)$/i)[1]) <= 199);
+                  if (!isAllowed) {
+                    return; // Nicht erlaubte Linie überspringen
+                  }
+                }
+
                 const filterLines = station.filter ? station.filter.split(',').map(f => f.trim()) : [];
                 if (filterLines.length === 0 || filterLines.includes(lineName)) {
-                  const key = `${lineName}:${towards}`;
+                  // Für Wien: Key basiert auf richtungsId (wenn vorhanden)
+                  const key = richtungsId ? `${lineName}:R${richtungsId}` : `${lineName}:${towards}`;
                   if (!ftAvailableDirections.some(d => d.key === key)) {
                     ftAvailableDirections.push({
                       key: key,
                       line: lineName,
                       towards: towards,
                       type: type,
-                      station: station.stopName
+                      richtungsId: richtungsId,
+                      station: station.stopName,
+                      network: station.network
                     });
                   }
                 }
@@ -4468,7 +5648,7 @@ async function loadFtDirectionsFromStations() {
           });
         }
       } catch (e) {
-        console.log('Fehler beim Laden der Richtungen:', station.stopName, e);
+        // Fehler beim Laden ignorieren
       }
     }
   }
@@ -4492,7 +5672,6 @@ async function loadFtDirectionsFromStations() {
     return (a.towards || '').localeCompare(b.towards || '');
   });
 
-  console.log('Geladene Richtungen:', ftAvailableDirections);
 }
 
 function parseFtExistingGroups(lineGroupsStr) {
@@ -4500,13 +5679,48 @@ function parseFtExistingGroups(lineGroupsStr) {
 
   ftLineGroups = [];
 
-  // Format: "U1:Leopoldau+62:Meidling,1:xyz+2:abc"
+  // Format: "U1:Leopoldau+62:Meidling,1:xyz+2:abc" (alt) oder "12:R60500312+19:R60500097" (neu)
   const groups = lineGroupsStr.split(',');
   groups.forEach((groupStr) => {
     if (groupStr.includes('+')) {
-      const directions = groupStr.split('+').map(d => d.trim()).filter(d => d);
-      if (directions.length >= 2) {
-        ftLineGroups.push({ directions: directions });
+      const rawDirections = groupStr.split('+').map(d => d.trim()).filter(d => d);
+
+      // Mappe alte Keys (12:Auwiesen) auf neue Keys (12:R60500312)
+      const mappedDirections = rawDirections.map(rawKey => {
+        // Wenn der Key schon das neue Format hat (mit :R), behalte ihn
+        if (rawKey.includes(':R')) {
+          return rawKey;
+        }
+
+        // Altes Format: "12:Auwiesen" -> versuche passende richtungsId zu finden
+        const colonIdx = rawKey.indexOf(':');
+        if (colonIdx > 0) {
+          const line = rawKey.substring(0, colonIdx);
+          const dest = rawKey.substring(colonIdx + 1);
+
+          // Suche in ftAvailableDirections nach passender Linie+Richtung
+          const match = ftAvailableDirections.find(d =>
+            d.line === line && d.towards === dest
+          );
+
+          if (match) {
+            return match.key;  // Nutze den neuen Key mit richtungsId
+          }
+
+          // Kein exakter Match - versuche nur nach Linie zu matchen
+          const lineMatch = ftAvailableDirections.find(d => d.line === line);
+          if (lineMatch && lineMatch.richtungsId) {
+            // Warnung: Nicht exakt, aber besser als nichts
+            return lineMatch.key;
+          }
+        }
+
+        // Fallback: Behalte den alten Key
+        return rawKey;
+      });
+
+      if (mappedDirections.length >= 2) {
+        ftLineGroups.push({ directions: mappedDirections });
       }
     }
   });
@@ -4632,7 +5846,6 @@ function renderFtPool() {
 
 // Touch-freundliche Gruppierungs-Funktionen
 function startFtGrouping() {
-  console.log('startFtGrouping aufgerufen');
   ftGroupingMode = true;
   ftSelectedForGroup = [];
   renderFtGroupingUI();
@@ -4645,42 +5858,38 @@ function cancelFtGrouping() {
 }
 
 function toggleFtSelection(key) {
-  console.log('toggleFtSelection aufgerufen mit key:', key);
   const idx = ftSelectedForGroup.indexOf(key);
   if (idx === -1) {
     ftSelectedForGroup.push(key);
-    console.log('Key hinzugefuegt, ftSelectedForGroup:', ftSelectedForGroup);
   } else {
     ftSelectedForGroup.splice(idx, 1);
-    console.log('Key entfernt, ftSelectedForGroup:', ftSelectedForGroup);
   }
   renderFtGroupingUI();
 }
 
 function confirmFtGroup() {
-  console.log('confirmFtGroup aufgerufen, ftSelectedForGroup:', ftSelectedForGroup);
-
   if (ftSelectedForGroup.length < 2) {
-    console.log('Weniger als 2 Richtungen ausgewaehlt, Abbruch');
     return;
   }
 
-  console.log('Erstelle Gruppe mit:', ftSelectedForGroup);
-
   // Neue Gruppe erstellen
   ftLineGroups.push({ directions: [...ftSelectedForGroup] });
-
-  console.log('ftLineGroups nach Erstellung:', JSON.stringify(ftLineGroups));
 
   // Reset
   ftGroupingMode = false;
   ftSelectedForGroup = [];
   renderFtGroupingUI();
+
+  // Reihenfolge-Liste aktualisieren (Gruppen haben sich geändert)
+  updateRowOrderAfterGroupChange();
 }
 
 function deleteFtGroup(gIdx) {
   ftLineGroups.splice(gIdx, 1);
   renderFtGroupingUI();
+
+  // Reihenfolge-Liste aktualisieren (Gruppen haben sich geändert)
+  updateRowOrderAfterGroupChange();
 }
 
 function removeFromGroup(gIdx, key) {
@@ -4692,35 +5901,36 @@ function removeFromGroup(gIdx, key) {
     }
   }
   renderFtGroupingUI();
+
+  // Reihenfolge-Liste aktualisieren (Gruppen haben sich geändert)
+  updateRowOrderAfterGroupChange();
+}
+
+// Aktualisiere die Reihenfolge-Liste wenn Gruppen geändert werden
+function updateRowOrderAfterGroupChange() {
+  // Leere ftRowOrder damit initRowOrderList es neu aufbaut
+  ftRowOrder = [];
+
+  // Wenn Statisch-Modus aktiv ist, sofort neu rendern
+  if (ftSortMode === 2) {
+    initRowOrderList();
+  }
 }
 
 
 function collectFtLineGroups() {
-  console.log('collectFtLineGroups aufgerufen, ftLineGroups:', JSON.stringify(ftLineGroups));
-  console.log('ftLineGroups.length:', ftLineGroups.length);
-
   if (ftLineGroups.length === 0) {
-    console.log('Keine Gruppen vorhanden');
     return '';
   }
-
-  // Debug: Zeige jede Gruppe
-  ftLineGroups.forEach((g, i) => {
-    console.log(`Gruppe ${i}:`, JSON.stringify(g), 'directions:', g.directions, 'length:', g.directions ? g.directions.length : 'undefined');
-  });
 
   // Nur Gruppen mit mindestens 2 Richtungen
   const validGroups = ftLineGroups.filter(g => g.directions && g.directions.length >= 2);
-  console.log('validGroups.length:', validGroups.length);
 
   if (validGroups.length === 0) {
-    console.log('Keine gueltigen Gruppen (mind. 2 Richtungen)');
     return '';
   }
 
-  const result = validGroups.map(g => g.directions.join('+')).join(',');
-  console.log('Gruppierungs-String:', result);
-  return result;
+  return validGroups.map(g => g.directions.join('+')).join(',');
 }
 
 function shortenDestFt(dest) {
@@ -4737,23 +5947,15 @@ function escapeHtmlFt(text) {
 
 // Event Delegation fuer Gruppierung - vermeidet Probleme mit Sonderzeichen
 function setupFtGroupingEvents() {
-  console.log('setupFtGroupingEvents aufgerufen');
-
   // Groups Container Events
   const groupsContainer = document.getElementById('ftGroupsContainer');
-  console.log('groupsContainer:', groupsContainer ? 'gefunden' : 'NICHT gefunden');
 
   if (groupsContainer) {
     groupsContainer.addEventListener('click', function(e) {
-      console.log('Click in groupsContainer, target:', e.target);
       const target = e.target.closest('[data-action]');
-      if (!target) {
-        console.log('Kein data-action Element gefunden');
-        return;
-      }
+      if (!target) return;
 
       const action = target.dataset.action;
-      console.log('Grouping action:', action, target.dataset);
 
       switch(action) {
         case 'start-grouping':
@@ -4795,37 +5997,27 @@ function setupFtGroupingEvents() {
 
   // Pool Container Events
   const poolContainer = document.getElementById('ftPoolItems');
-  console.log('poolContainer:', poolContainer ? 'gefunden' : 'NICHT gefunden');
 
   if (poolContainer) {
     poolContainer.addEventListener('click', function(e) {
-      console.log('Click in poolContainer, target:', e.target, 'ftGroupingMode:', ftGroupingMode);
       const target = e.target.closest('[data-pool-idx]');
-      if (!target) {
-        console.log('Kein pool Element');
-        return;
-      }
+      if (!target) return;
 
       const poolIdx = parseInt(target.dataset.poolIdx);
-      console.log('Pool select, idx:', poolIdx);
 
       if (poolIdx >= 0 && poolIdx < ftAvailableDirections.length) {
         const key = ftAvailableDirections[poolIdx].key;
 
         // Automatisch Gruppierungsmodus starten wenn noch nicht aktiv
         if (!ftGroupingMode) {
-          console.log('Starte automatisch Gruppierungsmodus');
           ftGroupingMode = true;
           ftSelectedForGroup = [];
         }
 
-        console.log('Adding to selection:', key);
         toggleFtSelection(key);
       }
     });
   }
-
-  console.log('Event-Listener eingerichtet');
 }
 
 // Event-Listener werden in initFtGrouping() angehaengt
@@ -4841,6 +6033,9 @@ function saveFromFinetuning() {
   const nightStart = parseInt(document.getElementById('ftNightStart').value) || 22;
   const nightEnd = parseInt(document.getElementById('ftNightEnd').value) || 6;
   const showFunMessages = isFtToggleActive('ftFunMessagesToggle');
+  const sortMode = getFtSortMode();
+  const rowOrder = getRowOrderString();  // Einfach für Wien
+  const rowOrderDestination = getRowOrderDestinationString();  // Mit Ziel für Linz
 
   // Gehweg-Werte sammeln
   const gehweg = [];
@@ -4851,7 +6046,9 @@ function saveFromFinetuning() {
 
   // Linien-Gruppierung sammeln
   const lineGroupsStr = collectFtLineGroups();
-  console.log('saveFromFinetuning - lineGroupsStr:', lineGroupsStr);
+
+  // Linz Linien+Ziel Filter sammeln (linefilterdestination)
+  const lineFilterDestStr = collectFtLineFilter();
 
   // Update recommendedConfig
   recommendedConfig.colour = colour;
@@ -4865,8 +6062,10 @@ function saveFromFinetuning() {
   recommendedConfig.showFunMessages = showFunMessages;
   recommendedConfig.gehweg = gehweg;
   recommendedConfig.lineGroups = lineGroupsStr;
-
-  console.log('recommendedConfig.lineGroups:', recommendedConfig.lineGroups);
+  recommendedConfig.lineFilterDestination = lineFilterDestStr;  // Linz Linie+Ziel Filter
+  recommendedConfig.sortMode = sortMode;
+  recommendedConfig.rowOrder = rowOrder;
+  recommendedConfig.rowOrderDestination = rowOrderDestination;
 
   // Speichern
   showSavingOverlay('Speichere Einstellungen...');
@@ -4917,11 +6116,12 @@ function sendConfigToDeviceDirect(config) {
     displaymode: String(config.displayMode),
     stopinterval: String(config.stopInterval),
     gehweg: gehwegString,
-    linegroups: config.lineGroups || ''  // NEU: Linien-Gruppierung
+    linegroups: config.lineGroups || '',  // NEU: Linien-Gruppierung
+    linefilter: config.lineFilter || '',  // Linien-Filter (nur Linienname)
+    linefilterdestination: config.lineFilterDestination || '',  // NEU: Linien+Ziel Filter für Linz
+    roworder: config.rowOrder || '',  // NEU: Zeilen-Reihenfolge einfach
+    roworderdestination: config.rowOrderDestination || ''  // NEU: Zeilen-Reihenfolge mit Ziel
   };
-
-  console.log('Sende Config direkt an Gerät:', configData);
-  console.log('linegroups im configData:', configData.linegroups);
 
   // Prüfe ob wir im iframe sind
   const inIframe = window.parent && window.parent !== window;
@@ -4992,8 +6192,9 @@ async function sendConfigDirectToDevice(configData, originalConfig) {
     formData.append('stopinterval', configData.stopinterval);
     formData.append('gehweg', configData.gehweg);
     formData.append('linegroups', configData.linegroups);
+    formData.append('linefilter', configData.linefilter);
+    formData.append('linefilterdestination', configData.linefilterdestination);
 
-    console.log('FormData linegroups:', configData.linegroups);
     updateSavingOverlay('Speichere Einstellungen...');
 
     const response = await fetch('http://straba.local/config', {
@@ -5198,8 +6399,6 @@ function saveConfig() {
   const rblString = stations.map(s => s.fullId).join(',');
   const filterString = stations.map(s => s.filter || '').join('|');
   
-  console.log('Saving:', { rbl: rblString, filter: filterString });
-  
   localStorage.setItem('straba_pending_rbl', rblString);
   localStorage.setItem('straba_pending_filter', filterString);
   
@@ -5212,30 +6411,45 @@ function saveConfig() {
 }
 
 // ==================== LOAD EXISTING ====================
-async function loadExistingConfig(rbl, filter) {
+// linefilterdestination: Linz-Format "1:Auwiesen,2:solarCity,27:Chemiepark" mit Line:Destination
+async function loadExistingConfig(rbl, filter, linefilterdestination) {
   if (!rbl || rbl.trim() === '') return;
-  
+
   const rblParts = rbl.split(',').map(s => s.trim()).filter(s => s);
   const filterParts = filter ? filter.split('|') : [];
-  
+
+  // Parse linefilterdestination: "1:Auwiesen,2:solarCity,27:Chemiepark" -> [{line: "1", towards: "Auwiesen"}, ...]
+  const lineDestinations = [];
+  if (linefilterdestination) {
+    linefilterdestination.split(',').forEach(entry => {
+      const colonIdx = entry.indexOf(':');
+      if (colonIdx > 0) {
+        lineDestinations.push({
+          line: entry.substring(0, colonIdx).trim(),
+          towards: entry.substring(colonIdx + 1).trim()
+        });
+      }
+    });
+  }
+
   for (let idx = 0; idx < rblParts.length; idx++) {
     const part = rblParts[idx];
     let network, stopId;
-    
+
     if (part.includes(':')) {
       [network, stopId] = part.split(':');
     } else {
       network = 'WL';
       stopId = part;
     }
-    
+
     const fullId = `${network}:${stopId}`;
     if (stations.some(s => s.fullId === fullId)) continue;
-    
+
     // Check if it's a journey (has > in stopId)
     const isJourney = stopId.includes('>');
     let stopName = `Station ${stopId}`;
-    
+
     if (isJourney) {
       const [fromId, toId] = stopId.split('>');
       // Try to get names from API
@@ -5249,19 +6463,80 @@ async function loadExistingConfig(rbl, filter) {
         stopName = resolvedName;
       }
     }
-    
-    stations.push({
+
+    // Filter für diese Station: Liniennamen aus filterParts oder aus lineDestinations
+    const stationFilter = filterParts[idx] || '';
+    const filterLines = stationFilter ? stationFilter.split(',').map(f => f.trim()) : [];
+
+    // Station erstellen
+    const station = {
       network,
       networkName: NETWORKS[network]?.name || network,
       stopId,
       stopName,
-      filter: filterParts[idx] || '',
+      filter: stationFilter,
       fullId,
       isJourney,
-      isExisting: true
-    });
+      isExisting: true,
+      directions: []  // Wird unten befüllt
+    };
+
+    // Directions aus API laden (gefiltert)
+    try {
+      const response = await fetch(`${DEPARTURES_API}?stopId=${fullId}`);
+      const data = await response.json();
+
+      if (data.data && data.data.monitors) {
+        data.data.monitors.forEach(monitor => {
+          if (monitor.lines && Array.isArray(monitor.lines)) {
+            monitor.lines.forEach(line => {
+              const lineName = line.name || '';
+              const towards = line.towards || monitor.towards || '';
+              const type = line.type || '';
+              const richtungsId = line.richtungsId || monitor.richtungsId || '';
+
+              // Prüfen ob diese Linie+Richtung ausgewählt werden soll
+              let shouldInclude = false;
+
+              if (lineDestinations.length > 0) {
+                // Linz-Modus: Prüfe gegen linefilterdestination (Line + Destination)
+                shouldInclude = lineDestinations.some(ld =>
+                  ld.line === lineName && ld.towards === towards
+                );
+              } else if (filterLines.length > 0) {
+                // Fallback: Nur Liniennummer prüfen
+                shouldInclude = filterLines.includes(lineName);
+              } else {
+                // Kein Filter: Alle Linien einschließen
+                shouldInclude = true;
+                console.log(`No filter, including ${lineName}:${towards}`);
+              }
+
+              if (shouldInclude) {
+                // Duplikate vermeiden
+                const exists = station.directions.some(d =>
+                  d.line === lineName && d.towards === towards
+                );
+                if (!exists) {
+                  station.directions.push({
+                    line: lineName,
+                    towards: towards,
+                    type: type,
+                    richtungsId: richtungsId
+                  });
+                }
+              }
+            });
+          }
+        });
+      }
+    } catch (e) {
+      // API error - station will have empty directions
+    }
+
+    stations.push(station);
   }
-  
+
   if (stations.length > 0) {
     updateStationsList();
   }
@@ -5302,22 +6577,134 @@ async function resolveStationName(network, stopId) {
 }
 
 // ==================== ESP32 COMMUNICATION ====================
-window.addEventListener('message', async function(event) {
-  if (event.data?.type === 'loadExistingConfig') {
+async function handleConfigMessage(data) {
+
+  if (data.type === 'loadExistingConfig') {
     // Load Wien data first if any WL stations
-    if (event.data.rbl && !event.data.rbl.includes(':')) {
+    if (data.rbl && !data.rbl.includes(':')) {
       await loadWienData();
     }
-    await loadExistingConfig(event.data.rbl, event.data.filter);
+    await loadExistingConfig(data.rbl, data.filter, data.linefilterdestination || '');
+    return;
   }
-  if (event.data?.type === 'loadFullConfig' && event.data.config?.rbl_id) {
-    // Load Wien data first if any WL stations  
-    if (event.data.config.rbl_id && !event.data.config.rbl_id.includes(':')) {
+
+  if (data.type === 'loadFullConfig' && (data.config?.rbl_id || data.config?.rbl)) {
+    // Markiere, dass eine bestehende Config geladen wurde
+    hasExistingConfig = true;
+
+    // WICHTIG: Bestehende Stationen löschen, da loadFullConfig vollständigere Daten hat
+    // (inkl. linefilterdestination). loadExistingConfig könnte vorher schon
+    // mit unvollständigen Daten gelaufen sein.
+    stations.length = 0;
+
+    // Unterstütze beide Feldnamen (rbl_id/rbl und lines_filter/filter)
+    const rblId = data.config.rbl_id || data.config.rbl || '';
+    const linesFilter = data.config.lines_filter || data.config.filter || '';
+    const lineFilterDest = data.config.linefilterdestination || '';
+
+    // Load Wien data first if any WL stations
+    if (rblId && !rblId.includes(':')) {
       await loadWienData();
     }
-    await loadExistingConfig(event.data.config.rbl_id, event.data.config.lines_filter);
+    await loadExistingConfig(rblId, linesFilter, lineFilterDest);
+
+    // Initialisiere recommendedConfig falls noch nicht vorhanden
+    if (!recommendedConfig) {
+      recommendedConfig = calculateRecommendedConfig() || {};
+    }
+
+    // Linz Linien+Ziel Filter aus Config übernehmen
+    if (data.config.linefilterdestination) {
+      recommendedConfig.lineFilterDestination = data.config.linefilterdestination;
+    }
+    // Linien-Gruppierung aus Config übernehmen
+    if (data.config.linegroups) {
+      recommendedConfig.lineGroups = data.config.linegroups;
+    }
+    // Sortierungsmodus aus Config übernehmen
+    if (data.config.sort_mode !== undefined) {
+      recommendedConfig.sortMode = parseInt(data.config.sort_mode) || 1;
+    }
+    // Zeilen-Reihenfolge aus Config übernehmen
+    if (data.config.roworder) {
+      recommendedConfig.rowOrder = data.config.roworder;
+    }
+    if (data.config.roworderdestination) {
+      recommendedConfig.rowOrderDestination = data.config.roworderdestination;
+    }
+    // Weitere Feintuning-Einstellungen
+    if (data.config.colour !== undefined) {
+      recommendedConfig.colour = parseInt(data.config.colour) || 1;
+    }
+    if (data.config.lines_count !== undefined) {
+      recommendedConfig.rows = parseInt(data.config.lines_count) || 2;
+    }
+    // displaylight (ESP32 Feldname)
+    if (data.config.displaylight !== undefined) {
+      recommendedConfig.displayLight = parseInt(data.config.displaylight) || 3;
+    }
+    // chopper und silberpfeil (ESP32 Feldnamen, als String gesendet)
+    if (data.config.chopper !== undefined) {
+      recommendedConfig.chopper = parseInt(data.config.chopper) || 0;
+    }
+    if (data.config.silberpfeil !== undefined) {
+      recommendedConfig.silberpfeil = parseInt(data.config.silberpfeil) || 0;
+    }
+    if (data.config.night_mode_enabled !== undefined) {
+      recommendedConfig.nightMode = data.config.night_mode_enabled;
+    }
+    if (data.config.night_mode_start !== undefined) {
+      recommendedConfig.nightStart = parseInt(data.config.night_mode_start) || 22;
+    }
+    if (data.config.night_mode_end !== undefined) {
+      recommendedConfig.nightEnd = parseInt(data.config.night_mode_end) || 6;
+    }
+    if (data.config.show_fun_messages !== undefined) {
+      recommendedConfig.showFunMessages = data.config.show_fun_messages;
+    }
+    // Gehweg aus Config übernehmen (Format: "stopId:value|stopId:value")
+    if (data.config.gehweg) {
+      const gehwegStr = data.config.gehweg;
+      const gehwegMap = {};
+
+      // Parse "stopId:value|stopId:value" oder "stopId:value,stopId:value"
+      const separator = gehwegStr.includes('|') ? '|' : ',';
+      gehwegStr.split(separator).forEach(entry => {
+        const [stopId, value] = entry.split(':');
+        if (stopId && value !== undefined) {
+          gehwegMap[stopId] = parseInt(value) || 0;
+        }
+      });
+
+      // Erstelle Array in der Reihenfolge der Stationen
+      recommendedConfig.gehweg = stations.map(station => {
+        const stopId = station.stopId || '';
+        return gehwegMap[stopId] || 0;
+      });
+    }
+
+    // UI aktualisieren wenn Feintuning-Seite sichtbar ist
+    const ftStep = document.getElementById('stepFinetuning');
+    if (ftStep && !ftStep.classList.contains('hidden')) {
+      initFinetuningStep();
+    }
+  }
+}
+
+// Event-Listener der die Funktion aufruft
+window.addEventListener('message', async function(event) {
+  if (event.data?.type === 'loadExistingConfig' || event.data?.type === 'loadFullConfig') {
+    await handleConfigMessage(event.data);
   }
 });
+
+// Markiere Handler als bereit und verarbeite gepufferte Nachrichten
+_configHandlerReady = true;
+if (_pendingConfigMessages.length > 0) {
+  console.log('Processing', _pendingConfigMessages.length, 'buffered config messages');
+  _pendingConfigMessages.forEach(msg => handleConfigMessage(msg));
+  _pendingConfigMessages = [];
+}
 
 // ==================== JOURNEY MODE (DB) ====================
 let journeyFromTimeout = null;
