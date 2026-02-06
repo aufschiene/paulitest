@@ -3644,7 +3644,12 @@ function extractLines(data) {
           }
 
           if (!linesMap.has(key)) {
-            linesMap.set(key, { name, towards, type: line.type || '' });
+            linesMap.set(key, {
+              name,
+              towards,
+              type: line.type || '',
+              richtungsId: line.richtungsId || ''
+            });
           }
         });
       }
@@ -5353,13 +5358,22 @@ async function initFtGrouping() {
   // Richtungen aus allen Stationen laden
   await loadFtDirectionsFromStations();
 
-  // Bestehende Gruppierung aus roworderdestination laden (neues Format)
-  // Fallback auf linegroups für alte Configs
-  if (recommendedConfig && recommendedConfig.rowOrderDestination) {
-    parseRowOrderDestination(recommendedConfig.rowOrderDestination);
-  } else if (recommendedConfig && recommendedConfig.lineGroups) {
+  // DEBUG: Zeige alle verfügbaren Richtungen
+  console.log('[initFtGrouping] ftAllDirections:', ftAllDirections.map(d => d.key));
+
+  // Bestehende Gruppierung laden:
+  // PRIORITÄT: lineGroups (enthält RichtungsIds, zuverlässiger)
+  // FALLBACK: rowOrderDestination (enthält Zieltexte, kann mehrdeutig sein)
+  if (recommendedConfig && recommendedConfig.lineGroups) {
+    console.log('[initFtGrouping] Lade aus lineGroups:', recommendedConfig.lineGroups);
     parseFtExistingGroups(recommendedConfig.lineGroups);
+  } else if (recommendedConfig && recommendedConfig.rowOrderDestination) {
+    console.log('[initFtGrouping] Lade aus rowOrderDestination:', recommendedConfig.rowOrderDestination);
+    parseRowOrderDestination(recommendedConfig.rowOrderDestination);
   }
+
+  // DEBUG: Zeige geladene Gruppen
+  console.log('[initFtGrouping] Nach Parsing - ftLineGroups:', ftLineGroups.map(g => g.directions));
 
   // WICHTIG: Prüfe ob alle Richtungen in ftAllDirections auch in ftLineGroups sind
   // Falls nicht: Füge fehlende Richtungen als neue 1er-Gruppen hinzu
@@ -5370,6 +5384,7 @@ async function initFtGrouping() {
 
   // Fehlende Richtungen finden und hinzufügen
   const missingDirections = ftAllDirections.filter(d => !usedKeys.has(d.key));
+  console.log('[initFtGrouping] Fehlende Richtungen:', missingDirections.map(d => d.key));
   if (missingDirections.length > 0) {
     missingDirections.forEach(dir => {
       ftLineGroups.push({ directions: [dir.key] });
@@ -5378,10 +5393,16 @@ async function initFtGrouping() {
 
   // Ungültige Keys aus ftLineGroups entfernen (Keys die nicht mehr in ftAllDirections existieren)
   const validKeys = new Set(ftAllDirections.map(d => d.key));
+  console.log('[initFtGrouping] Gültige Keys:', [...validKeys]);
   ftLineGroups = ftLineGroups.map(group => {
     const validDirections = (group.directions || []).filter(key => validKeys.has(key));
+    if (validDirections.length !== group.directions.length) {
+      console.log('[initFtGrouping] Gefilterte Gruppe:', group.directions, '->', validDirections);
+    }
     return { directions: validDirections };
   }).filter(group => group.directions.length > 0);  // Leere Gruppen entfernen
+
+  console.log('[initFtGrouping] Finale Gruppen:', ftLineGroups.map(g => g.directions));
 
   // Pool aktualisieren (Richtungen die nicht in Gruppen sind)
   updatePoolDirections();
@@ -5481,8 +5502,11 @@ function updatePoolDirections() {
 async function loadFtDirectionsFromStations() {
   ftAllDirections = [];
 
+  console.log('[loadFtDirectionsFromStations] Stationen:', stations.length);
+
   // Richtungen aus den gespeicherten Stationen laden
   for (const station of stations) {
+    console.log(`[loadFtDirectionsFromStations] Station: ${station.stopName}, directions:`, station.directions);
     if (station.directions && Array.isArray(station.directions)) {
       station.directions.forEach(dir => {
         const lineName = dir.line || '';
@@ -5502,6 +5526,7 @@ async function loadFtDirectionsFromStations() {
         }
 
         const key = richtungsId ? `${lineName}:R${richtungsId}` : `${lineName}:${towards}`;
+        console.log(`[loadFtDirectionsFromStations] Erstelle Key: ${key} (line=${lineName}, towards=${towards}, richtungsId=${richtungsId})`);
         if (!ftAllDirections.some(d => d.key === key)) {
           ftAllDirections.push({
             key, line: lineName, towards, type, richtungsId,
@@ -5512,10 +5537,14 @@ async function loadFtDirectionsFromStations() {
     }
   }
 
+  console.log('[loadFtDirectionsFromStations] ftAllDirections vor Filter:', ftAllDirections.map(d => d.key));
+
   // Richtungen ohne towards entfernen wenn es welche mit towards gibt
   const linesWithTowards = new Set();
   ftAllDirections.forEach(d => { if (d.towards) linesWithTowards.add(d.line); });
   ftAllDirections = ftAllDirections.filter(d => !(!d.towards && linesWithTowards.has(d.line)));
+
+  console.log('[loadFtDirectionsFromStations] ftAllDirections nach Filter:', ftAllDirections.map(d => d.key));
 
   // Nach Linie und dann nach Richtung sortieren
   ftAllDirections.sort((a, b) => {
@@ -5531,17 +5560,64 @@ function parseFtExistingGroups(lineGroupsStr) {
   if (!lineGroupsStr) return;
 
   ftLineGroups = [];
+  console.log('[parseFtExistingGroups] Eingabe:', lineGroupsStr);
 
-  // Format: "U1:Leopoldau+62:Meidling,1:xyz+2:abc" (alt) oder "12:R60500312+19:R60500097" (neu)
+  // Format: "U1:Leopoldau+62:Meidling,1:xyz+2:abc" (alt) oder "1:R60500312+2:R60500097" (neu)
   const groups = lineGroupsStr.split(',');
-  groups.forEach((groupStr) => {
+  console.log('[parseFtExistingGroups] Gruppen gefunden:', groups);
+
+  groups.forEach((groupStr, groupIdx) => {
     if (groupStr.includes('+')) {
       const rawDirections = groupStr.split('+').map(d => d.trim()).filter(d => d);
+      console.log(`[parseFtExistingGroups] Gruppe ${groupIdx}: rawDirections =`, rawDirections);
 
-      // Mappe alte Keys (12:Auwiesen) auf neue Keys (12:R60500312)
-      const mappedDirections = rawDirections.map(rawKey => {
-        // Wenn der Key schon das neue Format hat (mit :R), behalte ihn
+      // Mappe Keys auf verfügbare Keys in ftAllDirections
+      // Tracke welche Linien schon gematcht wurden (für Index-basiertes Matching)
+      const usedKeysInGroup = new Set();
+
+      const mappedDirections = rawDirections.map((rawKey, rawIdx) => {
+        // Wenn der Key schon das neue Format hat (mit :R), versuche ihn zu verifizieren
         if (rawKey.includes(':R')) {
+          // Prüfe ob dieser Key direkt in ftAllDirections existiert
+          const directMatch = ftAllDirections.find(d => d.key === rawKey);
+          if (directMatch) {
+            console.log(`[parseFtExistingGroups] '${rawKey}' -> direkter Match`);
+            usedKeysInGroup.add(directMatch.key);
+            return directMatch.key;
+          }
+
+          // Key parsen und nach richtungsId suchen
+          const colonIdx = rawKey.indexOf(':');
+          if (colonIdx > 0) {
+            const line = rawKey.substring(0, colonIdx);
+            const rId = rawKey.substring(colonIdx + 2);  // Skip ":R"
+
+            // Suche nach Linie + richtungsId
+            const ridMatch = ftAllDirections.find(d =>
+              d.line === line && d.richtungsId === rId
+            );
+            if (ridMatch) {
+              console.log(`[parseFtExistingGroups] '${rawKey}' -> richtungsId Match: ${ridMatch.key}`);
+              usedKeysInGroup.add(ridMatch.key);
+              return ridMatch.key;
+            }
+
+            // FALLBACK: Suche nach Linie und nimm erste nicht-benutzte Richtung
+            // Dies ist wichtig wenn die richtungsId sich geändert hat
+            const lineMatches = ftAllDirections.filter(d =>
+              d.line === line && !usedKeysInGroup.has(d.key)
+            );
+            if (lineMatches.length > 0) {
+              // Nimm die erste verfügbare Richtung für diese Linie
+              const fallbackMatch = lineMatches[0];
+              console.log(`[parseFtExistingGroups] '${rawKey}' -> Linien-Fallback (richtungsId geändert): ${fallbackMatch.key}`);
+              usedKeysInGroup.add(fallbackMatch.key);
+              return fallbackMatch.key;
+            }
+          }
+
+          // Key behalten auch wenn nicht gefunden (wird später gefiltert)
+          console.log(`[parseFtExistingGroups] '${rawKey}' -> KEIN Match, behalte Key`);
           return rawKey;
         }
 
@@ -5553,30 +5629,38 @@ function parseFtExistingGroups(lineGroupsStr) {
 
           // Suche in ftAllDirections nach passender Linie+Richtung
           const match = ftAllDirections.find(d =>
-            d.line === line && d.towards === dest
+            d.line === line && d.towards === dest && !usedKeysInGroup.has(d.key)
           );
 
           if (match) {
+            console.log(`[parseFtExistingGroups] '${rawKey}' -> towards Match: ${match.key}`);
+            usedKeysInGroup.add(match.key);
             return match.key;  // Nutze den neuen Key mit richtungsId
           }
 
           // Kein exakter Match - versuche nur nach Linie zu matchen
-          const lineMatch = ftAllDirections.find(d => d.line === line);
-          if (lineMatch && lineMatch.richtungsId) {
-            // Warnung: Nicht exakt, aber besser als nichts
+          const lineMatch = ftAllDirections.find(d =>
+            d.line === line && !usedKeysInGroup.has(d.key)
+          );
+          if (lineMatch) {
+            console.log(`[parseFtExistingGroups] '${rawKey}' -> Linien-Fallback: ${lineMatch.key}`);
+            usedKeysInGroup.add(lineMatch.key);
             return lineMatch.key;
           }
         }
 
         // Fallback: Behalte den alten Key
+        console.log(`[parseFtExistingGroups] '${rawKey}' -> Fallback, behalte Key`);
         return rawKey;
       });
 
+      console.log(`[parseFtExistingGroups] Gruppe ${groupIdx}: mappedDirections =`, mappedDirections);
       if (mappedDirections.length >= 2) {
         ftLineGroups.push({ directions: mappedDirections });
       }
     }
   });
+  console.log('[parseFtExistingGroups] Ergebnis ftLineGroups:', ftLineGroups);
 }
 
 function renderFtGroupingUI() {
