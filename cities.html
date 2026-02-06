@@ -4055,6 +4055,10 @@ async function selectStopForEdit(id, name, existingDirections, existingFilter) {
     extractLines(data);
 
     // Vorauswahl: Markiere Linien die bereits ausgewählt waren
+    console.log('[editStation] existingDirections:', existingDirections);
+    console.log('[editStation] existingFilter:', existingFilter);
+    console.log('[editStation] availableLines:', availableLines);
+
     availableLines.forEach((line, idx) => {
       let isSelected = false;
 
@@ -4066,7 +4070,9 @@ async function selectStopForEdit(id, name, existingDirections, existingFilter) {
 
           // Beide haben Richtung: müssen übereinstimmen
           if (d.towards && line.towards) {
-            return d.towards === line.towards;
+            const match = d.towards === line.towards;
+            console.log(`[editStation] Comparing: d.towards="${d.towards}" vs line.towards="${line.towards}" => ${match}`);
+            return match;
           }
 
           // Gespeicherte direction hat Richtung, aber API nicht: kein Match
