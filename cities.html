@@ -3399,22 +3399,20 @@ function addWienStation() {
     return;
   }
 
-  // Ausgewaehlte Richtungen speichern (Linie + towards + richtungsId/patternID)
+  // Ausgewaehlte Richtungen speichern (Linie + towards)
   const selectedDirections = [];
   wienSelectedDirections.forEach(d => {
     selectedDirections.push({
       line: wienSelectedLine.lineName,
       towards: d.towards || '',
-      type: 'metro',
-      richtungsId: String(d.patternID || '')  // Wien patternID = richtungsId
+      type: 'metro'
     });
   });
   wienOtherLines.forEach(ol => {
     selectedDirections.push({
       line: ol.lineName,
       towards: ol.towards || '',
-      type: ol.lineName.startsWith('U') ? 'metro' : 'tram',
-      richtungsId: String(ol.patternID || '')  // Wien patternID = richtungsId
+      type: ol.lineName.startsWith('U') ? 'metro' : 'tram'
     });
   });
 
@@ -3647,8 +3645,7 @@ function extractLines(data) {
             linesMap.set(key, {
               name,
               towards,
-              type: line.type || '',
-              richtungsId: line.richtungsId || ''
+              type: line.type || ''
             });
           }
         });
@@ -3867,8 +3864,7 @@ function addStation() {
   const selectedDirections = Array.from(selectedLines).map(idx => ({
     line: availableLines[idx].name,
     towards: availableLines[idx].towards || '',
-    type: availableLines[idx].type || '',
-    richtungsId: availableLines[idx].richtungsId || ''
+    type: availableLines[idx].type || ''
   }));
 
   if (editingStationIndex !== null) {
@@ -4271,7 +4267,7 @@ function buildLineFilterDestination(stationsList) {
   const lineToDestinations = {};
 
   stationsList.forEach(station => {
-    // Nur für Linz (Netzwerke ohne richtungsId)
+    // Für Linz: Sammle Linien+Ziele
     if (station.network === 'LINZ' && station.directions && station.directions.length > 0) {
       station.directions.forEach(dir => {
         if (dir.line && dir.towards) {
@@ -5084,9 +5080,8 @@ function getRowOrderString() {
 }
 
 function getRowOrderDestinationString() {
-  // NEUES KONZEPT: Alles sind Gruppen (auch 1er-Gruppen)
-  // Format: "1:Uni+2:Uni,3:Solarc,26:St.Margarethen" - Gruppen mit +, Einträge mit ,
-  // ftLineGroups = [{ directions: ['1:RId1', '2:RId2'] }, { directions: ['3:RId3'] }, ...]
+  // VEREINFACHT: Format ist immer "Linie:Ziel+Linie:Ziel,..."
+  // ftLineGroups = [{ directions: ['1:Auwiesen', '2:solarCity'] }, { directions: ['3:Solarc'] }, ...]
 
   if (ftLineGroups.length === 0) {
     return '';
@@ -5095,26 +5090,8 @@ function getRowOrderDestinationString() {
   const items = [];
   ftLineGroups.forEach(group => {
     if (group.directions && group.directions.length > 0) {
-      // Jede Richtung (Key) in "Linie:Ziel" Format umwandeln
-      const groupParts = group.directions.map(key => {
-        const dirInfo = ftAllDirections.find(d => d.key === key);
-        if (dirInfo) {
-          return `${dirInfo.line}:${dirInfo.towards || ''}`;
-        }
-        // Fallback: Key direkt verwenden (ohne das R-Prefix falls vorhanden)
-        const colonIdx = key.indexOf(':');
-        if (colonIdx > 0) {
-          const line = key.substring(0, colonIdx);
-          let dest = key.substring(colonIdx + 1);
-          // Falls es ein richtungsId-Key ist (z.B. "2:R60500123"), leeren String verwenden
-          if (dest.startsWith('R') && /^\d+$/.test(dest.substring(1))) {
-            dest = '';
-          }
-          return `${line}:${dest}`;
-        }
-        return key;
-      });
-      items.push(groupParts.join('+'));
+      // Keys sind bereits im "Linie:Ziel" Format
+      items.push(group.directions.join('+'));
     }
   });
   return items.join(',');
@@ -5452,7 +5429,7 @@ function parseRowOrderDestination(rowOrderStr) {
   });
 }
 
-// Mappt einen gespeicherten Key (z.B. "2:Universität") auf den verfügbaren Key in ftAllDirections
+// VEREINFACHT: Mappt einen gespeicherten Key (z.B. "2:Universität") auf verfügbare Keys
 function mapToAvailableKey(savedKey) {
   // Exakter Match
   let match = ftAllDirections.find(d => d.key === savedKey);
@@ -5463,22 +5440,21 @@ function mapToAvailableKey(savedKey) {
   if (colonIdx <= 0) return null;
 
   const line = savedKey.substring(0, colonIdx);
-  const rest = savedKey.substring(colonIdx + 1);
+  const dest = savedKey.substring(colonIdx + 1);
 
-  // Ist es ein richtungsId-Key? (z.B. "2:R60500123")
-  if (rest.startsWith('R')) {
-    const richtungsId = rest.substring(1);
-    match = ftAllDirections.find(d => d.line === line && d.richtungsId === richtungsId);
+  // Legacy-Support: Altes richtungsId-Format (z.B. "2:R60500123") -> Linie matchen
+  if (dest.startsWith('R') && /^\d+$/.test(dest.substring(1))) {
+    match = ftAllDirections.find(d => d.line === line);
     if (match) return match.key;
   }
 
-  // Ist es ein Zieltext-Key? (z.B. "2:Universität")
-  match = ftAllDirections.find(d => d.line === line && d.towards === rest);
+  // Zieltext-Key (z.B. "2:Universität")
+  match = ftAllDirections.find(d => d.line === line && d.towards === dest);
   if (match) return match.key;
 
   // Partial Match auf Zieltext
   match = ftAllDirections.find(d =>
-    d.line === line && (d.towards.includes(rest) || rest.includes(d.towards))
+    d.line === line && (d.towards.includes(dest) || dest.includes(d.towards))
   );
   if (match) return match.key;
 
@@ -5490,13 +5466,18 @@ function mapToAvailableKey(savedKey) {
 }
 
 // Aktualisiert ftPoolDirections basierend auf ftLineGroups
+// Pool = alle Richtungen die NICHT in Gruppen sind
 function updatePoolDirections() {
   const usedKeys = new Set();
   ftLineGroups.forEach(group => {
     (group.directions || []).forEach(key => usedKeys.add(key));
   });
 
+  // Eine Richtung ist im Pool wenn ihr Key NICHT in einer Gruppe ist
   ftPoolDirections = ftAllDirections.filter(d => !usedKeys.has(d.key));
+
+  console.log('[updatePoolDirections] usedKeys:', [...usedKeys]);
+  console.log('[updatePoolDirections] Pool:', ftPoolDirections.map(d => d.key));
 }
 
 async function loadFtDirectionsFromStations() {
@@ -5512,7 +5493,6 @@ async function loadFtDirectionsFromStations() {
         const lineName = dir.line || '';
         const towards = dir.towards || '';
         const type = dir.type || '';
-        const richtungsId = dir.richtungsId || '';
 
         if (!lineName) return;
 
@@ -5525,11 +5505,12 @@ async function loadFtDirectionsFromStations() {
           if (!isAllowed) return;
         }
 
-        const key = richtungsId ? `${lineName}:R${richtungsId}` : `${lineName}:${towards}`;
-        console.log(`[loadFtDirectionsFromStations] Erstelle Key: ${key} (line=${lineName}, towards=${towards}, richtungsId=${richtungsId})`);
+        // VEREINFACHT: Key ist immer Linie:Ziel (keine richtungsId mehr)
+        const key = `${lineName}:${towards}`;
+        console.log(`[loadFtDirectionsFromStations] Key: ${key}`);
         if (!ftAllDirections.some(d => d.key === key)) {
           ftAllDirections.push({
-            key, line: lineName, towards, type, richtungsId,
+            key, line: lineName, towards, type,
             station: station.stopName, network: station.network
           });
         }
@@ -5556,111 +5537,69 @@ async function loadFtDirectionsFromStations() {
   });
 }
 
+// VEREINFACHT: Format ist immer "Linie:Ziel+Linie:Ziel,..."
 function parseFtExistingGroups(lineGroupsStr) {
   if (!lineGroupsStr) return;
 
   ftLineGroups = [];
   console.log('[parseFtExistingGroups] Eingabe:', lineGroupsStr);
 
-  // Format: "U1:Leopoldau+62:Meidling,1:xyz+2:abc" (alt) oder "1:R60500312+2:R60500097" (neu)
+  // Format: "1:Auwiesen+2:solarCity,1:Uni+2:Uni"
   const groups = lineGroupsStr.split(',');
-  console.log('[parseFtExistingGroups] Gruppen gefunden:', groups);
 
   groups.forEach((groupStr, groupIdx) => {
     if (groupStr.includes('+')) {
       const rawDirections = groupStr.split('+').map(d => d.trim()).filter(d => d);
-      console.log(`[parseFtExistingGroups] Gruppe ${groupIdx}: rawDirections =`, rawDirections);
 
-      // Mappe Keys auf verfügbare Keys in ftAllDirections
-      // Tracke welche Linien schon gematcht wurden (für Index-basiertes Matching)
-      const usedKeysInGroup = new Set();
-
-      const mappedDirections = rawDirections.map((rawKey, rawIdx) => {
-        // Wenn der Key schon das neue Format hat (mit :R), versuche ihn zu verifizieren
-        if (rawKey.includes(':R')) {
-          // Prüfe ob dieser Key direkt in ftAllDirections existiert
-          const directMatch = ftAllDirections.find(d => d.key === rawKey);
-          if (directMatch) {
-            console.log(`[parseFtExistingGroups] '${rawKey}' -> direkter Match`);
-            usedKeysInGroup.add(directMatch.key);
-            return directMatch.key;
-          }
-
-          // Key parsen und nach richtungsId suchen
-          const colonIdx = rawKey.indexOf(':');
-          if (colonIdx > 0) {
-            const line = rawKey.substring(0, colonIdx);
-            const rId = rawKey.substring(colonIdx + 2);  // Skip ":R"
-
-            // Suche nach Linie + richtungsId
-            const ridMatch = ftAllDirections.find(d =>
-              d.line === line && d.richtungsId === rId
-            );
-            if (ridMatch) {
-              console.log(`[parseFtExistingGroups] '${rawKey}' -> richtungsId Match: ${ridMatch.key}`);
-              usedKeysInGroup.add(ridMatch.key);
-              return ridMatch.key;
-            }
-
-            // FALLBACK: Suche nach Linie und nimm erste nicht-benutzte Richtung
-            // Dies ist wichtig wenn die richtungsId sich geändert hat
-            const lineMatches = ftAllDirections.filter(d =>
-              d.line === line && !usedKeysInGroup.has(d.key)
-            );
-            if (lineMatches.length > 0) {
-              // Nimm die erste verfügbare Richtung für diese Linie
-              const fallbackMatch = lineMatches[0];
-              console.log(`[parseFtExistingGroups] '${rawKey}' -> Linien-Fallback (richtungsId geändert): ${fallbackMatch.key}`);
-              usedKeysInGroup.add(fallbackMatch.key);
-              return fallbackMatch.key;
-            }
-          }
-
-          // Key behalten auch wenn nicht gefunden (wird später gefiltert)
-          console.log(`[parseFtExistingGroups] '${rawKey}' -> KEIN Match, behalte Key`);
-          return rawKey;
-        }
-
-        // Altes Format: "12:Auwiesen" -> versuche passende richtungsId zu finden
+      // Mappe auf verfügbare Keys in ftAllDirections
+      const mappedDirections = rawDirections.map(rawKey => {
+        // Parse Linie:Ziel
         const colonIdx = rawKey.indexOf(':');
         if (colonIdx > 0) {
           const line = rawKey.substring(0, colonIdx);
-          const dest = rawKey.substring(colonIdx + 1);
+          let dest = rawKey.substring(colonIdx + 1);
 
-          // Suche in ftAllDirections nach passender Linie+Richtung
-          const match = ftAllDirections.find(d =>
-            d.line === line && d.towards === dest && !usedKeysInGroup.has(d.key)
-          );
-
-          if (match) {
-            console.log(`[parseFtExistingGroups] '${rawKey}' -> towards Match: ${match.key}`);
-            usedKeysInGroup.add(match.key);
-            return match.key;  // Nutze den neuen Key mit richtungsId
+          // Falls altes Format mit :R (richtungsId), extrahiere nur die Linie
+          if (dest.startsWith('R') && /^\d+$/.test(dest.substring(1))) {
+            // Altes richtungsId-Format - suche nach Linie
+            const lineMatch = ftAllDirections.find(d => d.line === line);
+            if (lineMatch) {
+              console.log(`[parseFtExistingGroups] '${rawKey}' -> Linien-Migration: ${lineMatch.key}`);
+              return lineMatch.key;
+            }
           }
 
-          // Kein exakter Match - versuche nur nach Linie zu matchen
-          const lineMatch = ftAllDirections.find(d =>
-            d.line === line && !usedKeysInGroup.has(d.key)
+          // Suche exakten Match Linie:Ziel
+          const match = ftAllDirections.find(d => d.line === line && d.towards === dest);
+          if (match) {
+            console.log(`[parseFtExistingGroups] '${rawKey}' -> Match: ${match.key}`);
+            return match.key;
+          }
+
+          // Partial Match (Ziel enthält oder ist enthalten)
+          const partialMatch = ftAllDirections.find(d =>
+            d.line === line && (d.towards.includes(dest) || dest.includes(d.towards))
           );
-          if (lineMatch) {
-            console.log(`[parseFtExistingGroups] '${rawKey}' -> Linien-Fallback: ${lineMatch.key}`);
-            usedKeysInGroup.add(lineMatch.key);
-            return lineMatch.key;
+          if (partialMatch) {
+            console.log(`[parseFtExistingGroups] '${rawKey}' -> Partial: ${partialMatch.key}`);
+            return partialMatch.key;
           }
         }
 
-        // Fallback: Behalte den alten Key
-        console.log(`[parseFtExistingGroups] '${rawKey}' -> Fallback, behalte Key`);
-        return rawKey;
-      });
+        // Direkter Key-Match
+        const directMatch = ftAllDirections.find(d => d.key === rawKey);
+        if (directMatch) return directMatch.key;
 
-      console.log(`[parseFtExistingGroups] Gruppe ${groupIdx}: mappedDirections =`, mappedDirections);
+        console.log(`[parseFtExistingGroups] '${rawKey}' -> NICHT gefunden`);
+        return null;
+      }).filter(k => k !== null);
+
       if (mappedDirections.length >= 2) {
         ftLineGroups.push({ directions: mappedDirections });
+        console.log(`[parseFtExistingGroups] Gruppe ${groupIdx}:`, mappedDirections);
       }
     }
   });
-  console.log('[parseFtExistingGroups] Ergebnis ftLineGroups:', ftLineGroups);
 }
 
 function renderFtGroupingUI() {
@@ -5928,14 +5867,11 @@ function collectFtLineGroups() {
     return '';
   }
 
-  // Keys zu "Linie:RrichtungsId" Format (für ESP32 Matching)
+  // VEREINFACHT: Format ist immer "Linie:Ziel+Linie:Ziel,..."
   return validGroups.map(g => {
     return g.directions.map(key => {
-      const dirInfo = ftAllDirections.find(d => d.key === key);
-      if (dirInfo && dirInfo.richtungsId) {
-        return `${dirInfo.line}:R${dirInfo.richtungsId}`;
-      }
-      return key;  // Fallback: Key direkt verwenden
+      // Key ist bereits im Format "Linie:Ziel"
+      return key;
     }).join('+');
   }).join(',');
 }
@@ -6505,7 +6441,6 @@ async function loadExistingConfig(rbl, filter, linefilterdestination, roworderde
               const lineName = line.name || '';
               const towards = line.towards || monitor.towards || '';
               const type = line.type || '';
-              const richtungsId = line.richtungsId || monitor.richtungsId || '';
 
               // Prüfen ob diese Linie+Richtung ausgewählt werden soll
               let shouldInclude = false;
@@ -6532,8 +6467,7 @@ async function loadExistingConfig(rbl, filter, linefilterdestination, roworderde
                   station.directions.push({
                     line: lineName,
                     towards: towards,
-                    type: type,
-                    richtungsId: richtungsId
+                    type: type
                   });
                 }
               }
