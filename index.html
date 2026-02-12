@@ -558,8 +558,8 @@
         <small id="sortmodeHint">Statisch = Feste Reihenfolge der Linien</small>
       </div>
       <div class="segmented" data-name="sortmode">
-        <div class="seg-btn" data-value="1">Nach Zeit</div>
-        <div class="seg-btn active" data-value="2">Statisch</div>
+        <div class="seg-btn" data-value="2">Nach Zeit</div>
+        <div class="seg-btn active" data-value="1">Statisch</div>
       </div>
     </div>
 
@@ -1598,7 +1598,13 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   };
 
   console.log('=== DEBUG ===');
-  console.log('sortmode:', getSegmentValue('sortmode'), '(1=Zeit, 2=Statisch)');
+  const sortmodeSegment = document.querySelector('[data-name="sortmode"]');
+  const sortmodeActiveBtn = sortmodeSegment?.querySelector('.active');
+  console.log('sortmode segment:', sortmodeSegment);
+  console.log('sortmode active button:', sortmodeActiveBtn);
+  console.log('sortmode active button text:', sortmodeActiveBtn?.textContent);
+  console.log('sortmode active button data-value:', sortmodeActiveBtn?.dataset?.value);
+  console.log('getSegmentValue("sortmode"):', getSegmentValue('sortmode'), '(1=Zeit, 2=Statisch)');
   console.log('displaymode:', getSegmentValue('displaymode'), '(1=Gemischt, 2=Slideshow)');
   console.log('=============');
   console.log('Sende Config an ESP32:', configData);
