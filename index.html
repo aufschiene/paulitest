@@ -1006,8 +1006,8 @@ function updateRowOrderList() {
   const section = document.getElementById('rowOrderSection');
   const sortMode = getSegmentValue('sortmode');
 
-  // Nur bei statischer Sortierung anzeigen (sortMode 1 = Statisch)
-  if (sortMode !== '1') {
+  // Nur bei statischer Sortierung anzeigen (sortMode 2 = Statisch in UI, sendet 1)
+  if (sortMode !== '2') {
     section.classList.remove('show');
     return;
   }
@@ -1248,7 +1248,7 @@ function updateUI() {
   const sortMode = getSegmentValue('sortmode');
   const sortHint = document.getElementById('sortmodeHint');
   if (sortHint) {
-    sortHint.textContent = sortMode === '1'
+    sortHint.textContent = sortMode === '2'
       ? 'Statisch = Feste Reihenfolge der Linien'
       : 'Nach Zeit = Nächste Abfahrt zuerst';
   }
@@ -1308,7 +1308,7 @@ function updatePreview() {
     { line: '13A', dest: 'Hauptbahnhof', time: 8, isHochflurer: false, hasKlima: false }
   ];
   
-  // Sortierung (2=Statisch, 1=Zeit)
+  // Sortierung (2=Statisch in UI, 1=Zeit in UI)
   if (sortMode === '2') {
     // Statisch: 13A, U6, 2
     lines = [lines[2], lines[0], lines[1]];
@@ -1535,7 +1535,7 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   let lineGroups = '';
 
   // Bei statischer Sortierung: Verwende die vom User festgelegte Reihenfolge
-  // sortMode 2 = Statisch
+  // sortMode 2 = Statisch in UI (sendet invertiert an ESP32)
   const sortMode = getSegmentValue('sortmode');
   if (sortMode === '2' && rowOrderItems.length > 0) {
     // Benutzer hat Reihenfolge festgelegt
