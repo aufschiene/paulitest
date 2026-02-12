@@ -1,0 +1,1806 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Straba - Erweiterte Features</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;padding:20px;color:#fff}
+    .container{max-width:440px;margin:0 auto}
+    
+    .logo{display:block;max-width:200px;height:auto;margin:0 auto 12px auto}
+    .subtitle{text-align:center;color:#aaa;margin-bottom:16px;font-size:14px;text-transform:uppercase;letter-spacing:1px}
+    
+    /* Intro Box */
+    .intro-box{
+      text-align:center;
+      padding:16px 20px;
+      margin-bottom:24px;
+      font-size:15px;
+      color:#ccc;
+      line-height:1.5;
+    }
+    .intro-box a{
+      color:#ffd700;
+      text-decoration:none;
+      font-weight:600;
+    }
+    .intro-box a:hover{
+      text-decoration:underline;
+    }
+    .back-link{
+      display:inline-block;
+      margin-top:12px;
+      padding:10px 20px;
+      background:rgba(255,255,255,0.1);
+      border-radius:10px;
+      color:#fff !important;
+      font-weight:500;
+      transition:all 0.2s;
+    }
+    .back-link:hover{
+      background:rgba(255,255,255,0.2);
+      text-decoration:none !important;
+    }
+    
+    /* Cards */
+    .card{background:rgba(255,255,255,0.08);border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid rgba(255,255,255,0.1)}
+    .card h2{font-size:14px;margin-bottom:16px;color:#ffd700;text-transform:uppercase;letter-spacing:0.5px;display:flex;align-items:center;gap:8px}
+    
+    /* Control Rows */
+    .control-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid rgba(255,255,255,0.08)}
+    .control-row:last-child{border-bottom:none}
+    .control-label{flex:1}
+    .control-label span{display:block;font-size:15px;font-weight:500}
+    .control-label small{color:#888;font-size:12px;margin-top:3px;display:block;line-height:1.4}
+    
+    /* Segmented Control */
+    .segmented{display:flex;background:rgba(0,0,0,0.3);border-radius:10px;padding:3px;gap:3px}
+    .seg-btn{
+      flex:1;
+      padding:10px 14px;
+      font-size:13px;
+      font-weight:600;
+      border-radius:8px;
+      color:#888;
+      cursor:pointer;
+      text-align:center;
+      transition:all 0.2s;
+      border:none;
+      background:none;
+      white-space:nowrap;
+    }
+    .seg-btn:hover{color:#ccc}
+    .seg-btn.active{background:#ffd700;color:#1a1a2e}
+    
+    /* Segmented mit Label darunter */
+    .seg-btn-with-label{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      padding:10px 14px;
+      font-size:13px;
+      font-weight:600;
+      border-radius:8px;
+      color:#888;
+      cursor:pointer;
+      text-align:center;
+      transition:all 0.2s;
+      border:none;
+      background:none;
+      gap:2px;
+    }
+    .seg-btn-with-label:hover{color:#ccc}
+    .seg-btn-with-label.active{background:#ffd700;color:#1a1a2e}
+    .seg-btn-with-label .badge{
+      font-size:9px;
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:0.3px;
+      opacity:0.7;
+    }
+    .seg-btn-with-label.active .badge{opacity:1}
+    
+    /* Breitere Segmented für Zeilen */
+    .segmented.wide{min-width:180px}
+    .segmented.wide .seg-btn{padding:12px 20px;font-size:15px}
+    
+    /* Toggle */
+    .toggle{
+      width:52px;
+      height:32px;
+      background:rgba(255,255,255,0.15);
+      border-radius:32px;
+      position:relative;
+      cursor:pointer;
+      transition:background 0.3s;
+      flex-shrink:0;
+    }
+    .toggle.on{background:#ffd700}
+    .toggle::after{
+      content:"";
+      position:absolute;
+      top:3px;
+      left:3px;
+      width:26px;
+      height:26px;
+      background:#fff;
+      border-radius:50%;
+      transition:transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow:0 2px 4px rgba(0,0,0,0.2);
+    }
+    .toggle.on::after{transform:translateX(20px)}
+    
+    /* Color Picker */
+    .color-row{display:flex;gap:12px}
+    .color-dot{
+      width:38px;
+      height:38px;
+      border-radius:50%;
+      cursor:pointer;
+      border:3px solid transparent;
+      transition:all 0.2s;
+    }
+    .color-dot:hover{transform:scale(1.1)}
+    .color-dot.active{border-color:#fff;box-shadow:0 0 12px rgba(255,255,255,0.3)}
+    .color-amber{background:#ffb340}
+    .color-white{background:#ffffff}
+    .color-orange{background:#ff9500}
+    
+    /* Expandable Card - Eine zusammenhängende Bubble */
+    .expand-card{
+      background:rgba(255,255,255,0.08);
+      border-radius:16px;
+      margin-bottom:16px;
+      border:1px solid rgba(255,255,255,0.1);
+      overflow:hidden;
+    }
+    .expand-header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:18px 20px;
+      cursor:pointer;
+      transition:background 0.2s;
+    }
+    .expand-header:hover{background:rgba(255,255,255,0.03)}
+    .expand-header h2{
+      margin:0;
+      font-size:14px;
+      color:#ffd700;
+      text-transform:uppercase;
+      letter-spacing:0.5px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .expand-arrow{
+      font-size:18px;
+      color:#888;
+      transition:transform 0.3s;
+    }
+    .expand-header.open .expand-arrow{transform:rotate(180deg);color:#ffd700}
+    
+    .expand-content{
+      max-height:0;
+      overflow:hidden;
+      transition:max-height 0.4s ease-out;
+    }
+    .expand-content.open{max-height:2000px}
+    
+    .expand-inner{
+      padding:0 20px 20px 20px;
+      border-top:1px solid rgba(255,255,255,0.08);
+    }
+    
+    /* Sections innerhalb der erweiterten Einstellungen */
+    .inner-section{
+      padding-top:20px;
+    }
+    .inner-section:not(:last-child){
+      padding-bottom:20px;
+      border-bottom:1px solid rgba(255,255,255,0.08);
+    }
+    .inner-section h3{
+      font-size:13px;
+      color:#ffd700;
+      margin-bottom:14px;
+      font-weight:600;
+      display:flex;
+      align-items:center;
+      gap:8px;
+    }
+    
+    /* Feature Description */
+    .feature-desc{
+      font-size:13px;
+      color:#aaa;
+      line-height:1.6;
+      margin-bottom:16px;
+      padding:12px 14px;
+      background:rgba(0,0,0,0.15);
+      border-radius:10px;
+    }
+    
+    /* Subsections */
+    .sub-section{
+      background:rgba(0,0,0,0.2);
+      border-radius:12px;
+      padding:16px;
+      margin-top:14px;
+      transition:opacity 0.3s, transform 0.3s;
+    }
+    .sub-section.disabled{opacity:0.4;pointer-events:none;transform:scale(0.98)}
+    .sub-section h4{font-size:12px;color:#aaa;margin-bottom:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.3px}
+    
+    /* Gehweg Liste */
+    .gehweg-item{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:12px 0;
+      border-bottom:1px solid rgba(255,255,255,0.06);
+      gap:12px;
+    }
+    .gehweg-item:last-child{border-bottom:none}
+    .gehweg-item .stop-info{flex:1;min-width:0}
+    .gehweg-item .stop-name{font-size:14px;color:#fff;font-weight:600;margin-bottom:4px}
+    .gehweg-item .stop-id{font-size:12px;color:#888;margin-top:2px}
+    .gehweg-item .stop-lines{font-size:12px;color:#aaa;line-height:1.6}
+    .line-badge-small{
+      display:inline-block;
+      background:rgba(255,215,0,0.2);
+      color:#ffd700;
+      padding:2px 6px;
+      border-radius:4px;
+      font-weight:600;
+      font-size:11px;
+      margin-right:4px;
+    }
+    .gehweg-item input{
+      width:70px;
+      text-align:center;
+      padding:10px;
+      background:rgba(0,0,0,0.3);
+      border:2px solid rgba(255,255,255,0.15);
+      color:#fff;
+      border-radius:10px;
+      font-size:15px;
+      flex-shrink:0;
+    }
+    .gehweg-item input:focus{outline:none;border-color:#ffd700}
+    .gehweg-item input:invalid{border-color:#ff453a}
+    .gehweg-error{font-size:11px;color:#ff453a;margin-top:4px;display:none}
+    .gehweg-error.show{display:block}
+    .gehweg-item .unit{color:#888;font-size:13px;margin-left:8px;flex-shrink:0}
+
+    /* Wien-Only Badge */
+    .wien-only-badge{
+      font-size:10px;
+      background:#E20613;
+      color:#fff;
+      padding:2px 6px;
+      border-radius:4px;
+      margin-left:8px;
+      font-weight:500;
+      text-transform:none;
+      letter-spacing:0;
+    }
+
+    /* Disabled/Hidden Feature Rows */
+    .control-row.feature-disabled{
+      opacity:0.4;
+      pointer-events:none;
+    }
+    .control-row.feature-hidden{
+      display:none;
+    }
+    .card.feature-hidden{
+      display:none;
+    }
+
+    /* Zeilen-Reihenfolge Drag & Drop */
+    .row-order-section{
+      margin-top:16px;
+      padding-top:16px;
+      border-top:1px solid rgba(255,255,255,0.1);
+      display:none;
+    }
+    .row-order-section.show{display:block}
+    .row-order-label{
+      font-size:13px;
+      color:#ffd700;
+      margin-bottom:8px;
+      font-weight:600;
+    }
+    .row-order-hint{
+      font-size:12px;
+      color:#888;
+      margin-bottom:12px;
+    }
+    .row-order-list{
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .row-order-item{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      padding:12px;
+      background:rgba(0,0,0,0.3);
+      border:1px solid rgba(255,255,255,0.1);
+      border-radius:10px;
+      cursor:grab;
+      transition:all 0.15s;
+    }
+    .row-order-item:hover{
+      border-color:rgba(255,215,0,0.4);
+      background:rgba(0,0,0,0.4);
+    }
+    .row-order-item.dragging{
+      opacity:0.5;
+      border-color:#ffd700;
+      cursor:grabbing;
+    }
+    .row-order-item.drag-over{
+      border-color:#ffd700;
+      background:rgba(255,215,0,0.1);
+    }
+    .row-order-item .drag-handle{
+      color:#666;
+      font-size:16px;
+      cursor:grab;
+    }
+    .row-order-item .row-number{
+      min-width:24px;
+      height:24px;
+      background:#ffd700;
+      color:#1a1a2e;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight:700;
+      font-size:12px;
+    }
+    .row-order-item .line-badge{
+      padding:4px 10px;
+      border-radius:6px;
+      font-weight:700;
+      font-size:13px;
+      background:#ffd700;
+      color:#1a1a2e;
+    }
+    .row-order-item .direction-text{
+      flex:1;
+      color:#ccc;
+      font-size:13px;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .row-order-item .move-buttons{
+      display:flex;
+      gap:4px;
+    }
+    .row-order-item .move-btn{
+      width:28px;
+      height:28px;
+      border:none;
+      background:rgba(255,255,255,0.1);
+      color:#888;
+      border-radius:6px;
+      cursor:pointer;
+      font-size:12px;
+      transition:all 0.15s;
+    }
+    .row-order-item .move-btn:hover:not(:disabled){
+      background:rgba(255,215,0,0.2);
+      color:#ffd700;
+    }
+    .row-order-item .move-btn:disabled{
+      opacity:0.3;
+      cursor:not-allowed;
+    }
+    .row-order-empty{
+      text-align:center;
+      padding:20px;
+      color:#666;
+      font-style:italic;
+    }
+
+    /* Number inputs */
+    input[type="number"]{
+      width:80px;
+      text-align:center;
+      background:rgba(0,0,0,0.3);
+      border:2px solid rgba(255,255,255,0.15);
+      color:#fff;
+      border-radius:10px;
+      padding:10px;
+      font-size:15px;
+    }
+    input[type="number"]:focus{outline:none;border-color:#ffd700}
+    
+    /* Hints */
+    .hint-small{
+      font-size:12px;
+      color:#888;
+      margin-top:10px;
+      line-height:1.4;
+    }
+    
+    /* Preview Box */
+    .preview-box{
+      background:#000;
+      border-radius:8px;
+      padding:16px;
+      font-family:"SF Mono",Monaco,"Courier New",monospace;
+      border:2px solid #333;
+      margin-bottom:12px;
+    }
+    .preview-row{
+      display:flex;
+      justify-content:space-between;
+      padding:8px 0;
+      font-size:15px;
+      letter-spacing:0.5px;
+    }
+    .preview-row .line-num{font-weight:bold;min-width:36px}
+    .preview-row .destination{flex:1;margin-left:8px}
+    .preview-row .countdown{font-weight:bold}
+    
+    /* Buttons */
+    .btn-primary{
+      width:100%;
+      padding:16px;
+      background:#ffd700;
+      color:#1a1a2e;
+      border-radius:12px;
+      font-weight:700;
+      font-size:16px;
+      border:none;
+      cursor:pointer;
+      margin-top:20px;
+      margin-bottom:40px;
+      transition:all 0.2s;
+    }
+    .btn-primary:hover{background:#ffed4a;transform:translateY(-2px);box-shadow:0 4px 20px rgba(255,215,0,0.3)}
+    .btn-primary:active{transform:translateY(0)}
+    
+    /* Loading Overlay */
+    .loading{
+      position:fixed;
+      top:0;left:0;right:0;bottom:0;
+      background:rgba(0,0,0,0.92);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      gap:20px;
+      z-index:1000;
+    }
+    .loading.show{display:flex}
+    .spinner{
+      width:48px;height:48px;
+      border:3px solid #333;
+      border-top-color:#ffd700;
+      border-radius:50%;
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .loading-text{font-size:16px;color:#fff}
+    
+    /* Pending Stations Banner */
+    .pending-banner{
+      background:linear-gradient(135deg,rgba(56,239,125,0.2),rgba(17,153,142,0.2));
+      border:1px solid rgba(56,239,125,0.4);
+      border-radius:12px;
+      padding:14px 16px;
+      margin-bottom:16px;
+    }
+    .pending-title{
+      font-weight:600;
+      color:#38ef7d;
+      margin-bottom:4px;
+      font-size:14px;
+    }
+    .pending-text{
+      color:#aaa;
+      font-size:12px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <img src="straba.png" alt="Straba" class="logo">
+  <p class="subtitle">Erweiterte Features</p>
+  
+  <!-- ==================== INTRO ==================== -->
+  <div class="intro-box">
+    Nun kannst du dein Straba ganz nach deinen Wünschen einstellen.<br>
+    <a href="localmainpage.html" class="back-link">← Zurück zu Linien einstellen</a>
+  </div>
+  
+  <!-- Banner für neue Stationen -->
+  <div class="pending-banner" id="pendingBanner" style="display:none;">
+    <div class="pending-title">✓ Neue Stationen bereit</div>
+    <div class="pending-text" id="pendingText">Deine ausgewählten Stationen werden beim Speichern übernommen.</div>
+  </div>
+  
+  <!-- ==================== VORSCHAU ==================== -->
+  <div class="card">
+    <h2>📺 Vorschau <span style="font-weight:400;font-size:12px;color:#888;text-transform:none;letter-spacing:0">– Beispiel Linien</span></h2>
+    <div class="preview-box" id="preview">
+      <!-- Wird dynamisch generiert -->
+    </div>
+  </div>
+  
+  <!-- ==================== ANZEIGE ==================== -->
+  <div class="card">
+    <h2>📊 Anzeige</h2>
+    
+    <div class="control-row">
+      <div class="control-label"><span>Anzahl Zeilen</span></div>
+      <div class="segmented wide" data-name="anzeige">
+        <div class="seg-btn" data-value="1">1</div>
+        <div class="seg-btn active" data-value="2">2</div>
+        <div class="seg-btn" data-value="3">3</div>
+      </div>
+    </div>
+    
+    <div class="control-row">
+      <div class="control-label">
+        <span>Sortierung</span>
+        <small id="sortmodeHint">Statisch = Feste Reihenfolge der Linien</small>
+      </div>
+      <div class="segmented" data-name="sortmode">
+        <div class="seg-btn active" data-value="1">Statisch</div>
+        <div class="seg-btn" data-value="2">Nach Zeit</div>
+      </div>
+    </div>
+
+    <!-- Zeilen-Reihenfolge (nur bei Statisch sichtbar) -->
+    <div class="row-order-section show" id="rowOrderSection">
+      <div class="row-order-label">Zeilen-Reihenfolge festlegen</div>
+      <div class="row-order-hint">Ziehe die Linien in die gewünschte Reihenfolge (Zeile 1 = oben)</div>
+      <div class="row-order-list" id="rowOrderList">
+        <!-- Wird dynamisch gefüllt -->
+        <div class="row-order-empty">Keine Linien konfiguriert</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== BARRIEREFREIHEIT (Wien-spezifisch) ==================== -->
+  <div class="card" id="cardBarrierefreiheit">
+    <h2>♿ Barrierefreiheit <span id="wienOnlyBadge1" class="wien-only-badge" style="display:none;">Wien</span></h2>
+
+    <div class="control-row" id="rowChopper">
+      <div class="control-label">
+        <span>Hochflurer markieren</span>
+        <small>Zeigt Warnfarbe bei nicht barrierefreien Fahrzeugen</small>
+      </div>
+      <div class="segmented" data-name="chopper">
+        <div class="seg-btn" data-value="0">Aus</div>
+        <div class="seg-btn active" data-value="1">An</div>
+      </div>
+    </div>
+
+    <div class="control-row" id="rowSilberpfeil">
+      <div class="control-label">
+        <span>U-Bahnen mit Klimaanlage</span>
+        <small>Markiert klimatisierte U-Bahn-Züge</small>
+      </div>
+      <div class="segmented" data-name="silberpfeil">
+        <div class="seg-btn" data-value="0">Aus</div>
+        <div class="seg-btn active" data-value="1">An</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== DESIGN ==================== -->
+  <div class="card" id="cardDesign">
+    <h2>🎨 Design</h2>
+
+    <div class="control-row" id="rowTextfarbe">
+      <div class="control-label"><span>Textfarbe</span></div>
+      <div class="color-row" data-name="textcolor">
+        <div class="color-dot color-amber active" data-value="1" title="Gelb/Amber"></div>
+        <div class="color-dot color-white" data-value="2" title="Weiß"></div>
+        <div class="color-dot color-orange" data-value="3" title="Orange"></div>
+      </div>
+    </div>
+
+    <div class="control-row">
+      <div class="control-label"><span>Helligkeit</span></div>
+      <div class="segmented" data-name="displaylight">
+        <div class="seg-btn" data-value="1">Dunkel</div>
+        <div class="seg-btn" data-value="2">Mittel</div>
+        <div class="seg-btn active" data-value="3">Hell</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- ==================== NACHTMODUS ==================== -->
+  <div class="card">
+    <h2>🌙 Nachtmodus</h2>
+    
+    <div class="control-row">
+      <div class="control-label">
+        <span>Nachtmodus aktivieren</span>
+        <small>Display schaltet sich automatisch ab</small>
+      </div>
+      <div class="toggle" id="nightmodeToggle"></div>
+    </div>
+    
+    <div class="sub-section disabled" id="nightSettings">
+      <div class="control-row">
+        <div class="control-label"><span>Display aus ab</span></div>
+        <input type="number" id="nightstart" min="0" max="23" value="22">
+        <span style="color:#888;margin-left:8px">Uhr</span>
+      </div>
+      <div class="control-row">
+        <div class="control-label"><span>Display an ab</span></div>
+        <input type="number" id="nightend" min="0" max="23" value="7">
+        <span style="color:#888;margin-left:8px">Uhr</span>
+      </div>
+    </div>
+    
+    <div class="hint-small">
+      Im Nachtmodus schaltet sich das Display komplett ab.
+    </div>
+  </div>
+  
+  <!-- ==================== ERWEITERTE EINSTELLUNGEN (Eine Bubble) ==================== -->
+  <div class="expand-card">
+    <div class="expand-header" id="expandHeader" onclick="toggleExpand()">
+      <h2>⚙️ Erweiterte Einstellungen</h2>
+      <span class="expand-arrow">▼</span>
+    </div>
+    
+    <div class="expand-content" id="expandContent">
+      <div class="expand-inner">
+        
+        <!-- ANZEIGE-MODUS -->
+        <div class="inner-section">
+          <h3>🔄 Anzeige-Modus</h3>
+          
+          <div class="feature-desc">
+            Straba nimmt alle Stationen und mischt sie auf ein geordnetes Display, sodass du auf einer Anzeige alle deine Verbindungen gleichzeitig im Blick hast. Falls du das nicht willst, wähle „Slideshow" – hier wird jede Haltestelle einzeln angezeigt.
+          </div>
+          
+          <div class="control-row">
+            <div class="control-label">
+              <span>Modus</span>
+            </div>
+            <div class="segmented" data-name="displaymode">
+              <div class="seg-btn-with-label active" data-value="1">
+                <span>Gemischt</span>
+                <span class="badge">Empfohlen</span>
+              </div>
+              <div class="seg-btn-with-label" data-value="2">
+                <span>Slideshow</span>
+                <span class="badge">&nbsp;</span>
+              </div>
+            </div>
+          </div>
+          
+          <div class="sub-section disabled" id="slideshowSettings">
+            <h4>Slideshow-Einstellungen</h4>
+            <div class="control-row">
+              <div class="control-label">
+                <span>Wechsel-Intervall</span>
+              </div>
+              <div class="segmented" data-name="stopinterval" style="width:200px">
+                <div class="seg-btn" data-value="5">5s</div>
+                <div class="seg-btn active" data-value="10">10s</div>
+                <div class="seg-btn" data-value="15">15s</div>
+                <div class="seg-btn" data-value="30">30s</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- GEHWEG -->
+        <div class="inner-section">
+          <h3>🚶 Gehweg zur Haltestelle</h3>
+          
+          <div class="control-row">
+            <div class="control-label">
+              <span>Gehweg-Filter aktivieren</span>
+              <small>Blendet unerreichbare Abfahrten aus.<br>Die Gehzeit kann bis zu 15 Minuten eingestellt werden.</small>
+            </div>
+            <div class="toggle" id="gehwegToggle"></div>
+          </div>
+          
+          <div class="sub-section disabled" id="gehwegSettings">
+            <h4>Gehzeit pro Haltestelle</h4>
+            <div id="gehwegList">
+              <div class="gehweg-item">
+                <div class="stop-info">
+                  <div class="stop-name" style="color:#888">Lade Haltestellen...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="hint-small">
+            Abfahrten unter der Minutenzahl werden ausgeblendet. 0 = kein Filter.
+          </div>
+        </div>
+        
+        <!-- INFOTAINMENT -->
+        <div class="inner-section">
+          <h3>💡 Infotainment</h3>
+          
+          <div class="feature-desc">
+            Dein Straba sagt dir "Frohe Weihnachten" oder "Alles Gute zum Öffi-Jahrestag" ;)
+          </div>
+          
+          <div class="control-row">
+            <div class="control-label">
+              <span>Infotainment aktivieren</span>
+              <small>Störungstexte werden immer angezeigt</small>
+            </div>
+            <div class="toggle on" id="funMessagesToggle"></div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+  
+  <!-- ==================== SPEICHERN ==================== -->
+  <button class="btn-primary" id="saveBtn">💾 Speichern & Neustarten</button>
+  
+</div>
+
+<!-- ==================== LOADING OVERLAY ==================== -->
+<div class="loading" id="loading">
+  <div class="spinner"></div>
+  <div class="loading-text">Speichere & starte neu...</div>
+</div>
+
+<script>
+// ==================== GLOBALE VARIABLEN ====================
+let pendingRbl = '';
+let pendingFilter = '';
+let currentConfig = {};
+let currentCapabilities = null;  // City Capabilities für Feature-Anzeige
+
+// City Capabilities (kopiert aus cities.html für Konsistenz)
+const CITY_CAPABILITIES = {
+  WL: {
+    textColorChangeable: true,
+    showHighFloor: true,
+    showAirCondition: true,
+    gehwegFilter: true,
+    nightMode: true,
+    defaultColour: 1,
+    defaultBrightness: 3
+  },
+  WLB: {
+    textColorChangeable: false,
+    showHighFloor: false,
+    showAirCondition: false,
+    gehwegFilter: true,
+    nightMode: true,
+    defaultColour: 4,
+    defaultBrightness: 3
+  },
+  LINZ: {
+    textColorChangeable: true,
+    showHighFloor: false,
+    showAirCondition: false,
+    gehwegFilter: true,
+    nightMode: true,
+    defaultColour: 2,
+    defaultBrightness: 3
+  },
+  DB: {
+    textColorChangeable: false,
+    showHighFloor: false,
+    showAirCondition: false,
+    gehwegFilter: true,
+    nightMode: true,
+    defaultColour: 6,
+    defaultBrightness: 3
+  },
+  BERLIN: {
+    textColorChangeable: false,
+    showHighFloor: false,
+    showAirCondition: false,
+    gehwegFilter: true,
+    nightMode: true,
+    defaultColour: 3,
+    defaultBrightness: 3
+  },
+  BODO: {
+    textColorChangeable: false,
+    showHighFloor: false,
+    showAirCondition: false,
+    gehwegFilter: true,
+    nightMode: true,
+    defaultColour: 7,
+    defaultBrightness: 3
+  }
+};
+
+// ==================== EXPAND TOGGLE ====================
+function toggleExpand() {
+  const header = document.getElementById('expandHeader');
+  const content = document.getElementById('expandContent');
+  header.classList.toggle('open');
+  content.classList.toggle('open');
+}
+
+// ==================== SEGMENTED CONTROLS ====================
+document.querySelectorAll('.segmented').forEach(seg => {
+  seg.querySelectorAll('.seg-btn, .seg-btn-with-label').forEach(btn => {
+    btn.addEventListener('click', () => {
+      seg.querySelectorAll('.seg-btn, .seg-btn-with-label').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateUI();
+    });
+  });
+});
+
+// ==================== COLOR DOTS ====================
+document.querySelectorAll('.color-row').forEach(row => {
+  row.querySelectorAll('.color-dot').forEach(dot => {
+    dot.addEventListener('click', () => {
+      row.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      dot.classList.add('active');
+      updatePreview();
+    });
+  });
+});
+
+// ==================== TOGGLES ====================
+document.querySelectorAll('.toggle').forEach(toggle => {
+  toggle.addEventListener('click', () => {
+    toggle.classList.toggle('on');
+    updateUI();
+  });
+});
+
+// ==================== GEHWEG LISTE ====================
+let currentStopIds = [];
+let currentStationDetails = [];
+
+function updateGehwegList(stopIds, gehwegValues, stationDetails) {
+  const container = document.getElementById('gehwegList');
+  currentStopIds = stopIds || [];
+  
+  // Details übernehmen wenn neue übergeben wurden
+  if (stationDetails && stationDetails.length > 0) {
+    currentStationDetails = stationDetails;
+    console.log('Neue Details übernommen:', currentStationDetails);
+  }
+  // Falls KEINE neuen Details und KEINE bestehenden Details, aus localStorage laden
+  else if (currentStationDetails.length === 0) {
+    const pendingDetails = localStorage.getItem('straba_pending_details');
+    if (pendingDetails) {
+      try {
+        currentStationDetails = JSON.parse(pendingDetails);
+        console.log('Details aus localStorage geladen:', currentStationDetails);
+      } catch (e) {
+        console.error('Fehler beim Parsen der Station Details:', e);
+      }
+    }
+  }
+  // Ansonsten: Behalte bestehende currentStationDetails (nicht überschreiben!)
+  
+  console.log('updateGehwegList - stopIds:', currentStopIds);
+  console.log('updateGehwegList - details:', currentStationDetails);
+  
+  if (currentStopIds.length === 0 && currentStationDetails.length === 0) {
+    container.innerHTML = `
+      <div class="gehweg-item">
+        <div class="stop-info">
+          <div class="stop-name" style="color:#888">Keine Haltestellen konfiguriert</div>
+          <div class="stop-id" style="color:#666">Bitte zuerst Linien einstellen</div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+  
+  const values = gehwegValues || [];
+  
+  // Wenn wir Details haben, zeige diese an
+  if (currentStationDetails.length > 0) {
+    container.innerHTML = currentStationDetails.map((station, i) => {
+      const val = values[i] !== undefined ? values[i] : 0;
+      
+      // Linien-Anzeige erstellen
+      let linesDisplay = '';
+      if (station.lines && station.lines.length > 0) {
+        linesDisplay = station.lines.map(l => 
+          `<span class="line-badge-small">${l.name}</span> → ${l.direction}`
+        ).join('<br>');
+      }
+      
+      // Station-Name (mit Fallback)
+      const stationName = station.name || station.stationName || `Haltestelle ${i + 1}`;
+      
+      return `
+        <div class="gehweg-item">
+          <div class="stop-info">
+            <div class="stop-name">${stationName}</div>
+            ${linesDisplay ? `<div class="stop-lines">${linesDisplay}</div>` : `<div class="stop-id">RBL ${station.id || currentStopIds[i] || '?'}</div>`}
+          </div>
+          <input type="number" min="0" max="15" step="1" value="${val}" data-index="${i}" data-stop-id="${station.id || currentStopIds[i] || ''}" onchange="validateGehweg(this)" oninput="validateGehweg(this)">
+          <span class="unit">Min</span>
+        </div>
+      `;
+    }).join('');
+  } else {
+    // Fallback: Nur Stop-IDs anzeigen
+    container.innerHTML = currentStopIds.map((id, i) => {
+      const val = values[i] !== undefined ? values[i] : 0;
+      return `
+        <div class="gehweg-item">
+          <div class="stop-info">
+            <div class="stop-name">Haltestelle ${i + 1}</div>
+            <div class="stop-id">RBL ${id}</div>
+          </div>
+          <input type="number" min="0" max="15" step="1" value="${val}" data-index="${i}" data-stop-id="${id}" onchange="validateGehweg(this)" oninput="validateGehweg(this)">
+          <span class="unit">Min</span>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function getCurrentGehwegValues() {
+  const inputs = document.querySelectorAll('#gehwegList input[type="number"]');
+  return Array.from(inputs).map(inp => parseInt(inp.value) || 0);
+}
+
+function validateGehweg(input) {
+  let val = parseFloat(input.value);
+  
+  // Keine Kommazahlen - nur ganze Zahlen
+  if (!Number.isInteger(val)) {
+    val = Math.floor(val);
+  }
+  
+  // Begrenzen auf 0-15
+  if (val < 0) val = 0;
+  if (val > 15) val = 15;
+  
+  // Wert setzen
+  input.value = val;
+}
+
+function getGehwegString() {
+  // Neues Format: "stopId:gehzeit|stopId:gehzeit"
+  // z.B. "5903:5|5939:0" statt "5|0"
+  const inputs = document.querySelectorAll('#gehwegList input[type="number"]');
+  if (inputs.length === 0) return '0';
+
+  const entries = [];
+  inputs.forEach(inp => {
+    const stopId = inp.dataset.stopId;
+    const value = parseInt(inp.value) || 0;
+    if (stopId) {
+      entries.push(`${stopId}:${value}`);
+    }
+  });
+
+  if (entries.length === 0) return '0';
+  return entries.join('|');
+}
+
+// ==================== ZEILEN-REIHENFOLGE (DRAG & DROP) ====================
+let rowOrderItems = [];  // Array mit {stopId, line, direction} Objekten
+let draggedRowItem = null;
+let draggedRowIndex = -1;
+
+function updateRowOrderList() {
+  const container = document.getElementById('rowOrderList');
+  const section = document.getElementById('rowOrderSection');
+  const sortMode = getSegmentValue('sortmode');
+
+  // Nur bei statischer Sortierung anzeigen
+  if (sortMode !== '1') {
+    section.classList.remove('show');
+    return;
+  }
+  section.classList.add('show');
+
+  // Erstelle Items aus den Pending/Current Daten
+  const rblString = pendingRbl || currentConfig.rbl_id || '';
+  const filterString = pendingFilter || currentConfig.lines_filter || '';
+
+  if (!rblString || !filterString) {
+    container.innerHTML = '<div class="row-order-empty">Keine Linien konfiguriert</div>';
+    rowOrderItems = [];
+    return;
+  }
+
+  // Nur neu aufbauen wenn sich die Daten geändert haben
+  const newItemsKey = `${rblString}|${filterString}`;
+  if (container.dataset.itemsKey !== newItemsKey || rowOrderItems.length === 0) {
+    // Items aus RBL und Filter erstellen
+    const stopIds = rblString.split(',').map(s => s.trim());
+    const filters = filterString.split('|').map(s => s.trim());
+
+    // Sammle alle Linien mit ihren Stop-IDs (für später beim Speichern)
+    const allLineEntries = [];
+    const seenLines = new Set();  // Um Duplikate zu vermeiden
+
+    stopIds.forEach((stopId, i) => {
+      const linesForStop = filters[i] ? filters[i].split(',').map(l => l.trim()) : [];
+      linesForStop.forEach(line => {
+        if (line) {
+          // Direction aus currentStationDetails holen wenn vorhanden
+          let direction = '';
+          if (currentStationDetails && currentStationDetails[i]) {
+            const station = currentStationDetails[i];
+            if (station.lines) {
+              const lineInfo = station.lines.find(l => l.name === line);
+              if (lineInfo) direction = lineInfo.direction || '';
+            }
+          }
+          allLineEntries.push({ stopId, line, direction });
+        }
+      });
+    });
+
+    // Für die Anzeige: Nur einzigartige Linien (erste Vorkommen behalten)
+    // Aber alle Stop-IDs für diese Linie merken
+    rowOrderItems = [];
+    const lineToStopIds = {};  // line -> [stopId1, stopId2, ...]
+
+    allLineEntries.forEach(entry => {
+      if (!lineToStopIds[entry.line]) {
+        lineToStopIds[entry.line] = [];
+      }
+      lineToStopIds[entry.line].push(entry.stopId);
+
+      // Nur beim ersten Vorkommen zur Anzeige hinzufügen
+      if (!seenLines.has(entry.line)) {
+        seenLines.add(entry.line);
+        rowOrderItems.push({
+          line: entry.line,
+          direction: entry.direction,
+          stopIds: lineToStopIds[entry.line]  // Referenz, wird automatisch aktualisiert
+        });
+      }
+    });
+
+    container.dataset.itemsKey = newItemsKey;
+  }
+
+  renderRowOrderList();
+}
+
+function renderRowOrderList() {
+  const container = document.getElementById('rowOrderList');
+
+  if (rowOrderItems.length === 0) {
+    container.innerHTML = '<div class="row-order-empty">Keine Linien konfiguriert</div>';
+    return;
+  }
+
+  container.innerHTML = rowOrderItems.map((item, idx) => {
+    const isFirst = idx === 0;
+    const isLast = idx === rowOrderItems.length - 1;
+    const dirText = item.direction || '';
+
+    return `
+      <div class="row-order-item" draggable="true" data-index="${idx}">
+        <span class="drag-handle">☰</span>
+        <span class="row-number">${idx + 1}</span>
+        <span class="line-badge">${item.line}</span>
+        <span class="direction-text">${dirText}</span>
+        <span class="move-buttons">
+          <button class="move-btn" onclick="moveRowOrderItem(${idx}, -1)" ${isFirst ? 'disabled' : ''}>▲</button>
+          <button class="move-btn" onclick="moveRowOrderItem(${idx}, 1)" ${isLast ? 'disabled' : ''}>▼</button>
+        </span>
+      </div>
+    `;
+  }).join('');
+
+  // Drag & Drop Events hinzufügen
+  const items = container.querySelectorAll('.row-order-item');
+  items.forEach(item => {
+    item.addEventListener('dragstart', handleRowDragStart);
+    item.addEventListener('dragend', handleRowDragEnd);
+    item.addEventListener('dragover', handleRowDragOver);
+    item.addEventListener('drop', handleRowDrop);
+    item.addEventListener('dragenter', handleRowDragEnter);
+    item.addEventListener('dragleave', handleRowDragLeave);
+  });
+}
+
+function handleRowDragStart(e) {
+  draggedRowItem = this;
+  draggedRowIndex = parseInt(this.dataset.index);
+  this.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', draggedRowIndex);
+}
+
+function handleRowDragEnd(e) {
+  this.classList.remove('dragging');
+  document.querySelectorAll('.row-order-item').forEach(item => {
+    item.classList.remove('drag-over');
+  });
+  draggedRowItem = null;
+  draggedRowIndex = -1;
+}
+
+function handleRowDragOver(e) {
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+}
+
+function handleRowDragEnter(e) {
+  e.preventDefault();
+  if (this !== draggedRowItem) {
+    this.classList.add('drag-over');
+  }
+}
+
+function handleRowDragLeave(e) {
+  this.classList.remove('drag-over');
+}
+
+function handleRowDrop(e) {
+  e.preventDefault();
+  e.stopPropagation();
+
+  const targetIndex = parseInt(this.dataset.index);
+
+  if (draggedRowIndex !== -1 && draggedRowIndex !== targetIndex) {
+    // Item verschieben
+    const movedItem = rowOrderItems.splice(draggedRowIndex, 1)[0];
+    rowOrderItems.splice(targetIndex, 0, movedItem);
+
+    // Liste neu rendern
+    renderRowOrderList();
+  }
+
+  this.classList.remove('drag-over');
+}
+
+// Mobile-freundliche Alternative zu Drag & Drop
+function moveRowOrderItem(index, direction) {
+  const newIndex = index + direction;
+
+  // Prüfe Grenzen
+  if (newIndex < 0 || newIndex >= rowOrderItems.length) return;
+
+  // Tausche Elemente
+  const temp = rowOrderItems[index];
+  rowOrderItems[index] = rowOrderItems[newIndex];
+  rowOrderItems[newIndex] = temp;
+
+  // Neu rendern
+  renderRowOrderList();
+}
+
+// Generiere rowOrder String aus der aktuellen Reihenfolge
+// Format: stopId:line für jede Stop-ID (in der Reihenfolge der Linien)
+function getRowOrderString() {
+  if (rowOrderItems.length === 0) return '';
+
+  // Für jede Linie alle ihre Stop-IDs ausgeben (in der Reihenfolge der Linien)
+  const parts = [];
+  rowOrderItems.forEach(item => {
+    if (item.stopIds && item.stopIds.length > 0) {
+      // Neue Struktur: item hat stopIds Array
+      item.stopIds.forEach(stopId => {
+        parts.push(`${stopId}:${item.line}`);
+      });
+    } else if (item.stopId) {
+      // Alte Struktur (Fallback): item hat einzelne stopId
+      parts.push(`${item.stopId}:${item.line}`);
+    }
+  });
+  return parts.join(',');
+}
+
+// ==================== UI UPDATES ====================
+function updateUI() {
+  // Slideshow Settings
+  const displayMode = getSegmentValue('displaymode');
+  const slideshowSettings = document.getElementById('slideshowSettings');
+  slideshowSettings.classList.toggle('disabled', displayMode !== '2');
+
+  // Gehweg Settings
+  const gehwegOn = document.getElementById('gehwegToggle').classList.contains('on');
+  document.getElementById('gehwegSettings').classList.toggle('disabled', !gehwegOn);
+
+  // Zeilen-Reihenfolge aktualisieren (zeigt/versteckt je nach Sortier-Modus)
+  updateRowOrderList();
+  
+  // Night Settings
+  const nightOn = document.getElementById('nightmodeToggle').classList.contains('on');
+  document.getElementById('nightSettings').classList.toggle('disabled', !nightOn);
+  
+  // Sortmode Hint
+  const sortMode = getSegmentValue('sortmode');
+  const sortHint = document.getElementById('sortmodeHint');
+  if (sortHint) {
+    sortHint.textContent = sortMode === '1' 
+      ? 'Statisch = Feste Reihenfolge der Linien' 
+      : 'Nach Zeit = Nächste Abfahrt zuerst';
+  }
+  
+  updatePreview();
+}
+
+function updatePreview() {
+  const textColorVal = getSegmentValue('textcolor');
+  const colors = {
+    '1': '#ffb340',  // Gelb/Amber
+    '2': '#ffffff',  // Weiß
+    '3': '#ff9500'   // Orange
+  };
+  const textColor = colors[textColorVal] || '#ffb340';
+  
+  // Helligkeit
+  const brightness = getSegmentValue('displaylight');
+  const opacityMap = { '1': 0.4, '2': 0.7, '3': 1.0 };
+  const brightnessOpacity = opacityMap[brightness] || 1.0;
+  
+  const zeilenCount = parseInt(getSegmentValue('anzeige')) || 2;
+  const sortMode = getSegmentValue('sortmode');
+  const hochflurerOn = getSegmentValue('chopper') === '1';
+  const klimaanlageOn = getSegmentValue('silberpfeil') === '1';
+  
+  // Nachtmodus Check
+  const nightOn = document.getElementById('nightmodeToggle').classList.contains('on');
+  const nightStart = parseInt(document.getElementById('nightstart').value) || 22;
+  const nightEnd = parseInt(document.getElementById('nightend').value) || 7;
+  const currentHour = new Date().getHours();
+  
+  const preview = document.getElementById('preview');
+  
+  // Nachtmodus aktiv?
+  let isNightTime = false;
+  if (nightOn) {
+    if (nightStart > nightEnd) {
+      isNightTime = currentHour >= nightStart || currentHour < nightEnd;
+    } else {
+      isNightTime = currentHour >= nightStart && currentHour < nightEnd;
+    }
+  }
+  
+  if (isNightTime) {
+    preview.innerHTML = '<div style="text-align:center;color:#444;padding:20px;font-size:13px;">💤 Display ist im Nachtmodus aus</div>';
+    preview.style.opacity = '0.5';
+    return;
+  }
+  
+  preview.style.opacity = brightnessOpacity;
+  
+  // Beispiel-Linien Daten
+  let lines = [
+    { line: 'U6', dest: 'Floridsdorf', time: 4, isHochflurer: false, hasKlima: true },
+    { line: '2', dest: 'Dornbach', time: 6, isHochflurer: true, hasKlima: false },
+    { line: '13A', dest: 'Hauptbahnhof', time: 8, isHochflurer: false, hasKlima: false }
+  ];
+  
+  // Sortierung
+  if (sortMode === '1') {
+    // Statisch: 13A, U6, 2
+    lines = [lines[2], lines[0], lines[1]];
+  } else {
+    // Zeit: Nach Countdown sortiert
+    lines.sort((a, b) => a.time - b.time);
+  }
+  
+  // Nur gewünschte Anzahl Zeilen
+  lines = lines.slice(0, zeilenCount);
+  
+  // HTML generieren
+  preview.innerHTML = lines.map(l => {
+    let lineDisplay = l.line;
+    let rowColor = textColor;
+    
+    // Klimaanlage: * bei U-Bahnen
+    if (klimaanlageOn && l.hasKlima) {
+      lineDisplay = l.line + '*';
+    }
+    
+    // Hochflurer: Blaue Schrift
+    if (hochflurerOn && l.isHochflurer) {
+      rowColor = '#87ceeb';
+    }
+    
+    return `
+      <div class="preview-row" style="color:${rowColor}">
+        <span class="line-num">${lineDisplay}</span>
+        <span class="destination">${l.dest}</span>
+        <span class="countdown">${l.time}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+function getSegmentValue(name) {
+  const seg = document.querySelector(`[data-name="${name}"]`);
+  if (!seg) return '1';
+  const active = seg.querySelector('.active');
+  return active ? active.dataset.value : '1';
+}
+
+function setSegmentValue(name, value) {
+  const seg = document.querySelector(`[data-name="${name}"]`);
+  if (!seg) return;
+  seg.querySelectorAll('.seg-btn, .seg-btn-with-label, .color-dot').forEach(btn => {
+    btn.classList.remove('active');
+    if (btn.dataset.value === String(value)) {
+      btn.classList.add('active');
+    }
+  });
+}
+
+// ==================== CONFIG LADEN (vom Parent via postMessage) ====================
+function applyConfig(config) {
+  console.log('Config anwenden:', config);
+  currentConfig = config;
+
+  // Capabilities aus RBL ableiten (falls nicht bereits gesetzt)
+  if (!currentCapabilities && config.rbl_id) {
+    const network = detectNetworkFromRbl(config.rbl_id);
+    updateFeatureVisibility(CITY_CAPABILITIES[network] || CITY_CAPABILITIES.WL);
+  }
+  
+  // Anzeige
+  setSegmentValue('anzeige', config.lines_count || '2');
+  setSegmentValue('sortmode', config.sort_mode || '1');
+  
+  // Barrierefreiheit
+  setSegmentValue('chopper', config.chopper || '1');
+  setSegmentValue('silberpfeil', config.silberpfeil || '1');
+  
+  // Design
+  // text_color ist die Wien-Schriftfarbe (1=Gelb, 2=Weiß, 3=Orange)
+  setSegmentValue('textcolor', config.text_color || '1');
+  setSegmentValue('displaylight', config.displaylight || '3');
+  
+  // Nachtmodus
+  if (config.night_mode_enabled) {
+    document.getElementById('nightmodeToggle').classList.add('on');
+  }
+  document.getElementById('nightstart').value = config.night_mode_start || '22';
+  document.getElementById('nightend').value = config.night_mode_end || '7';
+  
+  // Fun-Nachrichten
+  if (config.show_fun_messages === false || config.show_fun_messages === '0' || config.show_fun_messages === 0) {
+    document.getElementById('funMessagesToggle').classList.remove('on');
+  } else {
+    document.getElementById('funMessagesToggle').classList.add('on');
+  }
+  
+  // Erweiterte Einstellungen
+  setSegmentValue('displaymode', config.display_mode || '1');
+  setSegmentValue('stopinterval', config.stop_interval || '10');
+  
+  // Gehweg - neues Format: "stopId:gehzeit|stopId:gehzeit"
+  const stopIds = (config.rbl_id || '').split(',').map(s => s.trim()).filter(s => s);
+  const gehwegString = config.gehweg || '0';
+  
+  // Parse gehweg - unterstützt altes ("|" only) und neues Format ("stopId:value|")
+  let gehwegValues = [];
+  if (gehwegString.indexOf(':') !== -1) {
+    // Neues Format: "5903:5|5939:0"
+    const gehwegMap = {};
+    gehwegString.split('|').forEach(entry => {
+      const colonPos = entry.indexOf(':');
+      if (colonPos !== -1) {
+        const stopId = entry.substring(0, colonPos).trim();
+        const value = parseInt(entry.substring(colonPos + 1)) || 0;
+        gehwegMap[stopId] = value;
+      }
+    });
+    // In Reihenfolge der stopIds umwandeln
+    gehwegValues = stopIds.map(id => gehwegMap[id] || 0);
+  } else {
+    // Altes Format: "5|0" (Abwärtskompatibilität)
+    gehwegValues = gehwegString.split('|').map(v => parseInt(v) || 0);
+  }
+  
+  updateGehwegList(stopIds, gehwegValues);
+
+  if (config.gehweg && config.gehweg !== '0' && config.gehweg !== '') {
+    const hasValue = gehwegValues.some(v => v > 0);
+    if (hasValue) {
+      document.getElementById('gehwegToggle').classList.add('on');
+    }
+  }
+
+  // Zeilen-Reihenfolge aus bestehender Config laden
+  // Format: "stopId:Linie,stopId:Linie" (z.B. "272:2,692:13A")
+  // Gruppiere nach Linien (jede Linie kann mehrere Stop-IDs haben)
+  const savedRowOrder = config.roworder || config.linegroups || '';
+  if (savedRowOrder) {
+    rowOrderItems = [];
+    const seenLines = new Set();
+    const lineToStopIds = {};
+
+    savedRowOrder.split(',').forEach(entry => {
+      const colonPos = entry.indexOf(':');
+      if (colonPos > 0) {
+        const stopId = entry.substring(0, colonPos).trim();
+        const line = entry.substring(colonPos + 1).trim();
+        if (stopId && line) {
+          if (!lineToStopIds[line]) {
+            lineToStopIds[line] = [];
+          }
+          lineToStopIds[line].push(stopId);
+
+          // Nur beim ersten Vorkommen zur Anzeige hinzufügen
+          if (!seenLines.has(line)) {
+            seenLines.add(line);
+            rowOrderItems.push({
+              line: line,
+              direction: '',
+              stopIds: lineToStopIds[line]
+            });
+          }
+        }
+      }
+    });
+    // Container als "nicht frisch" markieren, damit renderRowOrderList aufgerufen wird
+    const container = document.getElementById('rowOrderList');
+    if (container) container.dataset.itemsKey = '';
+  }
+
+  updateUI();
+}
+
+// ==================== SPEICHERN (via postMessage an Parent/ESP32) ====================
+document.getElementById('saveBtn').addEventListener('click', () => {
+  document.getElementById('loading').classList.add('show');
+
+  const rblString = pendingRbl || currentConfig.rbl_id || '';
+  const filterString = pendingFilter || currentConfig.lines_filter || '';
+
+  // Wien rowOrder generieren: Verwende die Drag & Drop Reihenfolge wenn verfügbar
+  // Format: "stopId:Linie,stopId:Linie" (z.B. "272:2,692:13A,1370:44")
+  let rowOrder = '';
+  let lineGroups = '';
+
+  // Bei statischer Sortierung: Verwende die vom User festgelegte Reihenfolge
+  const sortMode = getSegmentValue('sortmode');
+  if (sortMode === '1' && rowOrderItems.length > 0) {
+    // Benutzer hat Reihenfolge festgelegt
+    rowOrder = getRowOrderString();
+    lineGroups = rowOrder;  // lineGroups = gleiche Reihenfolge wie rowOrder
+  } else if (rblString && filterString) {
+    // Fallback: Standard-Reihenfolge aus RBL/Filter
+    const stopIds = rblString.split(',').map(s => s.trim());
+    const filters = filterString.split('|').map(s => s.trim());
+
+    const rowOrderParts = [];
+    stopIds.forEach((stopId, i) => {
+      const linesForStop = filters[i] ? filters[i].split(',').map(l => l.trim()) : [];
+      linesForStop.forEach(line => {
+        if (line) {
+          rowOrderParts.push(`${stopId}:${line}`);
+        }
+      });
+    });
+    rowOrder = rowOrderParts.join(',');
+    lineGroups = rowOrder;
+  }
+
+  // Config-Daten sammeln
+  const configData = {
+    type: 'setRBL',
+
+    // Stop-IDs (entweder pending oder bestehende)
+    rbl: rblString,
+    filter: filterString,
+
+    // Anzeige
+    zeilen: getSegmentValue('anzeige'),
+    sortmode: getSegmentValue('sortmode'),
+
+    // Barrierefreiheit
+    chopper: getSegmentValue('chopper'),
+    silberpfeil: getSegmentValue('silberpfeil'),
+
+    // Design
+    colour: '1',  // Immer Wien (1) - index.html ist nur für Wien
+    textcolor: getSegmentValue('textcolor'),  // Wien Schriftfarbe (1=Gelb, 2=Weiß, 3=Orange)
+    displaylight: getSegmentValue('displaylight'),
+
+    // Nachtmodus
+    nightmode: document.getElementById('nightmodeToggle').classList.contains('on') ? '1' : '0',
+    nightstart: document.getElementById('nightstart').value,
+    nightend: document.getElementById('nightend').value,
+
+    // Fun-Nachrichten
+    showfunmessages: document.getElementById('funMessagesToggle').classList.contains('on') ? '1' : '0',
+
+    // Erweiterte
+    displaymode: getSegmentValue('displaymode'),
+    stopinterval: getSegmentValue('stopinterval'),
+
+    // Gehweg
+    gehweg: document.getElementById('gehwegToggle').classList.contains('on') ? getGehwegString() : '0',
+
+    // Wien rowOrder und lineGroups (Format: stopId:Linie) - Reihenfolge vom User
+    roworder: rowOrder,
+    linegroups: lineGroups
+  };
+
+  console.log('Sende Config an ESP32:', configData);
+
+  // Sende an Parent (ESP32-Seite)
+  if (window.parent && window.parent !== window) {
+    window.parent.postMessage(configData, '*');
+  } else {
+    console.error('Nicht in iframe - kann nicht speichern!');
+    alert('Fehler: Diese Seite muss im Straba-Interface geöffnet werden.');
+    document.getElementById('loading').classList.remove('show');
+    return;
+  }
+
+  // Status-Updates
+  setTimeout(() => {
+    document.querySelector('.loading-text').textContent = 'Neustart läuft...';
+  }, 2000);
+
+  setTimeout(() => {
+    document.querySelector('.loading-text').textContent = 'Fertig! Seite wird neu geladen...';
+  }, 5000);
+});
+
+// ==================== KOMMUNIKATION MIT ESP32 (PARENT) ====================
+window.addEventListener('message', function(event) {
+  console.log('Nachricht empfangen:', event.data);
+  
+  // ESP32 sendet bestehende Konfiguration
+  if (event.data && event.data.type === 'loadExistingConfig') {
+    console.log('Bestehende Config vom ESP32 erhalten');
+    
+    // Speichere RBL/Filter für später
+    if (event.data.rbl) {
+      currentConfig.rbl_id = event.data.rbl;
+      currentConfig.lines_filter = event.data.filter || '';
+      
+      // Gehweg-Liste aktualisieren
+      const stopIds = event.data.rbl.split(',').map(s => s.trim()).filter(s => s);
+      updateGehwegList(stopIds, []);
+    }
+  }
+  
+  // Empfange volle Config (JSON) vom ESP32
+  if (event.data && event.data.type === 'loadFullConfig') {
+    applyConfig(event.data.config);
+  }
+  
+  // Pending Stations von localmainpage
+  if (event.data && event.data.type === 'pendingStations') {
+    pendingRbl = event.data.rbl || '';
+    pendingFilter = event.data.filter || '';
+    
+    if (pendingRbl) {
+      const stopIds = pendingRbl.split(',').map(s => s.trim()).filter(s => s);
+      
+      // Zeige Banner
+      document.getElementById('pendingBanner').style.display = 'block';
+      document.getElementById('pendingText').textContent = 
+        `${stopIds.length} Station${stopIds.length > 1 ? 'en' : ''} ausgewählt. Wird beim Speichern übernommen.`;
+      
+      // Aktualisiere Gehweg-Liste
+      updateGehwegList(stopIds, [], event.data.details || []);
+    }
+  }
+});
+
+// ==================== FEATURE VISIBILITY BASIEREND AUF CAPABILITIES ====================
+function updateFeatureVisibility(capabilities) {
+  currentCapabilities = capabilities;
+
+  // Hochflurer-Option
+  const rowChopper = document.getElementById('rowChopper');
+  if (rowChopper) {
+    if (capabilities && capabilities.showHighFloor) {
+      rowChopper.classList.remove('feature-hidden', 'feature-disabled');
+    } else {
+      rowChopper.classList.add('feature-hidden');
+    }
+  }
+
+  // Klimaanlage-Option (Silberpfeil)
+  const rowSilberpfeil = document.getElementById('rowSilberpfeil');
+  if (rowSilberpfeil) {
+    if (capabilities && capabilities.showAirCondition) {
+      rowSilberpfeil.classList.remove('feature-hidden', 'feature-disabled');
+    } else {
+      rowSilberpfeil.classList.add('feature-hidden');
+    }
+  }
+
+  // Textfarbe-Option
+  const rowTextfarbe = document.getElementById('rowTextfarbe');
+  if (rowTextfarbe) {
+    if (capabilities && capabilities.textColorChangeable) {
+      rowTextfarbe.classList.remove('feature-hidden', 'feature-disabled');
+    } else {
+      rowTextfarbe.classList.add('feature-hidden');
+    }
+  }
+
+  // Wien-Badge anzeigen wenn Wien-Features aktiv
+  const wienBadge1 = document.getElementById('wienOnlyBadge1');
+  if (wienBadge1) {
+    const isWien = capabilities && (capabilities.showHighFloor || capabilities.showAirCondition);
+    wienBadge1.style.display = isWien ? 'inline' : 'none';
+  }
+
+  // Barrierefreiheit-Karte komplett verstecken wenn keine Features
+  const cardBarrierefreiheit = document.getElementById('cardBarrierefreiheit');
+  if (cardBarrierefreiheit) {
+    const hasAnyFeature = capabilities && (capabilities.showHighFloor || capabilities.showAirCondition);
+    if (!hasAnyFeature) {
+      cardBarrierefreiheit.classList.add('feature-hidden');
+    } else {
+      cardBarrierefreiheit.classList.remove('feature-hidden');
+    }
+  }
+
+  console.log('Feature visibility updated:', capabilities);
+}
+
+// Erkennt das Netzwerk aus der RBL-ID
+function detectNetworkFromRbl(rbl) {
+  if (!rbl) return 'WL';  // Default
+  const firstId = rbl.split(',')[0].trim();
+  if (firstId.includes(':')) {
+    const network = firstId.split(':')[0].toUpperCase();
+    return network;
+  }
+  // Nur Zahlen = Wiener Linien
+  return 'WL';
+}
+
+// ==================== PRECONFIG VON CITIES.HTML ÜBERNEHMEN ====================
+function applyPreConfig(preConfig) {
+  console.log('Übernehme PreConfig von cities:', preConfig);
+
+  // Capabilities übernehmen
+  if (preConfig.capabilities) {
+    updateFeatureVisibility(preConfig.capabilities);
+  } else {
+    // Capabilities aus Netzwerk ableiten
+    const network = detectNetworkFromRbl(preConfig.rbl);
+    updateFeatureVisibility(CITY_CAPABILITIES[network] || CITY_CAPABILITIES.WL);
+  }
+
+  // Display-Einstellungen
+  if (preConfig.colour) setSegmentValue('colour', preConfig.colour);
+  if (preConfig.rows) setSegmentValue('anzeige', preConfig.rows);
+  if (preConfig.sortMode) setSegmentValue('sortmode', preConfig.sortMode);
+  if (preConfig.displayLight) setSegmentValue('displaylight', preConfig.displayLight);
+
+  // Barrierefreiheit
+  if (preConfig.chopper !== undefined) setSegmentValue('chopper', preConfig.chopper);
+  if (preConfig.silberpfeil !== undefined) setSegmentValue('silberpfeil', preConfig.silberpfeil);
+
+  // Nachtmodus
+  if (preConfig.nightMode) {
+    document.getElementById('nightmodeToggle').classList.add('on');
+  }
+  if (preConfig.nightStart) document.getElementById('nightstart').value = preConfig.nightStart;
+  if (preConfig.nightEnd) document.getElementById('nightend').value = preConfig.nightEnd;
+
+  // Erweiterte Einstellungen
+  if (preConfig.displayMode) setSegmentValue('displaymode', preConfig.displayMode);
+  if (preConfig.stopInterval) setSegmentValue('stopinterval', preConfig.stopInterval);
+
+  // Fun-Nachrichten
+  if (preConfig.showFunMessages === false) {
+    document.getElementById('funMessagesToggle').classList.remove('on');
+  }
+
+  // Gehweg-Werte
+  if (preConfig.gehweg && Array.isArray(preConfig.gehweg)) {
+    const stopIds = preConfig.rbl ? preConfig.rbl.split(',').map(s => s.trim()).filter(s => s) : [];
+    updateGehwegList(stopIds, preConfig.gehweg, preConfig.details || []);
+
+    // Gehweg-Toggle aktivieren wenn Werte > 0
+    const hasValues = preConfig.gehweg.some(v => v > 0);
+    if (hasValues) {
+      document.getElementById('gehwegToggle').classList.add('on');
+    }
+  }
+
+  updateUI();
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  updatePreview();
+  updateUI();
+
+  // Frage Parent nach bestehender Config
+  if (window.parent && window.parent !== window) {
+    console.log('In iframe - frage Parent nach Config');
+    window.parent.postMessage({ type: 'requestExistingConfig' }, '*');
+    window.parent.postMessage({ type: 'requestFullConfig' }, '*');
+  }
+
+  // Prüfe localStorage für PreConfig von cities.html
+  const pendingConfigStr = localStorage.getItem('straba_pending_config');
+  if (pendingConfigStr) {
+    try {
+      const preConfig = JSON.parse(pendingConfigStr);
+      applyPreConfig(preConfig);
+
+      pendingRbl = preConfig.rbl || '';
+      pendingFilter = preConfig.filter || '';
+
+      const stopIds = pendingRbl.split(',').map(s => s.trim()).filter(s => s);
+
+      // Zeige Banner
+      document.getElementById('pendingBanner').style.display = 'block';
+      document.getElementById('pendingText').textContent =
+        `${stopIds.length} Station${stopIds.length > 1 ? 'en' : ''} ausgewählt. Wird beim Speichern übernommen.`;
+
+      // Lösche localStorage nach dem Laden
+      localStorage.removeItem('straba_pending_config');
+      localStorage.removeItem('straba_pending_rbl');
+      localStorage.removeItem('straba_pending_filter');
+      localStorage.removeItem('straba_pending_details');
+
+    } catch (e) {
+      console.error('Fehler beim Parsen der PreConfig:', e);
+    }
+  } else {
+    // Fallback: Alte Methode (nur RBL/Filter)
+    const localPendingRbl = localStorage.getItem('straba_pending_rbl');
+    if (localPendingRbl) {
+      pendingRbl = localPendingRbl;
+      pendingFilter = localStorage.getItem('straba_pending_filter') || '';
+
+      const stopIds = pendingRbl.split(',').map(s => s.trim()).filter(s => s);
+      let details = [];
+
+      const pendingDetails = localStorage.getItem('straba_pending_details');
+      if (pendingDetails) {
+        try {
+          details = JSON.parse(pendingDetails);
+        } catch (e) {
+          console.error('Fehler beim Parsen der Station Details:', e);
+        }
+      }
+
+      // Capabilities aus Netzwerk ableiten
+      const network = detectNetworkFromRbl(pendingRbl);
+      updateFeatureVisibility(CITY_CAPABILITIES[network] || CITY_CAPABILITIES.WL);
+
+      // Zeige Banner
+      document.getElementById('pendingBanner').style.display = 'block';
+      document.getElementById('pendingText').textContent =
+        `${stopIds.length} Station${stopIds.length > 1 ? 'en' : ''} ausgewählt. Wird beim Speichern übernommen.`;
+
+      // Aktualisiere Gehweg-Liste
+      updateGehwegList(stopIds, [], details);
+
+      // Lösche localStorage nach dem Laden
+      localStorage.removeItem('straba_pending_rbl');
+      localStorage.removeItem('straba_pending_filter');
+      localStorage.removeItem('straba_pending_details');
+    } else {
+      // Keine pending Config - Default zu Wien (alle Features)
+      updateFeatureVisibility(CITY_CAPABILITIES.WL);
+    }
+  }
+});
+</script>
+</body>
+</html>
