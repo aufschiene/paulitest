@@ -558,8 +558,8 @@
         <small id="sortmodeHint">Statisch = Feste Reihenfolge der Linien</small>
       </div>
       <div class="segmented" data-name="sortmode">
-        <div class="seg-btn" data-value="1">Nach Zeit</div>
-        <div class="seg-btn active" data-value="2">Statisch</div>
+        <div class="seg-btn" data-value="2">Nach Zeit</div>
+        <div class="seg-btn active" data-value="1">Statisch</div>
       </div>
     </div>
 
@@ -1006,8 +1006,8 @@ function updateRowOrderList() {
   const section = document.getElementById('rowOrderSection');
   const sortMode = getSegmentValue('sortmode');
 
-  // Nur bei statischer Sortierung anzeigen (sortMode 2 = Statisch im ESP32)
-  if (sortMode !== '2') {
+  // Nur bei statischer Sortierung anzeigen (sortMode 1 = Statisch in index.html)
+  if (sortMode !== '1') {
     section.classList.remove('show');
     return;
   }
@@ -1041,73 +1041,58 @@ function updateRowOrderList() {
     const filters = filterString.split('|').map(s => s.trim());
 
     // Sammle alle Linien mit ihren Stop-IDs und Directions
-    // Wichtig: Eine Linie kann mehrere Stop-IDs haben (für beide Richtungen)
-    // und verschiedene Directions - wir wollen nur EINE Zeile pro Linie!
-    const lineDataMap = {};  // line -> { stopIds: Set, directions: Set }
+    // NEUE LOGIK: Jede Linie+Richtung Kombination = separate Zeile
+    // Key ist "linie|richtung", so dass U1 Oberlaa und U1 Leopoldau getrennt sind
+    const lineDirectionMap = {};  // "line|direction" -> { stopIds: Set, firstIndex }
 
     stopIds.forEach((stopId, i) => {
       const linesForStop = filters[i] ? filters[i].split(',').map(l => l.trim()) : [];
       linesForStop.forEach(line => {
         if (line) {
-          // Initialisiere Map-Eintrag für diese Linie
-          if (!lineDataMap[line]) {
-            lineDataMap[line] = {
-              stopIds: new Set(),
-              directions: new Set(),
-              firstIndex: i  // Merke uns den ersten Index für die Sortierung
-            };
-          }
-
-          // Stop-ID hinzufügen
-          lineDataMap[line].stopIds.add(stopId);
-
-          // Direction aus currentStationDetails holen wenn vorhanden
+          // Direction aus currentStationDetails holen
+          let direction = '';
           if (currentStationDetails && currentStationDetails[i]) {
             const station = currentStationDetails[i];
             if (station.lines) {
               const lineInfo = station.lines.find(l => l.name === line);
               if (lineInfo && lineInfo.direction) {
-                lineDataMap[line].directions.add(lineInfo.direction);
+                direction = lineInfo.direction;
               }
             }
           }
+
+          // Key ist Linie + Richtung (oder nur Linie wenn keine Richtung bekannt)
+          const key = direction ? `${line}|${direction}` : line;
+
+          if (!lineDirectionMap[key]) {
+            lineDirectionMap[key] = {
+              line: line,
+              direction: direction,
+              stopIds: new Set(),
+              firstIndex: i
+            };
+          }
+
+          lineDirectionMap[key].stopIds.add(stopId);
         }
       });
     });
 
-    // Debug: Zeige lineDataMap
-    console.log('lineDataMap (dedupliziert nach Linienname):', lineDataMap);
+    // Debug: Zeige lineDirectionMap
+    console.log('lineDirectionMap (pro Linie+Richtung):', lineDirectionMap);
 
     // Konvertiere Map zu Array, sortiert nach erstem Vorkommen
-    const lineEntries = Object.entries(lineDataMap)
-      .sort((a, b) => a[1].firstIndex - b[1].firstIndex);
+    const lineEntries = Object.values(lineDirectionMap)
+      .sort((a, b) => a.firstIndex - b.firstIndex);
 
-    console.log('lineEntries (sortiert):', lineEntries.map(([line, data]) => ({
-      line,
-      stopIds: Array.from(data.stopIds),
-      directions: Array.from(data.directions)
-    })));
+    console.log('lineEntries (sortiert):', lineEntries);
 
-    // Erstelle rowOrderItems - EINE Zeile pro Linie!
-    rowOrderItems = lineEntries.map(([line, data]) => {
-      // Directions zusammenfassen oder erste nehmen
-      const directionsArray = Array.from(data.directions);
-      let displayDirection = '';
-      if (directionsArray.length === 1) {
-        displayDirection = directionsArray[0];
-      } else if (directionsArray.length === 2) {
-        // Beide Richtungen: "Richtung1 ↔ Richtung2"
-        displayDirection = directionsArray.join(' ↔ ');
-      } else if (directionsArray.length > 2) {
-        displayDirection = directionsArray.slice(0, 2).join(' ↔ ');
-      }
-
-      return {
-        line: line,
-        direction: displayDirection,
-        stopIds: Array.from(data.stopIds)
-      };
-    });
+    // Erstelle rowOrderItems - EINE Zeile pro Linie+Richtung!
+    rowOrderItems = lineEntries.map(data => ({
+      line: data.line,
+      direction: data.direction,
+      stopIds: Array.from(data.stopIds)
+    }));
 
     container.dataset.itemsKey = newItemsKey;
     console.log('rowOrderItems erstellt (finale Liste):', rowOrderItems);
@@ -1227,16 +1212,14 @@ function moveRowOrderItem(index, direction) {
 function getRowOrderString() {
   if (rowOrderItems.length === 0) return '';
 
-  // Für jede Linie alle ihre Stop-IDs ausgeben (in der Reihenfolge der Linien)
+  // Für jede Linie+Richtung alle ihre Stop-IDs ausgeben
   const parts = [];
   rowOrderItems.forEach(item => {
     if (item.stopIds && item.stopIds.length > 0) {
-      // Neue Struktur: item hat stopIds Array
       item.stopIds.forEach(stopId => {
         parts.push(`${stopId}:${item.line}`);
       });
     } else if (item.stopId) {
-      // Alte Struktur (Fallback): item hat einzelne stopId
       parts.push(`${item.stopId}:${item.line}`);
     }
   });
@@ -1265,7 +1248,7 @@ function updateUI() {
   const sortMode = getSegmentValue('sortmode');
   const sortHint = document.getElementById('sortmodeHint');
   if (sortHint) {
-    sortHint.textContent = sortMode === '2'
+    sortHint.textContent = sortMode === '1'
       ? 'Statisch = Feste Reihenfolge der Linien'
       : 'Nach Zeit = Nächste Abfahrt zuerst';
   }
@@ -1325,8 +1308,8 @@ function updatePreview() {
     { line: '13A', dest: 'Hauptbahnhof', time: 8, isHochflurer: false, hasKlima: false }
   ];
   
-  // Sortierung (ESP32: 2=Statisch, 1=Zeit)
-  if (sortMode === '2') {
+  // Sortierung (index.html: 1=Statisch, 2=Zeit)
+  if (sortMode === '1') {
     // Statisch: 13A, U6, 2
     lines = [lines[2], lines[0], lines[1]];
   } else {
@@ -1458,14 +1441,19 @@ function applyConfig(config) {
 
   // Zeilen-Reihenfolge aus bestehender Config laden
   // Format: "stopId:Linie,stopId:Linie" (z.B. "272:2,692:13A")
-  // Gruppiere nach Linien (jede Linie kann mehrere Stop-IDs haben)
-  // WICHTIG: Reihenfolge der LINIEN beibehalten, aber Duplikate entfernen!
+  // Zeilen-Reihenfolge aus bestehender Config laden
+  // NEUE LOGIK: Jede Linie+Richtung = separate Zeile (Richtung = StopId)
   const savedRowOrder = config.roworder || config.linegroups || '';
   console.log('applyConfig - savedRowOrder:', savedRowOrder);
   if (savedRowOrder) {
-    // Verwende Map um Linien-Reihenfolge zu erhalten und Stop-IDs zu sammeln
-    const lineOrderMap = new Map();  // line -> { stopIds: [], firstIndex: number }
+    // Parse savedRowOrder und hole Richtungen aus currentStationDetails
+    const lineDirectionMap = new Map();  // "line|stopId" -> { line, direction, stopIds, firstIndex }
     let index = 0;
+
+    // Erstelle Lookup für Stop-ID -> Station-Index
+    const stopIdToIndex = {};
+    const stopIds = (config.rbl_id || '').split(',').map(s => s.trim());
+    stopIds.forEach((id, i) => { stopIdToIndex[id] = i; });
 
     savedRowOrder.split(',').forEach(entry => {
       const colonPos = entry.indexOf(':');
@@ -1474,17 +1462,32 @@ function applyConfig(config) {
         const line = entry.substring(colonPos + 1).trim();
 
         if (stopId && line) {
-          if (!lineOrderMap.has(line)) {
-            // Neue Linie - erstelle Eintrag
-            lineOrderMap.set(line, {
+          // Hole Direction aus currentStationDetails
+          let direction = '';
+          const stationIndex = stopIdToIndex[stopId];
+          if (currentStationDetails && currentStationDetails[stationIndex]) {
+            const station = currentStationDetails[stationIndex];
+            if (station.lines) {
+              const lineInfo = station.lines.find(l => l.name === line);
+              if (lineInfo && lineInfo.direction) {
+                direction = lineInfo.direction;
+              }
+            }
+          }
+
+          // Key ist Linie + Richtung (um U1 Oberlaa und U1 Leopoldau zu trennen)
+          const key = direction ? `${line}|${direction}` : `${line}|${stopId}`;
+
+          if (!lineDirectionMap.has(key)) {
+            lineDirectionMap.set(key, {
+              line: line,
+              direction: direction,
               stopIds: [stopId],
               firstIndex: index
             });
-            console.log(`applyConfig - NEW line ${line} at index ${index}, stopId=${stopId}`);
           } else {
-            // Bestehende Linie - füge Stop-ID hinzu
-            lineOrderMap.get(line).stopIds.push(stopId);
-            console.log(`applyConfig - EXISTING line ${line}, added stopId=${stopId}`);
+            // Gleiche Linie+Richtung - füge Stop-ID hinzu
+            lineDirectionMap.get(key).stopIds.push(stopId);
           }
           index++;
         }
@@ -1492,11 +1495,11 @@ function applyConfig(config) {
     });
 
     // Konvertiere Map zu Array, sortiert nach firstIndex
-    rowOrderItems = Array.from(lineOrderMap.entries())
-      .sort((a, b) => a[1].firstIndex - b[1].firstIndex)
-      .map(([line, data]) => ({
-        line: line,
-        direction: '',  // Keine Richtungsinfo im roworder gespeichert
+    rowOrderItems = Array.from(lineDirectionMap.values())
+      .sort((a, b) => a.firstIndex - b.firstIndex)
+      .map(data => ({
+        line: data.line,
+        direction: data.direction,
         stopIds: data.stopIds
       }));
 
