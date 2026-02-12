@@ -558,8 +558,8 @@
         <small id="sortmodeHint">Statisch = Feste Reihenfolge der Linien</small>
       </div>
       <div class="segmented" data-name="sortmode">
-        <div class="seg-btn" data-value="1">Nach Zeit</div>
-        <div class="seg-btn active" data-value="2">Statisch</div>
+        <div class="seg-btn" data-value="2">Nach Zeit</div>
+        <div class="seg-btn active" data-value="1">Statisch</div>
       </div>
     </div>
 
@@ -1006,8 +1006,8 @@ function updateRowOrderList() {
   const section = document.getElementById('rowOrderSection');
   const sortMode = getSegmentValue('sortmode');
 
-  // Nur bei statischer Sortierung anzeigen (sortMode 2 = Statisch)
-  if (sortMode !== '2') {
+  // Nur bei statischer Sortierung anzeigen (sortMode 1 = Statisch)
+  if (sortMode !== '1') {
     section.classList.remove('show');
     return;
   }
@@ -1248,7 +1248,7 @@ function updateUI() {
   const sortMode = getSegmentValue('sortmode');
   const sortHint = document.getElementById('sortmodeHint');
   if (sortHint) {
-    sortHint.textContent = sortMode === '2'
+    sortHint.textContent = sortMode === '1'
       ? 'Statisch = Feste Reihenfolge der Linien'
       : 'Nach Zeit = Nächste Abfahrt zuerst';
   }
@@ -1383,7 +1383,10 @@ function applyConfig(config) {
   // Anzeige
   setSegmentValue('anzeige', config.lines_count || '2');
   // ESP32: sort_mode 1=Zeit, 2=Statisch. Default zu Statisch (2)
+  console.log('VOR setSegmentValue sortmode - config.sort_mode:', config.sort_mode);
   setSegmentValue('sortmode', config.sort_mode || '2');
+  console.log('NACH setSegmentValue sortmode - getSegmentValue:', getSegmentValue('sortmode'));
+  console.log('Active sortmode button:', document.querySelector('[data-name="sortmode"] .active')?.textContent);
   
   // Barrierefreiheit
   setSegmentValue('chopper', config.chopper || '1');
