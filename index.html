@@ -1393,7 +1393,8 @@ function applyConfig(config) {
   
   // Anzeige
   setSegmentValue('anzeige', config.lines_count || '2');
-  setSegmentValue('sortmode', config.sort_mode || '1');
+  // ESP32: sort_mode 1=Zeit, 2=Statisch. Default zu Statisch (2)
+  setSegmentValue('sortmode', config.sort_mode || '2');
   
   // Barrierefreiheit
   setSegmentValue('chopper', config.chopper || '1');
@@ -1587,6 +1588,12 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     linegroups: lineGroups
   };
 
+  console.log('=== SORTMODE DEBUG ===');
+  console.log('sortmode Segment:', document.querySelector('[data-name="sortmode"]'));
+  console.log('Active Button:', document.querySelector('[data-name="sortmode"] .active'));
+  console.log('Active Button data-value:', document.querySelector('[data-name="sortmode"] .active')?.dataset.value);
+  console.log('getSegmentValue("sortmode"):', getSegmentValue('sortmode'));
+  console.log('======================');
   console.log('Sende Config an ESP32:', configData);
 
   // Sende an Parent (ESP32-Seite)
