@@ -1023,58 +1023,85 @@ function updateRowOrderList() {
     return;
   }
 
-  // Nur neu aufbauen wenn sich die Daten geändert haben
-  const newItemsKey = `${rblString}|${filterString}`;
+  // Immer neu aufbauen wenn Daten vorhanden - der Cache führte zu Duplikaten
+  // wenn sich die Details aber nicht die IDs geändert haben
+  const newItemsKey = `${rblString}|${filterString}|${currentStationDetails.length}`;
   if (container.dataset.itemsKey !== newItemsKey || rowOrderItems.length === 0) {
     // Items aus RBL und Filter erstellen
     const stopIds = rblString.split(',').map(s => s.trim());
     const filters = filterString.split('|').map(s => s.trim());
 
-    // Sammle alle Linien mit ihren Stop-IDs (für später beim Speichern)
-    const allLineEntries = [];
-    const seenLines = new Set();  // Um Duplikate zu vermeiden
+    // Sammle alle Linien mit ihren Stop-IDs und Directions
+    // Wichtig: Eine Linie kann mehrere Stop-IDs haben (für beide Richtungen)
+    // und verschiedene Directions - wir wollen nur EINE Zeile pro Linie!
+    const lineDataMap = {};  // line -> { stopIds: Set, directions: Set }
 
     stopIds.forEach((stopId, i) => {
       const linesForStop = filters[i] ? filters[i].split(',').map(l => l.trim()) : [];
       linesForStop.forEach(line => {
         if (line) {
+          // Initialisiere Map-Eintrag für diese Linie
+          if (!lineDataMap[line]) {
+            lineDataMap[line] = {
+              stopIds: new Set(),
+              directions: new Set(),
+              firstIndex: i  // Merke uns den ersten Index für die Sortierung
+            };
+          }
+
+          // Stop-ID hinzufügen
+          lineDataMap[line].stopIds.add(stopId);
+
           // Direction aus currentStationDetails holen wenn vorhanden
-          let direction = '';
           if (currentStationDetails && currentStationDetails[i]) {
             const station = currentStationDetails[i];
             if (station.lines) {
               const lineInfo = station.lines.find(l => l.name === line);
-              if (lineInfo) direction = lineInfo.direction || '';
+              if (lineInfo && lineInfo.direction) {
+                lineDataMap[line].directions.add(lineInfo.direction);
+              }
             }
           }
-          allLineEntries.push({ stopId, line, direction });
         }
       });
     });
 
-    // Für die Anzeige: Nur einzigartige Linien (erste Vorkommen behalten)
-    // Aber alle Stop-IDs für diese Linie merken
-    rowOrderItems = [];
-    const lineToStopIds = {};  // line -> [stopId1, stopId2, ...]
+    // Debug: Zeige lineDataMap
+    console.log('lineDataMap (dedupliziert nach Linienname):', lineDataMap);
 
-    allLineEntries.forEach(entry => {
-      if (!lineToStopIds[entry.line]) {
-        lineToStopIds[entry.line] = [];
-      }
-      lineToStopIds[entry.line].push(entry.stopId);
+    // Konvertiere Map zu Array, sortiert nach erstem Vorkommen
+    const lineEntries = Object.entries(lineDataMap)
+      .sort((a, b) => a[1].firstIndex - b[1].firstIndex);
 
-      // Nur beim ersten Vorkommen zur Anzeige hinzufügen
-      if (!seenLines.has(entry.line)) {
-        seenLines.add(entry.line);
-        rowOrderItems.push({
-          line: entry.line,
-          direction: entry.direction,
-          stopIds: lineToStopIds[entry.line]  // Referenz, wird automatisch aktualisiert
-        });
+    console.log('lineEntries (sortiert):', lineEntries.map(([line, data]) => ({
+      line,
+      stopIds: Array.from(data.stopIds),
+      directions: Array.from(data.directions)
+    })));
+
+    // Erstelle rowOrderItems - EINE Zeile pro Linie!
+    rowOrderItems = lineEntries.map(([line, data]) => {
+      // Directions zusammenfassen oder erste nehmen
+      const directionsArray = Array.from(data.directions);
+      let displayDirection = '';
+      if (directionsArray.length === 1) {
+        displayDirection = directionsArray[0];
+      } else if (directionsArray.length === 2) {
+        // Beide Richtungen: "Richtung1 ↔ Richtung2"
+        displayDirection = directionsArray.join(' ↔ ');
+      } else if (directionsArray.length > 2) {
+        displayDirection = directionsArray.slice(0, 2).join(' ↔ ');
       }
+
+      return {
+        line: line,
+        direction: displayDirection,
+        stopIds: Array.from(data.stopIds)
+      };
     });
 
     container.dataset.itemsKey = newItemsKey;
+    console.log('rowOrderItems erstellt (finale Liste):', rowOrderItems);
   }
 
   renderRowOrderList();
@@ -1423,6 +1450,7 @@ function applyConfig(config) {
   // Format: "stopId:Linie,stopId:Linie" (z.B. "272:2,692:13A")
   // Gruppiere nach Linien (jede Linie kann mehrere Stop-IDs haben)
   const savedRowOrder = config.roworder || config.linegroups || '';
+  console.log('applyConfig - savedRowOrder:', savedRowOrder);
   if (savedRowOrder) {
     rowOrderItems = [];
     const seenLines = new Set();
@@ -1433,6 +1461,7 @@ function applyConfig(config) {
       if (colonPos > 0) {
         const stopId = entry.substring(0, colonPos).trim();
         const line = entry.substring(colonPos + 1).trim();
+        console.log(`applyConfig - Entry: stopId=${stopId}, line=${line}, seenLines.has(line)=${seenLines.has(line)}`);
         if (stopId && line) {
           if (!lineToStopIds[line]) {
             lineToStopIds[line] = [];
@@ -1447,10 +1476,14 @@ function applyConfig(config) {
               direction: '',
               stopIds: lineToStopIds[line]
             });
+            console.log(`applyConfig - Added line ${line} to rowOrderItems`);
+          } else {
+            console.log(`applyConfig - Line ${line} already seen, just added stopId ${stopId} to existing entry`);
           }
         }
       }
     });
+    console.log('applyConfig - Final rowOrderItems:', JSON.parse(JSON.stringify(rowOrderItems)));
     // Container als "nicht frisch" markieren, damit renderRowOrderList aufgerufen wird
     const container = document.getElementById('rowOrderList');
     if (container) container.dataset.itemsKey = '';
@@ -1795,11 +1828,17 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.removeItem('straba_pending_rbl');
       localStorage.removeItem('straba_pending_filter');
       localStorage.removeItem('straba_pending_details');
+
+      // Row Order Liste aktualisieren nachdem Details geladen wurden
+      updateRowOrderList();
     } else {
       // Keine pending Config - Default zu Wien (alle Features)
       updateFeatureVisibility(CITY_CAPABILITIES.WL);
     }
   }
+
+  // Finale Aktualisierung der Row Order Liste
+  updateRowOrderList();
 });
 </script>
 </body>
