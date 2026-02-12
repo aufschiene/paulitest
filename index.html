@@ -1013,6 +1013,15 @@ function updateRowOrderList() {
   }
   section.classList.add('show');
 
+  // Wenn rowOrderItems bereits von applyConfig geladen wurden, nur rendern
+  // (erkennbar daran, dass rowOrderItems existiert und itemsKey leer ist)
+  if (rowOrderItems.length > 0 && container.dataset.itemsKey === '') {
+    console.log('updateRowOrderList: Verwende bereits geladene rowOrderItems von applyConfig');
+    container.dataset.itemsKey = 'loaded-from-config';
+    renderRowOrderList();
+    return;
+  }
+
   // Erstelle Items aus den Pending/Current Daten
   const rblString = pendingRbl || currentConfig.rbl_id || '';
   const filterString = pendingFilter || currentConfig.lines_filter || '';
@@ -1449,42 +1458,50 @@ function applyConfig(config) {
   // Zeilen-Reihenfolge aus bestehender Config laden
   // Format: "stopId:Linie,stopId:Linie" (z.B. "272:2,692:13A")
   // Gruppiere nach Linien (jede Linie kann mehrere Stop-IDs haben)
+  // WICHTIG: Reihenfolge der LINIEN beibehalten, aber Duplikate entfernen!
   const savedRowOrder = config.roworder || config.linegroups || '';
   console.log('applyConfig - savedRowOrder:', savedRowOrder);
   if (savedRowOrder) {
-    rowOrderItems = [];
-    const seenLines = new Set();
-    const lineToStopIds = {};
+    // Verwende Map um Linien-Reihenfolge zu erhalten und Stop-IDs zu sammeln
+    const lineOrderMap = new Map();  // line -> { stopIds: [], firstIndex: number }
+    let index = 0;
 
     savedRowOrder.split(',').forEach(entry => {
       const colonPos = entry.indexOf(':');
       if (colonPos > 0) {
         const stopId = entry.substring(0, colonPos).trim();
         const line = entry.substring(colonPos + 1).trim();
-        console.log(`applyConfig - Entry: stopId=${stopId}, line=${line}, seenLines.has(line)=${seenLines.has(line)}`);
-        if (stopId && line) {
-          if (!lineToStopIds[line]) {
-            lineToStopIds[line] = [];
-          }
-          lineToStopIds[line].push(stopId);
 
-          // Nur beim ersten Vorkommen zur Anzeige hinzufügen
-          if (!seenLines.has(line)) {
-            seenLines.add(line);
-            rowOrderItems.push({
-              line: line,
-              direction: '',
-              stopIds: lineToStopIds[line]
+        if (stopId && line) {
+          if (!lineOrderMap.has(line)) {
+            // Neue Linie - erstelle Eintrag
+            lineOrderMap.set(line, {
+              stopIds: [stopId],
+              firstIndex: index
             });
-            console.log(`applyConfig - Added line ${line} to rowOrderItems`);
+            console.log(`applyConfig - NEW line ${line} at index ${index}, stopId=${stopId}`);
           } else {
-            console.log(`applyConfig - Line ${line} already seen, just added stopId ${stopId} to existing entry`);
+            // Bestehende Linie - füge Stop-ID hinzu
+            lineOrderMap.get(line).stopIds.push(stopId);
+            console.log(`applyConfig - EXISTING line ${line}, added stopId=${stopId}`);
           }
+          index++;
         }
       }
     });
+
+    // Konvertiere Map zu Array, sortiert nach firstIndex
+    rowOrderItems = Array.from(lineOrderMap.entries())
+      .sort((a, b) => a[1].firstIndex - b[1].firstIndex)
+      .map(([line, data]) => ({
+        line: line,
+        direction: '',  // Keine Richtungsinfo im roworder gespeichert
+        stopIds: data.stopIds
+      }));
+
     console.log('applyConfig - Final rowOrderItems:', JSON.parse(JSON.stringify(rowOrderItems)));
-    // Container als "nicht frisch" markieren, damit renderRowOrderList aufgerufen wird
+
+    // Container als "von config geladen" markieren
     const container = document.getElementById('rowOrderList');
     if (container) container.dataset.itemsKey = '';
   }
