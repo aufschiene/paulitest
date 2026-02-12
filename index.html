@@ -1591,12 +1591,10 @@ document.getElementById('saveBtn').addEventListener('click', () => {
     linegroups: lineGroups
   };
 
-  console.log('=== SORTMODE DEBUG ===');
-  console.log('sortmode Segment:', document.querySelector('[data-name="sortmode"]'));
-  console.log('Active Button:', document.querySelector('[data-name="sortmode"] .active'));
-  console.log('Active Button data-value:', document.querySelector('[data-name="sortmode"] .active')?.dataset.value);
-  console.log('getSegmentValue("sortmode"):', getSegmentValue('sortmode'));
-  console.log('======================');
+  console.log('=== DEBUG ===');
+  console.log('sortmode:', getSegmentValue('sortmode'), '(1=Zeit, 2=Statisch)');
+  console.log('displaymode:', getSegmentValue('displaymode'), '(1=Gemischt, 2=Slideshow)');
+  console.log('=============');
   console.log('Sende Config an ESP32:', configData);
 
   // Sende an Parent (ESP32-Seite)
