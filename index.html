@@ -558,8 +558,8 @@
         <small id="sortmodeHint">Statisch = Feste Reihenfolge der Linien</small>
       </div>
       <div class="segmented" data-name="sortmode">
-        <div class="seg-btn" data-value="2">Nach Zeit</div>
-        <div class="seg-btn active" data-value="1">Statisch</div>
+        <div class="seg-btn" data-value="1">Nach Zeit</div>
+        <div class="seg-btn active" data-value="2">Statisch</div>
       </div>
     </div>
 
@@ -1006,8 +1006,8 @@ function updateRowOrderList() {
   const section = document.getElementById('rowOrderSection');
   const sortMode = getSegmentValue('sortmode');
 
-  // Nur bei statischer Sortierung anzeigen (sortMode 1 = Statisch in index.html)
-  if (sortMode !== '1') {
+  // Nur bei statischer Sortierung anzeigen (sortMode 2 = Statisch)
+  if (sortMode !== '2') {
     section.classList.remove('show');
     return;
   }
@@ -1248,7 +1248,7 @@ function updateUI() {
   const sortMode = getSegmentValue('sortmode');
   const sortHint = document.getElementById('sortmodeHint');
   if (sortHint) {
-    sortHint.textContent = sortMode === '1'
+    sortHint.textContent = sortMode === '2'
       ? 'Statisch = Feste Reihenfolge der Linien'
       : 'Nach Zeit = Nächste Abfahrt zuerst';
   }
@@ -1308,8 +1308,8 @@ function updatePreview() {
     { line: '13A', dest: 'Hauptbahnhof', time: 8, isHochflurer: false, hasKlima: false }
   ];
   
-  // Sortierung (index.html: 1=Statisch, 2=Zeit)
-  if (sortMode === '1') {
+  // Sortierung (2=Statisch, 1=Zeit)
+  if (sortMode === '2') {
     // Statisch: 13A, U6, 2
     lines = [lines[2], lines[0], lines[1]];
   } else {
@@ -1526,9 +1526,9 @@ document.getElementById('saveBtn').addEventListener('click', () => {
   let lineGroups = '';
 
   // Bei statischer Sortierung: Verwende die vom User festgelegte Reihenfolge
-  // index.html: sortMode 1 = Statisch
+  // sortMode 2 = Statisch
   const sortMode = getSegmentValue('sortmode');
-  if (sortMode === '1' && rowOrderItems.length > 0) {
+  if (sortMode === '2' && rowOrderItems.length > 0) {
     // Benutzer hat Reihenfolge festgelegt
     rowOrder = getRowOrderString();
     lineGroups = rowOrder;  // lineGroups = gleiche Reihenfolge wie rowOrder
