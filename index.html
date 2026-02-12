@@ -1349,16 +1349,22 @@ function getSegmentValue(name) {
   const seg = document.querySelector(`[data-name="${name}"]`);
   if (!seg) return '1';
   const active = seg.querySelector('.active');
-  return active ? active.dataset.value : '1';
+  const value = active ? active.dataset.value : '1';
+  if (name === 'sortmode') {
+    console.log(`getSegmentValue('sortmode') -> active button text: "${active?.textContent.trim()}", data-value: "${value}"`);
+  }
+  return value;
 }
 
 function setSegmentValue(name, value) {
   const seg = document.querySelector(`[data-name="${name}"]`);
   if (!seg) return;
+  console.log(`setSegmentValue('${name}', '${value}')`);
   seg.querySelectorAll('.seg-btn, .seg-btn-with-label, .color-dot').forEach(btn => {
     btn.classList.remove('active');
     if (btn.dataset.value === String(value)) {
       btn.classList.add('active');
+      console.log(`  -> Activated button with data-value="${btn.dataset.value}", text="${btn.textContent.trim()}"`);
     }
   });
 }
