@@ -558,8 +558,8 @@
         <small id="sortmodeHint">Statisch = Feste Reihenfolge der Linien</small>
       </div>
       <div class="segmented" data-name="sortmode">
-        <div class="seg-btn" data-value="2">Nach Zeit</div>
-        <div class="seg-btn active" data-value="1">Statisch</div>
+        <div class="seg-btn" data-value="1">Nach Zeit</div>
+        <div class="seg-btn active" data-value="2">Statisch</div>
       </div>
     </div>
 
@@ -1569,7 +1569,8 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 
     // Anzeige
     zeilen: getSegmentValue('anzeige'),
-    sortmode: getSegmentValue('sortmode'),
+    // Invertiere sortmode: UI 2=Statisch -> ESP32 erwartet 2=Statisch, aber Toggle sendet invertiert
+    sortmode: getSegmentValue('sortmode') === '2' ? '1' : '2',
 
     // Barrierefreiheit
     chopper: getSegmentValue('chopper'),
