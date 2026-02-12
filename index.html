@@ -1569,8 +1569,8 @@ document.getElementById('saveBtn').addEventListener('click', () => {
 
     // Anzeige
     zeilen: getSegmentValue('anzeige'),
-    // Invertiere sortmode: UI 2=Statisch -> ESP32 erwartet 2=Statisch, aber Toggle sendet invertiert
-    sortmode: getSegmentValue('sortmode') === '2' ? '1' : '2',
+    // TEST: Statisch=3, Zeit=4
+    sortmode: getSegmentValue('sortmode') === '2' ? '3' : '4',
 
     // Barrierefreiheit
     chopper: getSegmentValue('chopper'),
