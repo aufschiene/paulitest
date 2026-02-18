@@ -1,9 +1,9 @@
 {
   "changelog": [
     {
-      "version": "1.4",
+      "version": "1.5.4",
       "date": "24.01.2026",
-      "title": "Update & Zeilen bei Betriebsschluss gefixed",
+      "title": "Umlaute Update + Grupperierung",
       "changes": [
         "Changelog wird bei Updates angezeigt",
         "Alle Änderungen seit letzter Version sichtbar",
