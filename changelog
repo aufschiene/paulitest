@@ -1,6 +1,19 @@
 {
   "changelog": [
     {
+      "version": "1.5.9",
+      "date": "27.02.2026",
+      "title": "Bugfixes & Verbesserungen",
+      "changes": [
+        "Fix: Gehweg-Filter wirkt nur noch auf die konfigurierte Haltestelle",
+        "Fix: Wien-Anzeige zeigt nun alle 3 Zeilen korrekt",
+        "Fix: Einstellungen werden beim Bearbeiten nicht mehr zurückgesetzt",
+        "Fix: Nachtmodus-Aufwachen holt sofort neue Daten",
+        "Neu: Automatisches Blättern wenn mehr Linien als Zeilen",
+        "Fix: Stammstrecke lineGroups filtert nun korrekt nach Richtung"
+      ]
+    },
+    {
       "version": "1.5.4",
       "date": "24.01.2026",
       "title": "Umlaute Update + Grupperierung",
@@ -19,4 +32,6 @@
         "Verbesserte Fahrzeug-Erkennung",
         "Bugfix: Silberpfeil-Anzeige korrigiert"
       ]
-    },
+    }
+  ]
+}
