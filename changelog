@@ -1,6 +1,19 @@
 {
   "changelog": [
     {
+      "version": "1.6.2",
+      "date": "02.03.2026",
+      "title": "Gruppierung & Stabilität",
+      "changes": [
+        "Fix: Gruppierung bei gleicher Linie von mehreren Haltestellen",
+        "Fix: Graz/Linz rowOrder verwendet nun richtungsId (inkl. Einzieher)",
+        "Fix: Tag/Nacht-Wechsel verbesserte WLAN-Verbindung",
+        "Fix: Changelog lädt nun direkt von GitHub",
+        "Neu: Linz API liefert H/R Richtungen wie Graz",
+        "Fix: OEBB-Displays ohne automatisches Seitenblättern"
+      ]
+    },
+    {
       "version": "1.5.9",
       "date": "27.02.2026",
       "title": "Bugfixes & Verbesserungen",
@@ -35,3 +48,4 @@
     }
   ]
 }
+
