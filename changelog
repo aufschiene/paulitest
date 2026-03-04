@@ -1,6 +1,14 @@
 {
   "changelog": [
     {
+      "version": "1.6.3",
+      "date": "04.03.2026",
+      "title": "Linz/Graz Fix & Update-Anzeige",
+      "changes": [
+        "Neu: Update-Seite zeigt 3-Schritte Fortschritt (Download → Neustart → Fertig)"
+      ]
+    },
+    {
       "version": "1.6.2",
       "date": "02.03.2026",
       "title": "Gruppierung & Stabilität",
