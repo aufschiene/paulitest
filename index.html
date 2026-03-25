@@ -2381,9 +2381,32 @@ document.addEventListener('DOMContentLoaded', function() {
       pendingRbl = localPendingRbl;
       pendingFilter = localStorage.getItem('straba_pending_filter') || '';
 
-      // Wenn frische Config von localmainpage → alte rowOrder/lineGroups verwerfen
+      // Wenn frische Config von localmainpage → ALLES komplett neu aufbauen
+      // Alte rowOrderItems, lineGroups verwerfen → werden aus pendingRbl+pendingFilter generiert
       if (localStorage.getItem('straba_pending_fresh') === '1') {
-        rowOrderItems = [];
+        rowOrderItems = [];  // Komplett neu
+        // Bestehende Gruppierungen aus ESP Config laden und filtern
+        var existingLG = currentConfig.linegroups || '';
+        var newStops = pendingRbl.split(',').map(function(s) { return s.trim(); });
+        if (existingLG && existingLG.indexOf('+') >= 0) {
+          // Gruppierungen filtern: nur behalten wenn ALLE Stops der Gruppe noch existieren
+          var filteredGroups = [];
+          existingLG.split(',').forEach(function(entry) {
+            if (entry.indexOf('+') >= 0) {
+              // Gruppen-Eintrag: "4131:U1+4136:U1" → prüfe ob alle stopIds noch da
+              var allExist = entry.split('+').every(function(part) {
+                var col = part.indexOf(':');
+                var sid = col > 0 ? part.substring(0, col).trim() : part.trim();
+                return newStops.indexOf(sid) >= 0;
+              });
+              if (allExist) filteredGroups.push(entry);
+            }
+            // Einzelne Einträge ohne + werden neu generiert
+          });
+          if (filteredGroups.length > 0) {
+            localStorage.setItem('straba_preserved_groups', filteredGroups.join(','));
+          }
+        }
         localStorage.removeItem('straba_pending_fresh');
       }
 
