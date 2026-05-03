@@ -9,6 +9,20 @@
     html{background:#1a1a2e}
     body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);min-height:100vh;padding:20px;color:#fff}
     .container{max-width:440px;margin:0 auto}
+    /* Wizard-Modus: Container horizontal + vertikal zentrieren */
+    body.wizard-active{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+      padding:20px;
+    }
+    body.wizard-active .container{
+      width:100%;
+      max-width:480px;
+      margin:auto 0;  /* falls flex-Container größer als Inhalt → vertikal zentriert */
+    }
 
     .logo{display:block;max-width:200px;height:auto;margin:0 auto 12px auto}
     .subtitle{text-align:center;color:#aaa;margin-bottom:16px;font-size:14px;text-transform:uppercase;letter-spacing:1px}
@@ -107,6 +121,13 @@
     /* Breitere Segmented fuer Zeilen */
     .segmented.wide{min-width:180px}
     .segmented.wide .seg-btn{padding:12px 20px;font-size:15px}
+    /* Kompakte 3-Button-Variante (Aus/Linie/Ganz) — alle Buttons gleich breit */
+    .segmented.compact-3 .seg-btn{
+      flex:1;
+      padding:10px 8px;
+      font-size:13px;
+      text-align:center;
+    }
 
     /* Toggle */
     .toggle{
@@ -233,7 +254,7 @@
       margin-top:14px;
       transition:opacity 0.3s, transform 0.3s;
     }
-    .sub-section.disabled{opacity:0.4;pointer-events:none;transform:scale(0.98)}
+    .sub-section.disabled{display:none}
     .sub-section h4{font-size:12px;color:#aaa;margin-bottom:12px;font-weight:500;text-transform:uppercase;letter-spacing:0.3px}
 
     /* Gehweg Liste */
@@ -300,6 +321,231 @@
     }
     .card.feature-hidden{
       display:none;
+    }
+
+    /* ==================== WIZARD STYLES ==================== */
+    .wizard-hidden{display:none !important;}
+    .wizard-nav-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:12px 16px;
+      background:rgba(0,0,0,0.25);
+      border:1px solid rgba(255,255,255,0.06);
+      border-radius:12px;
+      margin-bottom:16px;
+    }
+    .wizard-progress{flex:1;min-width:0}
+    .wizard-progress > span{
+      display:block;
+      font-size:12px;
+      color:#888;
+      margin-bottom:6px;
+      font-weight:500;
+    }
+    .wizard-progress-bar{
+      width:100%;
+      height:4px;
+      background:rgba(255,255,255,0.08);
+      border-radius:2px;
+      overflow:hidden;
+    }
+    .wizard-progress-fill{
+      height:100%;
+      background:#ffd700;
+      border-radius:2px;
+      transition:width 0.3s ease;
+      width:0%;
+    }
+    .wizard-back-link-row{
+      margin-bottom:14px;
+    }
+    .wizard-back-link{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:13px 16px;
+      background:linear-gradient(135deg, #11998e, #38ef7d);
+      color:#fff;
+      text-decoration:none;
+      font-size:14px;
+      font-weight:600;
+      border-radius:10px;
+      transition:all 0.15s;
+    }
+    .wizard-back-link:hover{
+      transform:translateY(-1px);
+      box-shadow:0 4px 14px rgba(56,239,125,0.25);
+    }
+    /* Im Wizard-Modus den grünen pending-banner sicher verstecken */
+    body.wizard-active #pendingBanner{display:none !important;}
+    .wizard-finetune-row{
+      margin-top:24px;
+    }
+    /* "oder" Trenner */
+    .wizard-finetune-divider{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      margin:0 0 12px;
+      color:#666;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:1.5px;
+    }
+    .wizard-finetune-divider::before,
+    .wizard-finetune-divider::after{
+      content:"";
+      flex:1;
+      height:1px;
+      background:rgba(255,255,255,0.08);
+    }
+    /* Feintunen-Card */
+    .wizard-finetune-card{
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:12px;
+      padding:14px 16px;
+      text-align:center;
+    }
+    .wizard-finetune-card-title{
+      color:#fff;
+      font-size:14px;
+      font-weight:600;
+      margin-bottom:6px;
+    }
+    .wizard-finetune-card-text{
+      color:#888;
+      font-size:12px;
+      line-height:1.5;
+      margin-bottom:12px;
+    }
+    .wizard-finetune-btn{
+      width:100%;
+      padding:12px 16px;
+      background:rgba(66,133,244,0.15);
+      border:1px solid rgba(66,133,244,0.5);
+      color:#6ea4ff;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.15s;
+    }
+    .wizard-finetune-btn:hover{
+      background:rgba(66,133,244,0.25);
+      transform:translateY(-1px);
+    }
+    /* Beschreibungstext nur im Wizard sichtbar — gibt zusätzlichen Kontext zum aktuellen Schritt */
+    .wizard-description{
+      display:none;
+    }
+    body.wizard-active .wizard-description{
+      display:block;
+      background:rgba(255,215,0,0.04);
+      border-left:3px solid rgba(255,215,0,0.4);
+      padding:10px 14px;
+      margin:8px 0 16px;
+      border-radius:4px;
+      color:#ccc;
+      font-size:13px;
+      line-height:1.5;
+    }
+    body.wizard-active .wizard-description b{
+      color:#ffd700;
+      font-weight:600;
+    }
+    .wizard-finetune-link{
+      color:#888;
+      text-decoration:none;
+      font-size:12px;
+      font-weight:500;
+      padding:6px 10px;
+    }
+    .wizard-finetune-link:hover{color:#ffd700}
+    .wizard-nav-bottom{
+      display:flex;
+      gap:8px;
+      margin-top:16px;
+    }
+    .btn-wizard{
+      flex:1;
+      padding:14px;
+      border:none;
+      border-radius:10px;
+      font-size:14px;
+      font-weight:600;
+      cursor:pointer;
+      transition:all 0.2s;
+    }
+    .btn-wizard-back{
+      background:rgba(255,255,255,0.08);
+      color:#fff;
+    }
+    .btn-wizard-back:hover{background:rgba(255,255,255,0.15)}
+    .btn-wizard-back:disabled{opacity:0.3;cursor:not-allowed}
+    .btn-wizard-next{
+      background:#ffd700;
+      color:#1a1a2e;
+      flex:1.3;
+    }
+    .btn-wizard-next:hover{background:#ffed4a}
+    .btn-wizard-next.is-finish{
+      background:linear-gradient(135deg,#11998e,#38ef7d);
+      color:#fff;
+    }
+    /* U-Bahn Badge-Vorschau (Beispielzeile die sich je nach Toggle ändert) */
+    .wien-badge-preview{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px 12px;
+      border-radius:10px;
+      background:#000;
+      border:1px solid rgba(255,255,255,0.08);
+      transition:background 0.2s, color 0.2s;
+    }
+    .wien-preview-line{
+      font-weight:800;
+      font-size:18px;
+      min-width:30px;
+      text-align:left;
+    }
+    .wien-preview-dest{
+      flex:1;
+      font-size:14px;
+      font-weight:500;
+    }
+    .wien-preview-cd{
+      font-weight:800;
+      font-size:18px;
+    }
+    /* Aus: gelbe Schrift wie auf Display */
+    .wien-preview-off{
+      background:#000;
+      color:#ffd700;
+    }
+    /* Linie: kleines Badge um Liniennummer */
+    .wien-preview-line-badge{
+      background:#000;
+      color:#ffd700;
+    }
+    .wien-preview-line-badge .wien-preview-line{
+      background:#A862A4;
+      color:#fff;
+      padding:3px 10px;
+      border-radius:6px;
+      min-width:0;
+      font-size:16px;
+    }
+    /* Ganze Zeile: gesamte Zeile farbig */
+    .wien-preview-full-row{
+      background:#A862A4;
+      color:#fff;
+      border-color:transparent;
     }
 
     /* Zeilen-Reihenfolge Drag & Drop */
@@ -838,9 +1084,9 @@
   <p class="subtitle">Erweiterte Features</p>
 
   <!-- ==================== INTRO ==================== -->
-  <div class="intro-box">
+  <div class="intro-box" id="introBox">
     Nun kannst du dein Straba ganz nach deinen Wuenschen einstellen.<br>
-    <a href="localmainpage.html" class="back-link">&larr; Zurueck zu Linien einstellen</a>
+    <a href="#" onclick="goBackToLines();return false;" class="back-link">&larr; Zur&uuml;ck zu Linien einstellen</a>
   </div>
 
   <!-- Banner fuer neue Stationen -->
@@ -849,11 +1095,42 @@
     <div class="pending-text" id="pendingText">Deine ausgewaehlten Stationen werden beim Speichern uebernommen.</div>
   </div>
 
-  <!-- ==================== 1. BARRIEREFREIHEIT (Wien) ==================== -->
-  <div class="card" id="cardBarrierefreiheit">
-    <h2>Features <span id="wienOnlyBadge1" class="wien-only-badge" style="display:none;">Wien</span></h2>
+  <!-- ==================== WIZARD: ZURÜCK-LINK ==================== -->
+  <div id="wizardBackLinkRow" class="wizard-back-link-row" style="display:none;">
+    <a href="#" onclick="goBackToLines();return false;" class="wizard-back-link">
+      &larr; Zur&uuml;ck zu Linien einstellen
+    </a>
+  </div>
 
-    <div class="control-row" id="rowChopper">
+  <!-- ==================== WIZARD NAV (TOP) ==================== -->
+  <div id="wizardNavTop" class="wizard-nav-top" style="display:none;">
+    <div class="wizard-progress">
+      <span id="wizardStepLabel">Schritt 1 von 3</span>
+      <div class="wizard-progress-bar">
+        <div class="wizard-progress-fill" id="wizardProgressFill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== 1. BARRIEREFREIHEIT (Wien) ==================== -->
+  <!-- Standardmäßig versteckt — wird nur sichtbar wenn updateFeatureVisibility() es freigibt -->
+  <div class="card feature-hidden" id="cardBarrierefreiheit">
+    <h2>Features <span id="wienOnlyBadge1" class="wien-only-badge" style="display:none;">Wien</span></h2>
+    <div class="wizard-description" id="featuresWizardDescription">
+      <b>Wien-spezifische Anzeige-Optionen.</b><br>
+      <span class="desc-chopper">
+        <b>Hochflurer markieren</b> kennzeichnet nicht-barrierefreie Fahrzeuge in hellblauer Schrift —
+        praktisch wenn du auf einen Niederflur-Wagen warten möchtest.
+      </span>
+      <span class="desc-ubahn">
+        <br>
+        <b>U-Bahnen mit Klimaanlage</b> ergänzt einen Stern (★) bei klimatisierten Zügen (z.B. U2*).<br>
+        <b>U-Bahn Badges</b> hinterlegen die Liniennummer in der Originalfarbe der Wiener Linien
+        (U1 rot, U2 lila, U3 orange, U4 grün, U6 braun).
+      </span>
+    </div>
+
+    <div class="control-row feature-hidden" id="rowChopper">
       <div class="control-label">
         <span>Hochflurer markieren</span>
         <small>Zeigt nicht barrierefreie Fahrzeuge in hellblau</small>
@@ -864,92 +1141,127 @@
       </div>
     </div>
 
-    <div class="control-row" id="rowSilberpfeil">
+    <div class="control-row feature-hidden" id="rowSilberpfeil">
       <div class="control-label">
         <span>U-Bahnen mit Klimaanlage</span>
-        <small>Markiert klimatisierte U-Bahn-Zuege</small>
+        <small>Markiert klimatisierte U-Bahn-Zuege mit einem Stern (z.B. <span class="ubahn-preview-row"><span class="ubahn-line-text">U2*</span></span>)</small>
       </div>
       <div class="segmented" data-name="silberpfeil">
         <div class="seg-btn active" data-value="0">Aus</div>
         <div class="seg-btn" data-value="1">An</div>
       </div>
     </div>
-  </div>
 
-  <!-- ==================== 2. ZEILEN ==================== -->
-  <div class="card">
-    <h2>Zeilen</h2>
-
-    <div class="control-row" style="border-bottom:none">
-      <div class="control-label"><span>Anzahl Zeilen</span></div>
-      <div class="segmented wide" data-name="anzeige">
-        <div class="seg-btn" data-value="1">1</div>
-        <div class="seg-btn active" data-value="2">2</div>
-        <div class="seg-btn" data-value="3">3</div>
+    <div class="control-row feature-hidden" id="rowWienBadges" style="flex-direction:column;align-items:stretch;gap:10px;">
+      <div class="control-label">
+        <span>Wien U-Bahn Badges</span>
+        <small>Linien in Original-Farben hervorheben</small>
+      </div>
+      <div class="segmented compact-3" data-name="wienbadges" style="width:100%;">
+        <div class="seg-btn active" data-value="0">Aus</div>
+        <div class="seg-btn" data-value="1">Linie</div>
+        <div class="seg-btn" data-value="2">Ganz</div>
+      </div>
+      <!-- Live-Vorschau Beispielzeile -->
+      <div id="wienBadgePreview" class="wien-badge-preview wien-preview-off">
+        <span class="wien-preview-line">U2</span>
+        <span class="wien-preview-dest">Heiligenstadt</span>
+        <span class="wien-preview-cd">5</span>
       </div>
     </div>
   </div>
 
-  <!-- ==================== 2. SORTIERUNG ==================== -->
-  <div class="card" id="cardSortierung">
-    <h2>Sortierung</h2>
+  <!-- ==================== ZEILEN & SORTIERUNG (kombiniert) ==================== -->
+  <div class="card" id="cardZeilenSortierung">
+    <h2>Zeilen & Sortierung</h2>
 
-    <div class="control-row">
+    <!-- Top-Toggle: Automatisch / Manuell -->
+    <div class="control-row" id="rowDisplayMode">
       <div class="control-label">
-        <span>Sortier-Modus</span>
-        <small id="sortmodeHint">Statisch = Feste Reihenfolge der Linien</small>
+        <span>Modus</span>
+        <small id="displayModeHint">Automatisch = Optimale Werte basierend auf deinen Linien</small>
       </div>
-      <div class="segmented" data-name="sortmode">
-        <div class="seg-btn active" data-value="1">Statisch</div>
-        <div class="seg-btn" data-value="2">Nach Zeit</div>
-      </div>
-    </div>
-
-    <div class="control-row" id="autoManualRow">
-      <div class="control-label">
-        <span>Reihenfolge</span>
-      </div>
-      <div class="segmented" data-name="sortorder" id="sortOrderSegmented">
+      <div class="segmented" data-name="displaymode_ui">
         <div class="seg-btn active" data-value="auto">Automatisch</div>
         <div class="seg-btn" data-value="manual">Manuell</div>
       </div>
     </div>
 
-    <div class="manual-sort-content" id="manualSortContent">
-      <div class="manual-sort-inner">
+    <!-- Untergeordnete Optionen — nur sichtbar im Manuell-Modus -->
+    <div id="manualDisplayOptions" style="display:none;">
 
-        <!-- Zeilen-Reihenfolge (Drag & Drop) -->
-        <div class="row-order-section" id="rowOrderSection">
-          <div class="row-order-label">Zeilen-Reihenfolge festlegen</div>
-          <div class="row-order-hint">Ziehe die Linien in die gewuenschte Reihenfolge (Zeile 1 = oben)</div>
-          <div class="row-order-list" id="rowOrderList">
-            <div class="row-order-empty">Keine Linien konfiguriert</div>
-          </div>
+      <div class="control-row">
+        <div class="control-label"><span>Anzahl Zeilen</span></div>
+        <div class="segmented wide" data-name="anzeige">
+          <div class="seg-btn" data-value="1">1</div>
+          <div class="seg-btn active" data-value="2">2</div>
+          <div class="seg-btn" data-value="3">3</div>
         </div>
+      </div>
 
-        <!-- Gruppierung -->
-        <div class="ft-grouping-section" id="ftGroupingSection">
-          <div class="ft-grouping-label">Richtungen gruppieren <span class="info-btn" onclick="showGroupingInfo()">?</span></div>
-          <div class="ft-grouping-hint">Gruppiere Linien die die gleiche Strecke fahren (z.B. Linie 1 und 62). Nicht gruppierte Linien werden einzeln angezeigt.</div>
+      <div class="control-row">
+        <div class="control-label">
+          <span>Sortier-Modus</span>
+          <small id="sortmodeHint">Statisch = Feste Reihenfolge der Linien</small>
+        </div>
+        <div class="segmented" data-name="sortmode">
+          <div class="seg-btn active" data-value="1">Statisch</div>
+          <div class="seg-btn" data-value="2">Nach Zeit</div>
+        </div>
+      </div>
 
-          <div class="ft-grouping-area">
-            <div class="ft-groups-container" id="ftGroupsContainer">
+      <div class="control-row" id="autoManualRow">
+        <div class="control-label">
+          <span>Reihenfolge</span>
+        </div>
+        <div class="segmented" data-name="sortorder" id="sortOrderSegmented">
+          <div class="seg-btn active" data-value="auto">Automatisch</div>
+          <div class="seg-btn" data-value="manual">Manuell</div>
+        </div>
+      </div>
+
+      <div class="manual-sort-content" id="manualSortContent">
+        <div class="manual-sort-inner">
+
+          <!-- Zeilen-Reihenfolge (Drag & Drop) -->
+          <div class="row-order-section" id="rowOrderSection">
+            <div class="row-order-label">Zeilen-Reihenfolge festlegen</div>
+            <div class="row-order-hint">Ziehe die Linien in die gewuenschte Reihenfolge (Zeile 1 = oben)</div>
+            <div class="row-order-list" id="rowOrderList">
+              <div class="row-order-empty">Keine Linien konfiguriert</div>
             </div>
+          </div>
 
-            <div class="ft-directions-pool" id="ftDirectionsPool">
-              <div class="pool-header">Verfuegbare Richtungen:</div>
-              <div class="pool-items" id="ftPoolItems">
+          <!-- Gruppierung -->
+          <div class="ft-grouping-section" id="ftGroupingSection">
+            <div class="ft-grouping-label">Richtungen gruppieren <span class="info-btn" onclick="showGroupingInfo()">?</span></div>
+            <div class="ft-grouping-hint">Gruppiere Linien die die gleiche Strecke fahren (z.B. Linie 1 und 62). Nicht gruppierte Linien werden einzeln angezeigt.</div>
+
+            <div class="ft-grouping-area">
+              <div class="ft-groups-container" id="ftGroupsContainer">
+              </div>
+
+              <div class="ft-directions-pool" id="ftDirectionsPool">
+                <div class="pool-header">Verfuegbare Richtungen:</div>
+                <div class="pool-items" id="ftPoolItems">
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
   <!-- ==================== 3. NACHTMODUS ==================== -->
-  <div class="card">
+  <div class="card" id="cardNachtmodus">
     <h2>Nachtmodus</h2>
+    <div class="wizard-description">
+      <b>Strom sparen wenn du schläfst.</b><br>
+      Aktiviere den Nachtmodus und das Display schaltet sich in dem von dir gewählten
+      Zeitraum komplett aus. Spart Energie :)
+    </div>
 
     <div class="control-row">
       <div class="control-label">
@@ -978,8 +1290,14 @@
   </div>
 
   <!-- ==================== 4. GEHWEG ==================== -->
-  <div class="card">
+  <div class="card" id="cardGehweg">
     <h2>Gehweg zur Haltestelle</h2>
+    <div class="wizard-description">
+      <b>Zeige nur Abfahrten, die du noch erreichen kannst.</b><br>
+      Trag pro Haltestelle ein, wie viele Minuten du mindestens zu Fuß brauchst.
+      Beispiel: <b>5&nbsp;min Gehweg</b> → Abfahrten die in 0-4&nbsp;Minuten kommen werden ausgeblendet,
+      damit du nicht hinhetzt für etwas das du eh nicht mehr schaffst. Maximal 15&nbsp;Minuten.
+    </div>
 
     <div class="control-row">
       <div class="control-label">
@@ -1006,7 +1324,7 @@
   </div>
 
   <!-- ==================== 5. ERWEITERTE EINSTELLUNGEN ==================== -->
-  <div class="expand-card">
+  <div class="expand-card" id="cardExpand">
     <div class="expand-header" id="expandHeader" onclick="toggleExpand()">
       <h2>Erweiterte Einstellungen</h2>
       <span class="expand-arrow">&#9660;</span>
@@ -1099,6 +1417,33 @@
     </div>
   </div>
 
+  <!-- ==================== WIZARD NAV (BOTTOM) ==================== -->
+  <div id="wizardNavBottom" class="wizard-nav-bottom" style="display:none;">
+    <button class="btn-wizard btn-wizard-back" id="wizardBackBtn" onclick="wizardBack()">
+      &larr; Zur&uuml;ck
+    </button>
+    <button class="btn-wizard btn-wizard-next" id="wizardNextBtn" onclick="wizardNext()">
+      Weiter &rarr;
+    </button>
+  </div>
+
+  <!-- Feintunen-Sektion nur im letzten Wizard-Schritt -->
+  <div id="wizardFinetuneRow" class="wizard-finetune-row" style="display:none;">
+    <div class="wizard-finetune-divider">
+      <span>oder</span>
+    </div>
+    <div class="wizard-finetune-card">
+      <div class="wizard-finetune-card-title">⚙️ Feintunen</div>
+      <div class="wizard-finetune-card-text">
+        Spezifischere Einstellungen wie Zeilen-Reihenfolge, Linien-Gruppierungen,
+        Schriftfarbe, Helligkeit, Slideshow-Modus und mehr.
+      </div>
+      <button type="button" class="wizard-finetune-btn" onclick="enableFullView()">
+        Erweiterte Einstellungen &rarr;
+      </button>
+    </div>
+  </div>
+
   <!-- ==================== SPEICHERN ==================== -->
   <button class="btn-primary" id="saveBtn">Speichern &amp; Neustarten</button>
 
@@ -1134,6 +1479,7 @@ let currentConfig = {};
 let currentCapabilities = null;
 let configLoaded = false;
 let settingsLoaded = false;
+let pendingPathActive = false;  // true wenn Stationen via Pending-Pfad geladen wurden (Settings vom Device noch laden!)
 let manualSortEnabled = false;
 
 // City Capabilities
@@ -1291,12 +1637,92 @@ document.querySelectorAll('.segmented').forEach(function(seg) {
       // Spezialbehandlung fuer sortorder Toggle
       if (seg.dataset.name === 'sortorder') {
         updateManualSortState();
+      } else if (seg.dataset.name === 'wienbadges') {
+        updateWienBadgePreview();
+      } else if (seg.dataset.name === 'displaymode_ui') {
+        applyDisplayAutoMode();
       } else {
         updateUI();
       }
     });
   });
 });
+
+// ==================== ZEILEN & SORTIERUNG: AUTO/MANUELL MODUS ====================
+// Zählt die Stations-Einträge im Filter — jede |-separierte Gruppe ist EIN Eintrag,
+// auch wenn sie mehrere Linien enthält (Stop mit mehreren Linien wird zu einer Display-Zeile gruppiert).
+// Beispiele:
+//   "U2"             → 1 Stop          → 3 Zeilen
+//   "U2,U4"          → 1 Stop (2 Lin.) → 3 Zeilen
+//   "U2|U2"          → 2 Stops         → 2 Zeilen
+//   "U2|U6"          → 2 Stops         → 2 Zeilen
+//   "U2,U4|U6"       → 2 Stops         → 2 Zeilen
+//   "U1|U2|U3"       → 3 Stops         → 3 Zeilen
+//   "U1|U2|U3|U4"    → 4 Stops         → 2 Zeilen
+//   "U1|U2|U3|U4|U6" → 5 Stops         → 3 Zeilen
+function countConfiguredLines() {
+  var filter = pendingFilter || (currentConfig && currentConfig.lines_filter) || '';
+  if (!filter) return 0;
+  var groups = filter.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+  return groups.length;
+}
+
+// Auto-Regel: 1→3, 2→2, 3→3, 4→2, 5+→3
+function calcAutoRows(lineCount) {
+  if (lineCount === 2 || lineCount === 4) return 2;
+  return 3;
+}
+
+// Wendet den aktuellen Modus an: Auto = compute & hide, Manuell = show controls
+function applyDisplayAutoMode() {
+  var seg = document.querySelector('[data-name="displaymode_ui"]');
+  if (!seg) return;
+  var active = seg.querySelector('.seg-btn.active');
+  var mode = active ? active.dataset.value : 'auto';
+  var manualBox = document.getElementById('manualDisplayOptions');
+  if (mode === 'auto') {
+    if (manualBox) manualBox.style.display = 'none';
+    // Auto-Werte berechnen + setzen
+    var autoRows = calcAutoRows(countConfiguredLines());
+    setSegmentValue('anzeige', String(autoRows));
+    setSegmentValue('sortmode', '1');           // Statisch als Default
+    setSegmentValue('sortorder', 'auto');
+    manualSortEnabled = false;
+    var manualContent = document.getElementById('manualSortContent');
+    if (manualContent) manualContent.classList.remove('open');
+    // localStorage merken
+    try { localStorage.setItem('straba_display_auto_mode', 'auto'); } catch (e) {}
+  } else {
+    if (manualBox) manualBox.style.display = '';
+    try { localStorage.setItem('straba_display_auto_mode', 'manual'); } catch (e) {}
+  }
+  updateUI();
+}
+
+// Setzt den Modus-Toggle auf 'auto' oder 'manual'
+function setDisplayAutoMode(mode) {
+  var seg = document.querySelector('[data-name="displaymode_ui"]');
+  if (!seg) return;
+  seg.querySelectorAll('.seg-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.value === mode);
+  });
+  applyDisplayAutoMode();
+}
+
+// Wien U-Bahn Badge: Live-Vorschau aktualisieren je nach Toggle
+function updateWienBadgePreview() {
+  var preview = document.getElementById('wienBadgePreview');
+  if (!preview) return;
+  var seg = document.querySelector('[data-name="wienbadges"]');
+  if (!seg) return;
+  var active = seg.querySelector('.seg-btn.active');
+  var val = active ? active.dataset.value : '0';
+  // CSS-Klasse setzen
+  preview.classList.remove('wien-preview-off', 'wien-preview-line-badge', 'wien-preview-full-row');
+  if (val === '1') preview.classList.add('wien-preview-line-badge');
+  else if (val === '2') preview.classList.add('wien-preview-full-row');
+  else preview.classList.add('wien-preview-off');
+}
 
 // ==================== COLOR DOTS ====================
 document.querySelectorAll('.color-row').forEach(function(row) {
@@ -1461,7 +1887,7 @@ function updateRowOrderList() {
           }
         });
       });
-    });
+    }
 
     rowOrderItems = lineEntries;
     container.dataset.itemsKey = newItemsKey;
@@ -1959,26 +2385,256 @@ function setSegmentValue(name, value) {
   });
 }
 
+// ==================== WIZARD-LOGIK ====================
+// Wizard-Schritte in Reihenfolge: Wien Features → Gehweg → Nachtmodus
+// (Zeilen & Sortierung wird übersprungen — ist standardmäßig automatisch)
+var wizardSteps = [
+  { id: 'cardBarrierefreiheit', label: 'Wien Features',
+    // Nur sichtbar wenn Wien-Capabilities (Hochflurer ODER Klima)
+    isAvailable: function() { return currentCapabilities && (currentCapabilities.showHighFloor || currentCapabilities.showAirCondition); } },
+  { id: 'cardGehweg', label: 'Gehweg',
+    // Standardmäßig verfügbar (auch ohne capabilities-Info)
+    isAvailable: function() { return !currentCapabilities || currentCapabilities.gehwegFilter !== false; } },
+  { id: 'cardNachtmodus', label: 'Nachtmodus',
+    // Standardmäßig verfügbar (auch ohne capabilities-Info)
+    isAvailable: function() { return !currentCapabilities || currentCapabilities.nightMode !== false; } },
+];
+var wizardCurrentStep = 0;
+var wizardViewMode = 'wizard';  // 'wizard' oder 'full'
+
+function getActiveWizardSteps() {
+  return wizardSteps.filter(function(s) { return s.isAvailable(); });
+}
+
+function applyWizardView() {
+  var saveBtn = document.getElementById('saveBtn');
+  var navTop = document.getElementById('wizardNavTop');
+  var navBottom = document.getElementById('wizardNavBottom');
+  var finetuneRow = document.getElementById('wizardFinetuneRow');
+  var introBox = document.getElementById('introBox');
+  var expandCard = document.getElementById('cardExpand');
+  var zeilenCard = document.getElementById('cardZeilenSortierung');
+  var backToWizard = document.getElementById('backToWizardLink');
+  var pendingBanner = document.getElementById('pendingBanner');
+  var wizardBackLinkRow = document.getElementById('wizardBackLinkRow');
+
+  if (wizardViewMode === 'full') {
+    document.body.classList.remove('wizard-active');
+    // Full-Modus: alles sichtbar, keine Wizard-Navigation
+    if (navTop) navTop.style.display = 'none';
+    if (navBottom) navBottom.style.display = 'none';
+    if (finetuneRow) finetuneRow.style.display = 'none';
+    if (wizardBackLinkRow) wizardBackLinkRow.style.display = 'none';
+    if (saveBtn) saveBtn.style.display = '';
+    if (introBox) introBox.classList.remove('wizard-hidden');
+    if (expandCard) expandCard.classList.remove('wizard-hidden');
+    if (zeilenCard) zeilenCard.classList.remove('wizard-hidden');
+    if (backToWizard) backToWizard.style.display = '';
+    // Pending-Banner darf im Full-Modus wieder angezeigt werden (von der ursprünglichen Logik)
+    // → Wir setzen ihn nicht aktiv, lassen aber die andere Logik ihn zeigen falls nötig
+    // Alle Wizard-Karten zeigen (außer feature-hidden die durch andere Logik versteckt sind)
+    wizardSteps.forEach(function(s) {
+      var el = document.getElementById(s.id);
+      if (el) el.classList.remove('wizard-hidden');
+    });
+    return;
+  }
+
+  // Wizard-Modus
+  document.body.classList.add('wizard-active');
+  if (navTop) navTop.style.display = '';
+  if (navBottom) navBottom.style.display = '';
+  if (saveBtn) saveBtn.style.display = 'none';
+  if (introBox) introBox.classList.add('wizard-hidden');
+  if (expandCard) expandCard.classList.add('wizard-hidden');
+  if (zeilenCard) zeilenCard.classList.add('wizard-hidden');  // Zeilen+Sortierung im Wizard verstecken
+  if (backToWizard) backToWizard.style.display = 'none';
+  // Pending-Banner im Wizard verstecken — stattdessen Back-Link zeigen
+  if (pendingBanner) pendingBanner.style.display = 'none';
+  if (wizardBackLinkRow) wizardBackLinkRow.style.display = '';
+
+  var activeSteps = getActiveWizardSteps();
+  if (activeSteps.length === 0) {
+    // Keine Schritte verfügbar → Full-Modus erzwingen
+    enableFullView();
+    return;
+  }
+  if (wizardCurrentStep >= activeSteps.length) wizardCurrentStep = activeSteps.length - 1;
+  if (wizardCurrentStep < 0) wizardCurrentStep = 0;
+
+  // Alle Wizard-Karten verstecken
+  wizardSteps.forEach(function(s) {
+    var el = document.getElementById(s.id);
+    if (el) el.classList.add('wizard-hidden');
+  });
+  // Nur die aktive Karte zeigen
+  var current = activeSteps[wizardCurrentStep];
+  var currentEl = document.getElementById(current.id);
+  if (currentEl) currentEl.classList.remove('wizard-hidden');
+
+  // Progress aktualisieren
+  var stepLabel = document.getElementById('wizardStepLabel');
+  var fill = document.getElementById('wizardProgressFill');
+  if (stepLabel) stepLabel.textContent = 'Schritt ' + (wizardCurrentStep + 1) + ' von ' + activeSteps.length + ' — ' + current.label;
+  if (fill) fill.style.width = (((wizardCurrentStep + 1) / activeSteps.length) * 100) + '%';
+
+  // Buttons aktualisieren
+  var backBtn = document.getElementById('wizardBackBtn');
+  var nextBtn = document.getElementById('wizardNextBtn');
+  var isLast = (wizardCurrentStep === activeSteps.length - 1);
+  if (backBtn) backBtn.disabled = (wizardCurrentStep === 0);
+  if (nextBtn) {
+    nextBtn.innerHTML = isLast ? 'Speichern &amp; Fertig' : 'Weiter &rarr;';
+    nextBtn.classList.toggle('is-finish', isLast);
+  }
+  // Feintunen-Link nur im LETZTEN Schritt anzeigen
+  if (finetuneRow) finetuneRow.style.display = isLast ? '' : 'none';
+
+  window.scrollTo(0, 0);
+}
+
+function wizardBack() {
+  if (wizardCurrentStep > 0) {
+    wizardCurrentStep--;
+    applyWizardView();
+  }
+}
+
+function wizardSkip() {
+  // Skip = einfach weiter ohne Werte zu ändern
+  wizardNext();
+}
+
+function wizardNext() {
+  var activeSteps = getActiveWizardSteps();
+  if (wizardCurrentStep >= activeSteps.length - 1) {
+    // Letzter Schritt → IM WIZARD immer Auto-Zeilenanzahl erzwingen.
+    // Der Wizard zeigt den Auto/Manuell-Toggle gar nicht — User hatte keine Möglichkeit
+    // manuell zu wählen, also gilt automatisch die Auto-Regel.
+    if (typeof countConfiguredLines === 'function' && typeof calcAutoRows === 'function') {
+      var lineCount = countConfiguredLines();
+      var autoRows = calcAutoRows(lineCount);
+      console.log('[Wizard] Auto-Zeilen:', lineCount, 'unique Linien →', autoRows, 'Zeilen');
+      setSegmentValue('anzeige', String(autoRows));
+      // Sortmode default Statisch (1) wenn keine manuelle Wahl getroffen
+      setSegmentValue('sortmode', '1');
+      setSegmentValue('sortorder', 'auto');
+    }
+    var saveBtn = document.getElementById('saveBtn');
+    if (saveBtn) saveBtn.click();
+    return;
+  }
+  wizardCurrentStep++;
+  applyWizardView();
+}
+
+function enableFullView() {
+  // Wechselt zur Full-Ansicht (nur für die aktuelle Session — Auto-Detect entscheidet beim nächsten Laden)
+  wizardViewMode = 'full';
+  applyWizardView();
+}
+
+function enableWizardView() {
+  // Wechselt zur Wizard-Ansicht (nur für die aktuelle Session — Auto-Detect entscheidet beim nächsten Laden)
+  wizardViewMode = 'wizard';
+  wizardCurrentStep = 0;
+  applyWizardView();
+}
+
+// Prüft ob die Config Werte enthält die NICHT im Wizard einstellbar sind
+// (Erweiterte Einstellungen). Wenn ja → User hat schon mal Feintuning genutzt → Wizard
+// nicht mehr zeigen.
+//
+// Firmware-Defaults: displaylight=3 (Hell), textColor=1 (Gelb), displayMode=1 (Gemischt),
+// stopInterval=10, showFunMessages=true. Abweichungen davon = Power-User.
+function configHasAdvancedSettings(config) {
+  if (!config) return false;
+  // Helligkeit ≠ Default "Hell" (3)
+  if (config.displaylight !== undefined && config.displaylight !== '' &&
+      parseInt(config.displaylight) > 0 && parseInt(config.displaylight) !== 3) return true;
+  // Textfarbe ≠ Default "Gelb" (1)
+  if (config.text_color !== undefined && String(config.text_color) !== '' &&
+      String(config.text_color) !== '1' && String(config.text_color) !== '0') return true;
+  // Fun Messages explizit aus
+  if (config.show_fun_messages === false || config.show_fun_messages === '0' || config.show_fun_messages === 0) return true;
+  // Display-Mode = Slideshow (2)
+  if (String(config.display_mode) === '2') return true;
+  // Stop-Interval ≠ Default 10
+  if (config.stop_interval !== undefined && config.stop_interval !== '' &&
+      parseInt(config.stop_interval) > 0 && parseInt(config.stop_interval) !== 10) return true;
+  return false;
+}
+
+function initWizardMode() {
+  // Auto-Detect — kein localStorage mehr nötig:
+  // Wenn die geladene Config erweiterte Settings hat (Helligkeit, Textfarbe, Slideshow etc.)
+  // → User hat schon mal feingetunt → Full-View. Sonst Wizard.
+  if (configHasAdvancedSettings(currentConfig)) {
+    console.log('[Wizard] Erweiterte Settings erkannt → Full-View');
+    wizardViewMode = 'full';
+  } else {
+    console.log('[Wizard] Keine erweiterten Settings → Wizard-Modus');
+    wizardViewMode = 'wizard';
+  }
+  wizardCurrentStep = 0;
+  applyWizardView();
+}
+
+// ==================== ZURÜCK ZU LINIEN-EINSTELLUNG ====================
+// Speichert den aktuellen (möglicherweise geänderten) Stations-Zustand in localStorage,
+// damit localmainpage.html ihn statt der alten Device-Config anzeigt
+function goBackToLines() {
+  var rbl = pendingRbl || (currentConfig && currentConfig.rbl_id) || '';
+  var filter = pendingFilter || (currentConfig && currentConfig.lines_filter) || '';
+  if (rbl) {
+    localStorage.setItem('straba_back_rbl', rbl);
+    localStorage.setItem('straba_back_filter', filter);
+    localStorage.setItem('straba_back_active', '1');
+  }
+  window.location.href = 'localmainpage.html';
+}
+
 // ==================== CONFIG LADEN ====================
 function applyConfig(config) {
   if (settingsLoaded) return;
-  console.log('Config anwenden:', config);
+  console.log('Config anwenden:', config, 'pendingPathActive=', pendingPathActive);
   currentConfig = config;
 
   if (!currentCapabilities && config.rbl_id) {
     var network = detectNetworkFromRbl(config.rbl_id);
     updateFeatureVisibility(CITY_CAPABILITIES[network] || CITY_CAPABILITIES.WL);
+  } else if (currentCapabilities) {
+    // currentCapabilities ist bereits gesetzt (z.B. aus Pending-Pfad) — aber lines_filter
+    // war vielleicht damals leer. Jetzt mit dem geladenen Filter neu prüfen!
+    updateFeatureVisibility(currentCapabilities);
   }
 
+  // Default-Fallback: '0' = Aus (NICHT '1' — sonst springt Hochflurer/Klima auf An wenn Wert fehlt)
   setSegmentValue('anzeige', config.lines_count || '2');
   setSegmentValue('sortmode', config.sort_mode || config.sortmode || '1');
-  setSegmentValue('chopper', config.chopper || '1');
-  setSegmentValue('silberpfeil', config.silberpfeil || '1');
+  setSegmentValue('chopper', (config.chopper !== undefined && config.chopper !== '') ? config.chopper : '0');
+  setSegmentValue('silberpfeil', (config.silberpfeil !== undefined && config.silberpfeil !== '') ? config.silberpfeil : '0');
+  setSegmentValue('wienbadges', (config.wien_badges !== undefined && config.wien_badges !== '') ? config.wien_badges : '0');
+  updateWienBadgePreview();
+
+  // Display-Modus (Auto/Manuell) aus localStorage holen — default: auto
+  var savedDisplayMode = 'auto';
+  try {
+    var v = localStorage.getItem('straba_display_auto_mode');
+    if (v === 'manual') savedDisplayMode = 'manual';
+  } catch (e) {}
+  setDisplayAutoMode(savedDisplayMode);
+
+  // Wizard-Modus initialisieren (nur wenn noch nicht initialisiert)
+  if (typeof initWizardMode === 'function') initWizardMode();
   setSegmentValue('textcolor', config.text_color || '1');
   setSegmentValue('displaylight', config.displaylight || '3');
 
+  // Nachtmodus: explizit add ODER remove (sonst bleibt alter Zustand bestehen)
   if (config.night_mode_enabled) {
     document.getElementById('nightmodeToggle').classList.add('on');
+  } else {
+    document.getElementById('nightmodeToggle').classList.remove('on');
   }
   document.getElementById('nightstart').value = config.night_mode_start || '22';
   document.getElementById('nightend').value = config.night_mode_end || '7';
@@ -1992,12 +2648,12 @@ function applyConfig(config) {
   setSegmentValue('displaymode', config.display_mode || '1');
   setSegmentValue('stopinterval', config.stop_interval || '10');
 
-  // Gehweg
-  var stopIds = (config.rbl_id || '').split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+  // Gehweg parsen
+  var deviceStopIds = (config.rbl_id || '').split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
   var gehwegString = config.gehweg || '0';
-  var gehwegValues = [];
+  var gehwegMap = {};
+  var gehwegValuesByDeviceOrder = [];
   if (gehwegString.indexOf(':') !== -1) {
-    var gehwegMap = {};
     gehwegString.split('|').forEach(function(entry) {
       var colonPos = entry.indexOf(':');
       if (colonPos !== -1) {
@@ -2006,16 +2662,38 @@ function applyConfig(config) {
         gehwegMap[stopId] = value;
       }
     });
-    gehwegValues = stopIds.map(function(id) { return gehwegMap[id] || 0; });
+    gehwegValuesByDeviceOrder = deviceStopIds.map(function(id) { return gehwegMap[id] || 0; });
   } else {
-    gehwegValues = gehwegString.split('|').map(function(v) { return parseInt(v) || 0; });
+    gehwegValuesByDeviceOrder = gehwegString.split('|').map(function(v) { return parseInt(v) || 0; });
+    deviceStopIds.forEach(function(id, i) { gehwegMap[id] = gehwegValuesByDeviceOrder[i] || 0; });
   }
 
-  updateGehwegList(stopIds, gehwegValues);
-
-  if (config.gehweg && config.gehweg !== '0' && config.gehweg !== '') {
-    if (gehwegValues.some(function(v) { return v > 0; })) {
+  if (pendingPathActive && pendingRbl) {
+    // Pending-Pfad: Stationen kommen von localStorage. Gehweg-Werte aus device per stopId-Match
+    // übernehmen (gleiche Stops behalten ihren Wert), neue Stops bekommen 0.
+    var pendingStopIds = pendingRbl.split(',').map(function(s) { return s.trim(); }).filter(function(s) { return s; });
+    var mappedGehweg = pendingStopIds.map(function(id) { return gehwegMap[id] || 0; });
+    // updateGehwegList wurde im Pending-Pfad bereits mit Details aufgerufen — Werte hier nachreichen
+    var inputs = document.querySelectorAll('#gehwegList input[type="number"]');
+    inputs.forEach(function(inp, i) {
+      if (mappedGehweg[i] !== undefined) inp.value = String(mappedGehweg[i]);
+    });
+    if (mappedGehweg.some(function(v) { return v > 0; })) {
       document.getElementById('gehwegToggle').classList.add('on');
+    } else {
+      document.getElementById('gehwegToggle').classList.remove('on');
+    }
+  } else {
+    // Normaler Pfad: device stopIds + gehwegValues
+    updateGehwegList(deviceStopIds, gehwegValuesByDeviceOrder);
+    if (config.gehweg && config.gehweg !== '0' && config.gehweg !== '') {
+      if (gehwegValuesByDeviceOrder.some(function(v) { return v > 0; })) {
+        document.getElementById('gehwegToggle').classList.add('on');
+      } else {
+        document.getElementById('gehwegToggle').classList.remove('on');
+      }
+    } else {
+      document.getElementById('gehwegToggle').classList.remove('on');
     }
   }
 
@@ -2080,6 +2758,26 @@ document.getElementById('saveBtn').addEventListener('click', function() {
 
   var rblString = pendingRbl || currentConfig.rbl_id || '';
   var filterString = pendingFilter || currentConfig.lines_filter || '';
+
+  // AUTO-ZEILEN: Wenn der Auto-Modus aktiv ist (oder wir im Wizard sind),
+  // immer die Anzahl basierend auf den Stops neu berechnen.
+  // Damit landet die richtige Zeilenanzahl auf dem Device, egal über welchen Pfad gespeichert wird.
+  (function autoRowsFinalCheck() {
+    var dmSeg = document.querySelector('[data-name="displaymode_ui"]');
+    var dmActive = dmSeg ? dmSeg.querySelector('.seg-btn.active') : null;
+    var inAutoMode = !dmActive || dmActive.dataset.value === 'auto';
+    var inWizard = (typeof wizardViewMode !== 'undefined' && wizardViewMode === 'wizard');
+    if ((inAutoMode || inWizard) && typeof countConfiguredLines === 'function' && typeof calcAutoRows === 'function') {
+      // Filter-String aus dem aktuell zu speichernden Wert nehmen (nicht aus pendingFilter
+      // weil der könnte stale sein wenn der User in localmainpage gerade weitere hinzugefügt hat)
+      var liveFilter = filterString || '';
+      var groups = liveFilter.split('|').map(function(s) { return s.trim(); }).filter(function(s) { return s.length > 0; });
+      var lineCount = groups.length;
+      var autoRows = calcAutoRows(lineCount);
+      console.log('[Save] Auto-Zeilen Re-Check:', lineCount, 'Stop-Gruppen →', autoRows, 'Zeilen (filter:', liveFilter, ')');
+      setSegmentValue('anzeige', String(autoRows));
+    }
+  })();
 
   var rowOrder = '';
   var lineGroups = '';
@@ -2172,6 +2870,7 @@ document.getElementById('saveBtn').addEventListener('click', function() {
     sortmode: sortMode,
     chopper: getSegmentValue('chopper'),
     silberpfeil: getSegmentValue('silberpfeil'),
+    wienbadges: getSegmentValue('wienbadges'),
     colour: '1',
     textcolor: getSegmentValue('textcolor'),
     displaylight: getSegmentValue('displaylight'),
@@ -2237,8 +2936,24 @@ window.addEventListener('message', function(event) {
 });
 
 // ==================== FEATURE VISIBILITY ====================
+// Prüft ob in den aktuell konfigurierten Filtern eine U-Bahn-Linie (U1..U6) vorkommt
+function hasUBahnLine() {
+  var filterString = pendingFilter || currentConfig.lines_filter || '';
+  if (!filterString) return false;
+  // Filter ist "|"- oder ","-getrennt: "U1,U4|2|U6"
+  var parts = filterString.split(/[|,]/);
+  for (var i = 0; i < parts.length; i++) {
+    var p = parts[i].trim().toUpperCase();
+    if (/^U[1-6]$/.test(p)) return true;
+  }
+  return false;
+}
+
 function updateFeatureVisibility(capabilities) {
   currentCapabilities = capabilities;
+
+  // U-Bahn nur sichtbar machen wenn Wien-Capabilities UND mindestens eine U-Bahn-Linie konfiguriert
+  var ubahnConfigured = hasUBahnLine();
 
   var rowChopper = document.getElementById('rowChopper');
   if (rowChopper) {
@@ -2248,8 +2963,22 @@ function updateFeatureVisibility(capabilities) {
 
   var rowSilberpfeil = document.getElementById('rowSilberpfeil');
   if (rowSilberpfeil) {
-    if (capabilities && capabilities.showAirCondition) rowSilberpfeil.classList.remove('feature-hidden', 'feature-disabled');
-    else rowSilberpfeil.classList.add('feature-hidden');
+    // Klimaanlage-Stern: nur wenn U-Bahn konfiguriert (das Feature betrifft nur U-Bahn)
+    if (capabilities && capabilities.showAirCondition && ubahnConfigured) {
+      rowSilberpfeil.classList.remove('feature-hidden', 'feature-disabled');
+    } else {
+      rowSilberpfeil.classList.add('feature-hidden');
+    }
+  }
+
+  var rowWienBadges = document.getElementById('rowWienBadges');
+  if (rowWienBadges) {
+    // Wien U-Bahn Badges: nur wenn U-Bahn konfiguriert
+    if (capabilities && capabilities.showAirCondition && ubahnConfigured) {
+      rowWienBadges.classList.remove('feature-hidden', 'feature-disabled');
+    } else {
+      rowWienBadges.classList.add('feature-hidden');
+    }
   }
 
   var rowTextfarbe = document.getElementById('rowTextfarbe');
@@ -2266,10 +2995,31 @@ function updateFeatureVisibility(capabilities) {
 
   var cardBarrierefreiheit = document.getElementById('cardBarrierefreiheit');
   if (cardBarrierefreiheit) {
-    var hasAnyFeature = capabilities && (capabilities.showHighFloor || capabilities.showAirCondition);
-    if (!hasAnyFeature) cardBarrierefreiheit.style.display = 'none';
-    else cardBarrierefreiheit.style.display = '';
+    // Karte zeigen wenn mindestens eine Zeile sichtbar wäre:
+    //   - Hochflurer (showHighFloor) ODER
+    //   - U-Bahn-Klima/Badges (showAirCondition + U-Bahn konfiguriert)
+    var hasChopperRow = capabilities && capabilities.showHighFloor;
+    var hasUBahnRows = capabilities && capabilities.showAirCondition && ubahnConfigured;
+    if (hasChopperRow || hasUBahnRows) {
+      cardBarrierefreiheit.classList.remove('feature-hidden');
+      cardBarrierefreiheit.style.display = '';
+    } else {
+      cardBarrierefreiheit.classList.add('feature-hidden');
+    }
   }
+
+  // Wizard-Beschreibung "U-Bahn"-Teile nur zeigen wenn U-Bahn konfiguriert ist
+  var descUbahn = document.querySelectorAll('#featuresWizardDescription .desc-ubahn');
+  descUbahn.forEach(function(el) {
+    el.style.display = ubahnConfigured ? '' : 'none';
+  });
+  var descChopper = document.querySelectorAll('#featuresWizardDescription .desc-chopper');
+  descChopper.forEach(function(el) {
+    el.style.display = (capabilities && capabilities.showHighFloor) ? '' : 'none';
+  });
+
+  // Wizard neu rendern, da sich die verfügbaren Schritte geändert haben können
+  if (typeof applyWizardView === 'function') applyWizardView();
 }
 
 function detectNetworkFromRbl(rbl) {
@@ -2281,6 +3031,9 @@ function detectNetworkFromRbl(rbl) {
 
 // ==================== PRECONFIG VON CITIES.HTML ====================
 function applyPreConfig(preConfig) {
+  // pendingFilter setzen damit hasUBahnLine() funktioniert wenn updateFeatureVisibility aufgerufen wird
+  if (preConfig.filter) pendingFilter = preConfig.filter;
+
   if (preConfig.capabilities) updateFeatureVisibility(preConfig.capabilities);
   else {
     var network = detectNetworkFromRbl(preConfig.rbl);
@@ -2320,6 +3073,11 @@ function applyPreConfig(preConfig) {
 
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('[INIT] DOMContentLoaded fired');
+  console.log('[INIT] straba_pending_config:', localStorage.getItem('straba_pending_config'));
+  console.log('[INIT] straba_pending_rbl:', localStorage.getItem('straba_pending_rbl'));
+  console.log('[INIT] straba_pending_fresh:', localStorage.getItem('straba_pending_fresh'));
+  console.log('[INIT] window.parent === window:', window.parent === window);
   updateUI();
 
   var pendingConfigStr = localStorage.getItem('straba_pending_config');
@@ -2352,7 +3110,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   } else {
     var localPendingRbl = localStorage.getItem('straba_pending_rbl');
+    console.log('[INIT] pendingRbl from localStorage:', localPendingRbl);
+    console.log('[INIT] all localStorage keys:', Object.keys(localStorage));
     if (localPendingRbl) {
+      console.log('[INIT] Pending-Pfad aktiv!');
       pendingRbl = localPendingRbl;
       pendingFilter = localStorage.getItem('straba_pending_filter') || '';
 
@@ -2409,11 +3170,16 @@ document.addEventListener('DOMContentLoaded', function() {
       updateRowOrderList();
 
       configLoaded = true;
-      settingsLoaded = true;
+      // WICHTIG: settingsLoaded NICHT setzen — Settings vom Device sollen weiterhin geladen werden
+      // (sonst gehen chopper/silberpfeil/nightMode/gehweg-Werte verloren!)
+      pendingPathActive = true;
+      console.log('[INIT] Pending-Pfad: Stationen aus localStorage, Settings werden vom Device nachgeladen');
       var cle2 = document.getElementById('configLoading');
-      if (cle2) cle2.classList.remove('show');
+      if (cle2) { cle2.classList.remove('show'); console.log('[INIT] Loading overlay removed'); }
+      else console.error('[INIT] configLoading element NOT FOUND!');
       updateUI();
     } else {
+      console.log('[INIT] Kein pendingRbl, kein pendingConfig → warte auf ESP Parent');
       updateFeatureVisibility(CITY_CAPABILITIES.WL);
     }
   }
@@ -2444,10 +3210,19 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (!settingsLoaded) {
+    console.log('[INIT] settingsLoaded=false → requesting config from parent in 100ms');
     setTimeout(requestConfigFromParent, 100);
+  } else {
+    console.log('[INIT] settingsLoaded=true → skipping parent request');
   }
 
   updateRowOrderList();
+
+  // Wizard-Modus initialisieren — als Fallback wenn applyConfig nicht läuft
+  // (zB bei preConfig-Pfad mit settingsLoaded=true vor dem Device-Reply)
+  if (typeof initWizardMode === 'function') initWizardMode();
+
+  console.log('[INIT] DOMContentLoaded handler complete. settingsLoaded=' + settingsLoaded + ' configLoaded=' + configLoaded);
 });
 </script>
 </body>
