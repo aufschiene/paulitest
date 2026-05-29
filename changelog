@@ -1,14 +1,25 @@
 {
   "changelog": [
-{
-  "version": "1.7.5",
-  "date": "08.04.2026",
-  "title": "Gehweg-Fix",
-  "changes": [
-    "Fix: Gehweg-Filter wirkt nun pro Haltestelle individuell",
-    "Fix: Nachtmodus wird bei Neukonfiguration nicht mehr zurückgesetzt"
-  ]
-}
+    {
+      "version": "2.0",
+      "date": "29.05.2026",
+      "title": "Willkommen im catch.it Universum",
+      "changes": [
+        "Aus deinem Straba wird catch.it, das größte Update seiner Geschichte",
+        "Neu: Ganz Europa, von Wien auf über 20 Städte und ständig mehr",
+        "Neu: Alle S-Bahnen, vom Wiener Stammstrecken-Takt über Regionalzug und Railjet bis hin zur Westbahn",
+        "Verbesserte Stabilität und schnellere Updates"
+      ]
+    },
+    {
+      "version": "1.7.5",
+      "date": "08.04.2026",
+      "title": "Gehweg-Fix",
+      "changes": [
+        "Fix: Gehweg-Filter wirkt nun pro Haltestelle individuell",
+        "Fix: Nachtmodus wird bei Neukonfiguration nicht mehr zurückgesetzt"
+      ]
+    },
     {
       "version": "1.6.3",
       "date": "04.03.2026",
@@ -60,4 +71,3 @@
     }
   ]
 }
-
