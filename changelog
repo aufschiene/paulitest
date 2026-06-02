@@ -1,6 +1,19 @@
 {
   "changelog": [
     {
+      "version": "2.1",
+      "date": "02.06.2026",
+      "title": "Neue Anzeigen: Matrix & Paperwhite",
+      "changes": [
+        "Neu: Unterstützung für Matrix-Anzeigen",
+        "Neu: Unterstützung für Paperwhite-Anzeigen",
+        "Fix: Gehweg-Filter korrigiert",
+        "Fix: Sortierung der Abfahrten korrigiert"
+      ]
+    },
+{
+  "changelog": [
+    {
       "version": "2.0",
       "date": "29.05.2026",
       "title": "Willkommen im catch.it Universum",
